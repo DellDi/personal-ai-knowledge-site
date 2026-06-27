@@ -3,7 +3,7 @@ import { getCollection, render } from 'astro:content';
 import Button from '../../../components/Button.astro';
 import EntryLayout from '../../../layouts/EntryLayout.astro';
 import type { PublicEntry } from '../../../lib/content';
-import type { Locale } from '../../../lib/i18n';
+import { ui, type Locale } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
   const entries = await getCollection('resources', ({ data }) => data.status === 'published');
@@ -15,9 +15,10 @@ export async function getStaticPaths() {
 
 const { entry, locale } = Astro.props as { entry: PublicEntry; locale: Locale };
 const { Content, headings } = await render(entry);
+const t = ui[locale];
 ---
 
 <EntryLayout collection="resources" entry={entry} locale={locale} headings={headings}>
-  {'url' in entry.data && entry.data.url && <p><Button href={entry.data.url}>Open resource</Button></p>}
+  {'url' in entry.data && entry.data.url && <p><Button href={entry.data.url}>{t.openResource}</Button></p>}
   <Content />
 </EntryLayout>

@@ -49,6 +49,74 @@ export const collectionNames: Record<Locale, Record<PublicCollection, string>> =
   },
 };
 
+export const knowledgeAreaLabels: Record<Locale, Record<string, string>> = {
+  'zh-CN': {
+    'ai-agent': 'AI Agent 实践',
+    architecture: '工程架构',
+    'data-engineering': '数据工程',
+    frontend: '前端工程',
+    product: '产品方法',
+    operations: '运营管理',
+    management: '团队管理',
+    tools: '工具体系',
+  },
+  en: {
+    'ai-agent': 'AI Agents',
+    architecture: 'Architecture',
+    'data-engineering': 'Data Engineering',
+    frontend: 'Frontend',
+    product: 'Product',
+    operations: 'Operations',
+    management: 'Management',
+    tools: 'Tools',
+  },
+};
+
+export const knowledgeLevelLabels: Record<Locale, Record<string, string>> = {
+  'zh-CN': {
+    basic: '基础',
+    intermediate: '进阶',
+    advanced: '深入',
+  },
+  en: {
+    basic: 'Basic',
+    intermediate: 'Intermediate',
+    advanced: 'Advanced',
+  },
+};
+
+export const resourceTypeLabels: Record<Locale, Record<string, string>> = {
+  'zh-CN': {
+    tool: '工具',
+    book: '书籍',
+    article: '文章',
+    video: '视频',
+    repo: '代码仓库',
+    course: '课程',
+  },
+  en: {
+    tool: 'Tool',
+    book: 'Book',
+    article: 'Article',
+    video: 'Video',
+    repo: 'Repository',
+    course: 'Course',
+  },
+};
+
+export const timelineKindLabels: Record<Locale, Record<string, string>> = {
+  'zh-CN': {
+    milestone: '里程碑',
+    release: '发布',
+    learning: '学习记录',
+  },
+  en: {
+    milestone: 'Milestone',
+    release: 'Release',
+    learning: 'Learning',
+  },
+};
+
 export function isPublished(entry: PublicEntry) {
   return entry.data.status === 'published';
 }

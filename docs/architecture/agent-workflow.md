@@ -1,23 +1,30 @@
-# Agent Workflow
+# Agent 工作流
 
-## Rules
+## 规则
 
-- Read `AGENTS.md` before coding.
-- Read the project Skill for platform changes.
-- Prefer official Astro docs for framework behavior.
-- Update architecture docs when schema, routing, deployment, or UI rules change.
-- Update Agile Markdown when task scope changes.
+- 编码前读取 `AGENTS.md`。
+- 平台相关修改读取项目 Skill。
+- Astro 行为优先参考官方文档。
+- 修改 schema、路由、部署、UI 规则或中文文案策略时，同步更新架构文档。
+- 修改任务范围时，同步更新 Agile Markdown。
 
-## Verification
+## 个人站点定位要求
 
-Run:
+- 默认中文输出。
+- 页面文案服务个人展示、知识沉淀、技能储备和项目复盘。
+- 技术英文可以保留，但不能让页面看起来像英文模板站或泛泛的开发者社区站。
+- README、AGENTS、Skill 和项目文档也应保持中文优先。
+
+## 验证
+
+运行：
 
 ```bash
 pnpm -C apps/web check
 pnpm -C apps/web build
 ```
 
-For deployment changes, also run:
+涉及部署时，还要运行：
 
 ```bash
 docker compose up --build

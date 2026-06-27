@@ -15,8 +15,8 @@ const t = ui[locale];
 <header class="site-header">
   <div class="container header-inner">
     <a class="brand focus-ring" href={getLocalePath(locale)} aria-label={t.siteName}>
-      <span>AI</span>
-      <strong>Knowledge</strong>
+      <span>{t.brandPrimary}</span>
+      <strong>{t.brandSecondary}</strong>
     </a>
     <nav class="nav" aria-label="Primary">
       {t.nav.map((item) => (

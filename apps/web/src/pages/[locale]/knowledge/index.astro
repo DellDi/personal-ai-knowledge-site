@@ -4,7 +4,7 @@ import Card from '../../../components/Card.astro';
 import SectionHeader from '../../../components/SectionHeader.astro';
 import Tag from '../../../components/Tag.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { formatDate, getEntryPath, getPublishedEntries } from '../../../lib/content';
+import { formatDate, getEntryPath, getPublishedEntries, knowledgeAreaLabels, knowledgeLevelLabels } from '../../../lib/content';
 import { locales, ui, type Locale } from '../../../lib/i18n';
 
 export function getStaticPaths() {
@@ -17,21 +17,21 @@ const areas = [...new Set(entries.map((entry) => entry.data.area))];
 const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title={t.nav[3].label} description="Long-lived documentation, playbooks, and methods." canonicalPath={`/${locale}/knowledge`}>
+<BaseLayout locale={locale} title={t.nav[3].label} description={t.knowledgeDescription} canonicalPath={`/${locale}/knowledge`}>
   <section class="container knowledge-shell">
     <aside class="knowledge-nav">
       <p>{t.nav[3].label}</p>
-      {areas.length > 0 ? areas.map((area) => <a href={`#${area}`}>{area}</a>) : <span>{t.empty}</span>}
+      {areas.length > 0 ? areas.map((area) => <a href={`#${area}`}>{knowledgeAreaLabels[locale][area]}</a>) : <span>{t.empty}</span>}
     </aside>
     <div>
-      <SectionHeader title={t.nav[3].label} description="Stable documents, troubleshooting notes, methods, and architecture references." />
+      <SectionHeader title={t.nav[3].label} description={t.knowledgeDescription} />
       <div class="stack">
         {entries.length > 0 ? entries.map((entry) => (
           <Card href={getEntryPath('knowledge', entry)}>
             <article class="knowledge-card" id={entry.data.area}>
               <div>
-                <Badge tone="blue">{entry.data.area}</Badge>
-                <Badge>{entry.data.level}</Badge>
+                <Badge tone="blue">{knowledgeAreaLabels[locale][entry.data.area]}</Badge>
+                <Badge>{knowledgeLevelLabels[locale][entry.data.level]}</Badge>
               </div>
               <h3>{entry.data.title}</h3>
               <p>{entry.data.description}</p>

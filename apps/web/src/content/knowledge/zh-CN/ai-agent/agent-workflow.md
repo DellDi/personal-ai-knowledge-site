@@ -1,12 +1,12 @@
 ---
 title: "Agent 开发工作流"
-description: "用 AGENTS.md、项目 Skill 和 Agile Markdown 约束 AI coding agent 的协作边界。"
+description: "用 AGENTS.md、项目 Skill 和 Markdown 项目管理约束 AI 编程助手的协作边界。"
 lang: "zh-CN"
 translationKey: "knowledge-agent-workflow"
 slug: "ai-agent/agent-workflow"
 date: 2026-06-27
 updated: 2026-06-27
-tags: ["ai-agent", "workflow", "agile-md"]
+tags: ["AI Agent", "开发规范", "项目管理"]
 status: "published"
 featured: true
 area: "ai-agent"

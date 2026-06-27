@@ -5,11 +5,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { defaultLocale, getLocalePath } from '../lib/i18n';
 ---
 
-<BaseLayout locale={defaultLocale} title="Language" description="Choose a language for the content platform." canonicalPath="/">
+<BaseLayout locale={defaultLocale} title="选择语言" description="进入 AI 知识实践站中文主站或英文预留入口。" canonicalPath="/">
   <section class="language-entry container">
     <Card>
-      <p>Personal AI Knowledge Site</p>
-      <h1>Choose language</h1>
+      <p>个人品牌与知识资产</p>
+      <h1>AI 知识实践站</h1>
       <div class="actions">
         <Button href={getLocalePath('zh-CN')} variant="primary">中文</Button>
         <Button href={getLocalePath('en')} variant="quiet">English</Button>

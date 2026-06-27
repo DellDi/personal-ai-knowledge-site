@@ -9,8 +9,8 @@ export async function GET(context: APIContext) {
   const entries = [...zh, ...en];
 
   return rss({
-    title: 'Personal AI Knowledge Site Podcast',
-    description: 'Podcast episodes from the content platform.',
+    title: 'AI 知识实践站播客',
+    description: '围绕我的 AI 实践、工程经验、项目复盘和知识管理的播客节目。',
     site,
     items: entries.map((entry) => ({
       title: entry.data.title,

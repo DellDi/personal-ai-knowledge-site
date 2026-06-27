@@ -60,7 +60,7 @@ const t = ui[locale];
     const hydrated = await Promise.all(search.results.slice(0, 8).map((result: any) => result.data()));
     const filtered = hydrated.filter((item: any) => item.url.startsWith(`/${locale}/`));
     status.hidden = filtered.length > 0;
-    status.textContent = filtered.length === 0 ? 'No results.' : '';
+    status.textContent = filtered.length === 0 ? (locale === 'zh-CN' ? '没有找到匹配内容。' : 'No results found.') : '';
     results.innerHTML = filtered
       .map((item: any) => `<a class="result-card" href="${item.url}"><strong>${item.meta.title}</strong><span>${item.excerpt}</span></a>`)
       .join('');

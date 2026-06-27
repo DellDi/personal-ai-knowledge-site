@@ -15,9 +15,9 @@ const entries = await getPublishedEntries('glossary', locale);
 const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title={t.nav[7].label} description="Terms and concept definitions." canonicalPath={`/${locale}/glossary`}>
+<BaseLayout locale={locale} title={t.nav[7].label} description={t.glossaryDescription} canonicalPath={`/${locale}/glossary`}>
   <section class="container page-section">
-    <SectionHeader title={t.nav[7].label} description="A small but growing vocabulary for agents, data, architecture, and product systems." />
+    <SectionHeader title={t.nav[7].label} description={t.glossaryDescription} />
     <div class="grid">
       {entries.length > 0 ? entries.map((entry) => <GlossaryItem entry={entry} />) : <Card>{t.empty}</Card>}
     </div>

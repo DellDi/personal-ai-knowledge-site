@@ -1,16 +1,20 @@
-# ADR-001: Use Astro As The Platform Base
+# ADR-001：使用 Astro 作为平台底座
 
-## Status
+## 状态
 
-Accepted.
+已接受。
 
-## Decision
+## 决策
 
-Use Astro for the public content platform because the site is content-driven, static-first, and needs limited client-side JavaScript.
+使用 Astro 构建公开内容平台。项目以中文内容发布和知识组织为主，适合静态优先、局部交互、少客户端 JavaScript 的技术路线。
 
-## Implementation
+## 实现方式
 
-- `apps/web` contains the public site.
-- Content Collections define the content schema.
-- React islands are reserved for interactive controls.
-- Docker production deployment serves static output through Nginx.
+- `apps/web` 是公开主站。
+- Content Collections 定义内容结构。
+- React islands 只用于主题切换、搜索等交互控件。
+- Docker 生产部署通过 Nginx 服务静态产物。
+
+## 文案要求
+
+页面可见内容默认中文优先。技术名词可以保留英文原名，但解释、按钮、栏目说明和空状态应围绕个人品牌、知识资产和技能储备表达。

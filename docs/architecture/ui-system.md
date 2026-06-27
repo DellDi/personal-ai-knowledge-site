@@ -1,26 +1,35 @@
-# UI System
+# UI 系统
 
-## Direction
+## 方向
 
-Editorial Brutalism: strong typography, hard borders, visible grid logic, high contrast, and controlled accent colors.
+编辑式野兽派：强排版、硬边框、清晰网格、高对比和有限的高饱和点缀。
 
-## Tokens
+这个风格服务个人品牌展示和中文内容阅读，不做纯英文作品集或国外模板站的表达方式。
 
-Tokens live in `apps/web/src/styles/global.css`.
+## Token
 
-Core decisions:
+Token 位于 `apps/web/src/styles/global.css`。
 
-- Background: warm editorial paper in light mode, deep neutral in dark mode
-- Border: 2px hard border
-- Shadow: hard offset shadow
-- Radius: 4px
-- Fonts: Newsreader, Public Sans, Space Mono
+核心决策：
 
-## Rules
+- 背景：亮色为温暖纸面，黑夜为深色中性背景
+- 边框：2px 硬边框
+- 阴影：硬偏移阴影
+- 圆角：4px
+- 字体：Newsreader、Public Sans、Space Mono
 
-- Use Astro components for static UI.
-- Use React only for interactive islands.
-- No nested UI cards.
-- Keep body text readable before visual impact.
-- Check 320px, 768px, 1024px, and 1440px widths.
-- Respect `prefers-reduced-motion`.
+## 文案与排版规则
+
+- 中文页面标题、按钮、栏目说明和空状态优先服务个人展示、知识沉淀和技能储备。
+- 技术英文作为名词保留，不作为主叙事语言。
+- 不把内部工程描述直接展示给普通访问者。
+- 正文阅读体验优先于视觉冲击。
+- 黑夜模式必须保证正文、代码块、卡片、导航和标签可读。
+
+## 实现规则
+
+- 静态 UI 使用 Astro 组件。
+- React 只用于交互岛。
+- 不做卡片套卡片。
+- 检查 320px、768px、1024px、1440px。
+- 尊重 `prefers-reduced-motion`。

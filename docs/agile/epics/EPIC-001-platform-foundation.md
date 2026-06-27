@@ -1,17 +1,17 @@
-# EPIC-001: Platform Foundation
+# EPIC-001：平台骨架
 
-## Goal
+## 目标
 
-Create a static-first Astro platform foundation that supports bilingual content, dark mode, content collections, RSS, search, Docker deployment, and future admin workflows.
+建立一个中文优先、静态优先的 Astro 内容平台底座，支持内容集合、多语言预留、黑夜模式、RSS、搜索、Docker 部署和后台管理预留。
 
-## Stories
+## 任务故事
 
-- STORY-001 bootstrap project
-- STORY-002 content model
-- STORY-003 i18n routing
-- STORY-004 design system and dark mode
-- STORY-005 public routes
-- STORY-006 RSS search sitemap
-- STORY-007 Docker deployment
-- STORY-008 agent and agile workflow
-- STORY-009 admin reservation
+- STORY-001 初始化工程
+- STORY-002 建立内容模型
+- STORY-003 建立多语言路由
+- STORY-004 建立设计系统和黑夜模式
+- STORY-005 建立公开页面
+- STORY-006 建立 RSS、搜索和 Sitemap
+- STORY-007 建立 Docker 部署
+- STORY-008 建立 Agent 与 Markdown 项目管理规范
+- STORY-009 预留后台管理入口

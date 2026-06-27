@@ -1,19 +1,19 @@
-# DECISION-001: Use Astro
+# DECISION-001：使用 Astro
 
-## Status
+## 状态
 
-Accepted.
+已接受。
 
-## Context
+## 背景
 
-The platform is content-driven, static-first, and only needs selective interactivity.
+这个站点以中文内容发布和知识组织为主，需要静态优先、少客户端 JavaScript、局部交互和长期可维护的内容模型。
 
-## Decision
+## 决策
 
-Use Astro as the web foundation, with React islands for interactive controls and Content Collections for structured content.
+使用 Astro 作为 Web 底座，React 只用于交互岛，Content Collections 负责结构化内容。
 
-## Consequences
+## 影响
 
-- Static deployment remains simple.
-- Content schema validation happens at build time.
-- Future CMS or AI export can be added without replacing the public rendering layer.
+- 静态部署保持简单。
+- 内容结构在构建期校验。
+- 后续接入 CMS 或 AI 检索导出时，不需要替换公开渲染层。

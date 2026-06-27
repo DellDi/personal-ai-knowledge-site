@@ -1,19 +1,19 @@
-# Product Vision
+# 产品愿景
 
-Personal AI Knowledge Site is a bilingual Astro content platform for personal brand, podcast publishing, long-form posts, knowledge base documents, topic hubs, project cases, resources, glossary, search, RSS, and future AI retrieval.
+AI 知识实践站是一个以站点所有者本人为中心的 Astro 个人内容站，用于呈现个人品牌、沉淀知识体系、整理技能储备、记录项目实践，并为后续 AI 检索能力预留结构化内容基础。
 
-The product is not a simple blog. It is a public content layer, knowledge organization layer, and future AI retrieval foundation.
+这个项目不是普通博客，而是个人展示层、知识组织层、技能资产层和未来 AI 检索层的统一底座。
 
-## Audience
+## 核心服务对象
 
-- Engineers and builders interested in AI agents, data, architecture, product, and operations.
-- Future collaborators who need clear project conventions.
-- The site owner, who needs a maintainable publishing system.
+- 首先服务站点所有者本人：展示经历、能力、项目、知识和持续成长。
+- 其次服务外部访问者：快速理解站点所有者是谁、擅长什么、做过什么、在积累什么。
+- 同时服务未来协作者和 AI 编程助手：让后续内容扩展有清晰结构和约束。
 
-## Principles
+## 产品原则
 
-- Static-first by default.
-- Content Collections as the source of truth.
-- Bilingual URLs from day one.
-- Dark mode as a first-class reading experience.
-- Admin, CMS, comments, and AI RAG are planned extension points, not V1 dependencies.
+- 中文表达优先，但目标不是泛泛面向某类用户，而是呈现站点所有者本人。
+- 静态优先，保持部署简单。
+- 内容集合是结构化内容的唯一来源。
+- 黑夜模式是一等阅读体验。
+- 后台管理、CMS、评论和 AI 检索是扩展位，不是首版依赖。

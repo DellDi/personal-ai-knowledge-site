@@ -7,7 +7,7 @@ import ProjectCard from '../../components/ProjectCard.astro';
 import SectionHeader from '../../components/SectionHeader.astro';
 import TopicCard from '../../components/TopicCard.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { getPublishedEntries } from '../../lib/content';
+import { getPublishedEntries, knowledgeAreaLabels } from '../../lib/content';
 import { getLocalePath, locales, ui, type Locale } from '../../lib/i18n';
 
 export function getStaticPaths() {
@@ -31,8 +31,8 @@ const featuredTopic = topics[0];
       <h1>{t.homeTitle}</h1>
       <p>{t.homeIntro}</p>
       <div class="hero-actions">
-        <Button href={getLocalePath(locale, '/knowledge')}>Knowledge Base</Button>
-        <Button href={getLocalePath(locale, '/search')} variant="quiet">Search</Button>
+        <Button href={getLocalePath(locale, '/knowledge')}>{t.knowledgeCta}</Button>
+        <Button href={getLocalePath(locale, '/search')} variant="quiet">{t.searchCta}</Button>
       </div>
     </div>
     <Card class="hero-aside">
@@ -55,11 +55,11 @@ const featuredTopic = topics[0];
   </section>
 
   <section class="container section">
-    <SectionHeader title={t.knowledgeAreas} description="AI Agent / Architecture / Data Engineering / Frontend / Product / Operations" />
+    <SectionHeader title={t.knowledgeAreas} description={t.knowledgeAreasDescription} />
     <div class="area-grid">
       {['ai-agent', 'architecture', 'data-engineering', 'frontend', 'product', 'operations'].map((area) => (
         <Card href={getLocalePath(locale, '/knowledge')}>
-          <span>{area}</span>
+          <span>{knowledgeAreaLabels[locale][area]}</span>
           <strong>{knowledge.filter((item) => item.data.area === area).length}</strong>
         </Card>
       ))}
@@ -74,7 +74,7 @@ const featuredTopic = topics[0];
       </div>
     </div>
     <div>
-      <SectionHeader title="Projects" />
+      <SectionHeader title={t.projectsTitle} />
       <div class="stack">
         {projects.length > 0 ? projects.slice(0, 2).map((entry) => <ProjectCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
       </div>

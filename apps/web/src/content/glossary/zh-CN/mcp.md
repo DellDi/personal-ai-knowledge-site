@@ -6,7 +6,7 @@ translationKey: "glossary-mcp"
 slug: "mcp"
 date: 2026-06-27
 updated: 2026-06-27
-tags: ["ai-agent", "protocol", "tools"]
+tags: ["AI Agent", "协议", "工具体系"]
 status: "published"
 featured: true
 aliases: ["Model Context Protocol", "模型上下文协议"]

@@ -10,7 +10,7 @@ interface Props {
   title?: string;
 }
 
-const { headings, title = 'On this page' } = Astro.props;
+const { headings, title = '本页目录' } = Astro.props;
 const items = headings.filter((heading) => heading.depth > 1 && heading.depth < 4);
 ---
 

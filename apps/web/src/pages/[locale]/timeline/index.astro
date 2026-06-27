@@ -3,8 +3,8 @@ import Badge from '../../../components/Badge.astro';
 import Card from '../../../components/Card.astro';
 import SectionHeader from '../../../components/SectionHeader.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { formatDate, getPublishedEntries } from '../../../lib/content';
-import { locales, type Locale } from '../../../lib/i18n';
+import { formatDate, getPublishedEntries, timelineKindLabels } from '../../../lib/content';
+import { locales, ui, type Locale } from '../../../lib/i18n';
 
 export function getStaticPaths() {
   return locales.map((locale) => ({ params: { locale }, props: { locale } }));
@@ -12,16 +12,17 @@ export function getStaticPaths() {
 
 const { locale } = Astro.props as { locale: Locale };
 const entries = await getPublishedEntries('timeline', locale);
+const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title="Timeline" description="Project and content evolution timeline." canonicalPath={`/${locale}/timeline`}>
+<BaseLayout locale={locale} title={t.timelineTitle} description={t.timelineDescription} canonicalPath={`/${locale}/timeline`}>
   <section class="container page-section">
-    <SectionHeader title="Timeline" description="A dated trail for content, product, and platform evolution." />
+    <SectionHeader title={t.timelineTitle} description={t.timelineDescription} />
     <div class="stack">
       {entries.map((entry) => (
         <Card>
           <article>
-            <Badge tone="accent">{entry.data.kind}</Badge>
+            <Badge tone="accent">{timelineKindLabels[locale][entry.data.kind]}</Badge>
             <h3>{entry.data.title}</h3>
             <p>{entry.data.description}</p>
             <span>{formatDate(entry.data.date, locale)}</span>

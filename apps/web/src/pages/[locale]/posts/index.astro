@@ -15,9 +15,9 @@ const entries = await getPublishedEntries('posts', locale);
 const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title={t.nav[2].label} description="Technical essays, product notes, and engineering retrospectives." canonicalPath={`/${locale}/posts`}>
+<BaseLayout locale={locale} title={t.nav[2].label} description={t.postsDescription} canonicalPath={`/${locale}/posts`}>
   <section class="container page-section">
-    <SectionHeader title={t.nav[2].label} description="Long-form notes for architecture, AI agents, product systems, and practical engineering." />
+    <SectionHeader title={t.nav[2].label} description={t.postsDescription} />
     <div class="grid">
       {entries.length > 0 ? entries.map((entry) => <ArticleCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
     </div>

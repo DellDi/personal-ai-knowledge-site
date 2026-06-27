@@ -15,9 +15,9 @@ const entries = await getPublishedEntries('resources', locale);
 const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title={t.nav[6].label} description="Tools, books, links, and references." canonicalPath={`/${locale}/resources`}>
+<BaseLayout locale={locale} title={t.nav[6].label} description={t.resourcesDescription} canonicalPath={`/${locale}/resources`}>
   <section class="container page-section">
-    <SectionHeader title={t.nav[6].label} description="Useful tools, links, books, repos, and courses grouped by long-term value." />
+    <SectionHeader title={t.nav[6].label} description={t.resourcesDescription} />
     <div class="grid">
       {entries.length > 0 ? entries.map((entry) => <ResourceCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
     </div>

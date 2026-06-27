@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import Card from './Card.astro';
 import Tag from './Tag.astro';
 import { getEntryPath } from '../lib/content';
-import { type Locale } from '../lib/i18n';
+import { ui, type Locale } from '../lib/i18n';
 
 interface Props {
   entry: CollectionEntry<'topics'>;
@@ -11,11 +11,12 @@ interface Props {
 }
 
 const { entry, locale } = Astro.props;
+const t = ui[locale];
 ---
 
 <Card href={getEntryPath('topics', entry)}>
   <article class="topic-card">
-    <p>{entry.data.items.length} linked items</p>
+    <p>{locale === 'zh-CN' ? `${entry.data.items.length} 个${t.topicLinkedItems}` : `${entry.data.items.length} ${t.topicLinkedItems}`}</p>
     <h3>{entry.data.title}</h3>
     <span>{entry.data.description}</span>
     <div>

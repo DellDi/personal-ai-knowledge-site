@@ -1,15 +1,15 @@
 ---
-title: "Personal AI Knowledge Site"
-description: "一个面向个人品牌、知识沉淀和 AI 检索扩展的 Astro 内容平台。"
+title: "AI 知识实践站"
+description: "一个用于呈现个人品牌、项目实践、知识沉淀和技能储备的 Astro 内容站。"
 lang: "zh-CN"
 translationKey: "project-personal-ai-knowledge-site"
 slug: "personal-ai-knowledge-site"
 date: 2026-06-27
 updated: 2026-06-27
-tags: ["astro", "knowledge-base", "ai-agent"]
+tags: ["Astro", "知识库", "AI Agent"]
 status: "published"
 featured: true
-role: "Founder / Engineer"
+role: "产品与工程实践"
 stack: ["Astro", "React", "Tailwind CSS", "Pagefind", "Docker"]
 links:
   - label: "GitHub"
@@ -18,8 +18,8 @@ links:
 
 ## 项目背景
 
-项目目标是把个人品牌、博客、播客、知识库、专题和项目案例组织成统一内容平台，并为后续 CMS、评论、订阅和 AI RAG 保留接口。
+项目目标是把我的个人品牌、博客、播客、知识库、专题和项目案例组织成统一内容站，并为后续内容管理、评论、订阅和 AI 检索保留接口。
 
 ## 第一阶段
 
-第一阶段重点是平台底座：静态部署、多语言、黑夜模式、内容 schema、SEO/RSS/Search 基础和 Agent 开发规范。
+第一阶段重点是个人内容建站底座：静态部署、中文表达与多语言预留、黑夜模式、内容结构、SEO/RSS/搜索基础和 Agent 开发规范。

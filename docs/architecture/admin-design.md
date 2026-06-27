@@ -1,32 +1,32 @@
-# Admin Design Reservation
+# 后台管理预留设计
 
-## V1 Boundary
+## 首版边界
 
-`/admin` is a static noindex shell. It does not provide:
+`/admin` 是静态 noindex 壳页面。首版不提供：
 
-- authentication
-- content writes
-- workflow state
-- CMS adapter
-- database connection
+- 登录鉴权
+- 内容写入
+- 审核流状态
+- CMS 适配器
+- 数据库连接
 
-## Future Information Architecture
+## 后续信息架构
 
-- Dashboard
-- Content calendar
-- Collection editor
-- Review queue
-- Media library
-- Search index status
-- Publishing checklist
-- Settings
+- 运营首页
+- 内容日历
+- 集合编辑器
+- 审核队列
+- 媒体库
+- 搜索索引状态
+- 发布检查清单
+- 系统设置
 
-## Future Decision
+## 第二轮决策
 
-Round 2 must decide between:
+第二轮需要决定后台方案：
 
-- independent `apps/admin`
-- external CMS
+- 独立 `apps/admin`
+- 外部 CMS
 - Git-based CMS
 
-The decision must include auth, draft/review/publish workflow, rollback, content schema compatibility, and deployment implications.
+决策必须覆盖鉴权、草稿/审核/发布流程、回滚、内容 schema 兼容和部署影响。

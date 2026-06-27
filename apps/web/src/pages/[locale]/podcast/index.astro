@@ -15,9 +15,9 @@ const entries = await getPublishedEntries('podcast', locale);
 const t = ui[locale];
 ---
 
-<BaseLayout locale={locale} title={t.nav[1].label} description="Podcast episodes and transcripts." canonicalPath={`/${locale}/podcast`}>
+<BaseLayout locale={locale} title={t.nav[1].label} description={t.podcastDescription} canonicalPath={`/${locale}/podcast`}>
   <section class="container page-section">
-    <SectionHeader title={t.nav[1].label} description="Episodes, audio, transcripts, timelines, and referenced resources." />
+    <SectionHeader title={t.nav[1].label} description={t.podcastDescription} />
     <div class="grid">
       {entries.length > 0 ? entries.map((entry) => <PodcastCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
     </div>

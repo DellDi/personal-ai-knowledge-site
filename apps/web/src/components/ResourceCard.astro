@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Card from './Card.astro';
 import Tag from './Tag.astro';
-import { getEntryPath } from '../lib/content';
+import { getEntryPath, resourceTypeLabels } from '../lib/content';
 import { type Locale } from '../lib/i18n';
 
 interface Props {
@@ -15,7 +15,7 @@ const { entry, locale } = Astro.props;
 
 <Card href={entry.data.url ?? getEntryPath('resources', entry)}>
   <article class="resource-card">
-    <p>{entry.data.type}</p>
+    <p>{resourceTypeLabels[locale][entry.data.type]}</p>
     <h3>{entry.data.title}</h3>
     <span>{entry.data.description}</span>
     <div>

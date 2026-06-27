@@ -1,12 +1,12 @@
 ---
-title: "Astro Content Platform"
-description: "把 Astro、Content Collections、RSS、搜索、多语言和 Agent 规范串成一个长期专题。"
+title: "个人 AI 知识站建设"
+description: "把 Astro、内容集合、RSS、搜索、多语言预留和 Agent 规范串成一个长期个人建站专题。"
 lang: "zh-CN"
 translationKey: "topic-astro-content-platform"
 slug: "astro-content-platform"
 date: 2026-06-27
 updated: 2026-06-27
-tags: ["astro", "content-platform", "seo"]
+tags: ["Astro", "内容平台", "SEO"]
 status: "published"
 featured: true
 items:
@@ -18,7 +18,7 @@ hero: "/images/topic-astro-content-platform.png"
 
 ## 专题说明
 
-这个专题记录从空仓库到内容平台的演进过程，覆盖信息架构、内容模型、UI 设计系统、部署、Agent 工作流和后续 AI 检索。
+这个专题记录从空仓库到个人内容站的演进过程，覆盖信息架构、内容模型、UI 设计系统、部署、Agent 工作流和后续 AI 检索。
 
 ## 当前阶段
 

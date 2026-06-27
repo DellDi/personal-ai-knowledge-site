@@ -1,13 +1,13 @@
-# Deployment
+# 部署
 
-## Local
+## 本地开发
 
 ```bash
 pnpm install
 pnpm -C apps/web dev
 ```
 
-## Static Build
+## 静态构建
 
 ```bash
 pnpm -C apps/web build
@@ -20,8 +20,8 @@ pnpm -C apps/web preview
 docker compose up --build
 ```
 
-The Docker image builds Astro static output and serves `apps/web/dist` through Nginx on `http://localhost:8080`.
+Docker 镜像会构建 Astro 静态产物，并通过 Nginx 在 `http://localhost:8080` 服务 `apps/web/dist`。
 
-## Health Check
+## 健康检查
 
-Nginx exposes `/healthz`.
+Nginx 暴露 `/healthz`。

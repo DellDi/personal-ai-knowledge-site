@@ -1,22 +1,22 @@
-# Personal AI Knowledge Site
+# AI 知识实践站
 
-Astro-based bilingual content platform for personal brand, podcast publishing, blog posts, knowledge base documents, topic hubs, project cases, resources, glossary, search, RSS, sitemap, dark mode, Docker deployment, and future admin/CMS/AI retrieval workflows.
+这是一个以站点所有者本人为中心的 Astro 个人内容站，服务个人品牌展示、知识沉淀、技能储备、项目复盘和长期成长记录。第一阶段覆盖播客、文章、知识库、专题、项目案例、资源库、术语库、搜索、RSS、站点地图、黑夜模式、Docker 部署，以及后续后台管理、CMS、评论和 AI 检索扩展。
 
-## Status
+## 当前状态
 
-Round 1 platform foundation is implemented:
+第一版平台骨架已完成：
 
-- Astro app in `apps/web`
-- `zh-CN` and `en` route prefixes
-- Content Collections for podcast, posts, knowledge, topics, projects, resources, glossary, and timeline
-- Editorial Brutalism UI tokens with light/dark themes
-- Pagefind search shell
-- `/rss.xml` and `/podcast/rss.xml`
-- Docker Compose production static deployment through Nginx
-- `/admin` noindex reserved shell
-- AGENTS.md, project Skill, Agile docs, and architecture docs
+- Astro 主站位于 `apps/web`
+- 中文表达优先，路由固定为 `/zh-CN`；英文 `/en` 先作为后续国际化预留
+- 内容集合覆盖播客、文章、知识库、专题、项目、资源、术语和时间线
+- 视觉方向为中文内容友好的编辑式野兽派，支持亮色、黑夜和跟随系统
+- 生产构建后生成 Pagefind 静态搜索索引
+- 提供 `/rss.xml`、`/podcast/rss.xml` 和 Sitemap
+- 提供 Docker Compose + Nginx 静态部署配置
+- `/admin` 是后台管理预留壳页面，当前不提供登录或写入能力
+- 已建立 `AGENTS.md`、项目 Skill、Agile Markdown 和架构文档
 
-## Commands
+## 常用命令
 
 ```bash
 pnpm install
@@ -26,31 +26,35 @@ pnpm -C apps/web build
 pnpm -C apps/web preview
 ```
 
-## Docker
+## Docker 预览
 
 ```bash
 docker compose up --build
 ```
 
-Then open:
+启动后访问：
 
 - `http://localhost:8080/zh-CN/`
 - `http://localhost:8080/en/`
 - `http://localhost:8080/rss.xml`
 - `http://localhost:8080/podcast/rss.xml`
 
-## Structure
+## 目录结构
 
 ```txt
-apps/web                         Astro public site
-docs/agile                       Agile Markdown roadmap, epics, stories, sprints
-docs/architecture                Architecture and platform decisions
-.skills/astro-content-platform   Project-specific agent skill
-AGENTS.md                        Coding agent instructions
-Dockerfile                       Static production image
-docker-compose.yml               Local production deployment
-nginx/default.conf               Nginx static serving config
+apps/web                         Astro 主站
+docs/agile                       Markdown 项目管理：路线图、史诗、故事、迭代
+docs/architecture                架构文档和平台决策
+.skills/astro-content-platform   项目专用 Agent Skill
+AGENTS.md                        Agent 开发约束
+Dockerfile                       生产静态镜像
+docker-compose.yml               本地生产部署预览
+nginx/default.conf               Nginx 静态服务配置
 ```
+
+## 内容定位
+
+首版内容以个人展示和自我沉淀为主：对外呈现“我是谁、做过什么、在积累什么能力”，对内沉淀可复用的知识资产和技能储备。中文是当前主要表达语言，英文路由保留但不是当前内容主线；新增公开内容时，应优先保证中文标题、摘要、标签和页面描述完整。
 
 ## License
 

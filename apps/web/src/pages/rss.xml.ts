@@ -7,8 +7,8 @@ export async function GET(context: APIContext) {
   const entries = await getAllPublishedEntries();
 
   return rss({
-    title: 'Personal AI Knowledge Site',
-    description: 'Podcast, posts, knowledge, topics, projects, resources, and glossary updates.',
+    title: 'AI 知识实践站',
+    description: '个人品牌、项目实践、知识储备与技能沉淀的内容更新。',
     site,
     items: entries.map(({ collection, entry }) => ({
       title: entry.data.title,

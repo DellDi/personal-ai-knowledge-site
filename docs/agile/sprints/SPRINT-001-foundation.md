@@ -1,24 +1,24 @@
-# SPRINT-001: Foundation
+# SPRINT-001：平台骨架
 
-## Goal
+## 目标
 
-Deliver the first-round platform foundation.
+交付第一版中文优先的 Astro 内容平台骨架。
 
-## Tasks
+## 任务
 
-- Bootstrap Astro app
-- Add workspace and dependencies
-- Add Content Collections
-- Add bilingual routes
-- Add light/dark theme tokens
-- Add public list/detail routes
-- Add RSS, podcast RSS, sitemap, search shell
-- Add Docker Compose static deployment
-- Add admin shell and admin design docs
-- Add Agent and Agile docs
+- 初始化 Astro 主站
+- 增加 workspace 和依赖
+- 增加 Content Collections
+- 增加中文优先和英文预留路由
+- 增加亮色/黑夜主题 token
+- 增加公开列表页和详情页
+- 增加 RSS、播客 RSS、Sitemap 和搜索页
+- 增加 Docker Compose 静态部署
+- 增加后台预留页和后台设计文档
+- 增加 Agent 和 Markdown 项目管理文档
 
-## Exit Criteria
+## 退出标准
 
-- `pnpm -C apps/web check` passes
-- `pnpm -C apps/web build` passes
-- Docker image serves the static site
+- `pnpm -C apps/web check` 通过
+- `pnpm -C apps/web build` 通过
+- Docker 镜像可服务静态站点
