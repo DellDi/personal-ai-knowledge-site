@@ -1,0 +1,123 @@
+---
+import Badge from '../../../components/Badge.astro';
+import Card from '../../../components/Card.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import Tag from '../../../components/Tag.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatDate, getEntryPath, getPublishedEntries } from '../../../lib/content';
+import { locales, ui, type Locale } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const entries = await getPublishedEntries('knowledge', locale);
+const areas = [...new Set(entries.map((entry) => entry.data.area))];
+const t = ui[locale];
+---
+
+<BaseLayout locale={locale} title={t.nav[3].label} description="Long-lived documentation, playbooks, and methods." canonicalPath={`/${locale}/knowledge`}>
+  <section class="container knowledge-shell">
+    <aside class="knowledge-nav">
+      <p>{t.nav[3].label}</p>
+      {areas.length > 0 ? areas.map((area) => <a href={`#${area}`}>{area}</a>) : <span>{t.empty}</span>}
+    </aside>
+    <div>
+      <SectionHeader title={t.nav[3].label} description="Stable documents, troubleshooting notes, methods, and architecture references." />
+      <div class="stack">
+        {entries.length > 0 ? entries.map((entry) => (
+          <Card href={getEntryPath('knowledge', entry)}>
+            <article class="knowledge-card" id={entry.data.area}>
+              <div>
+                <Badge tone="blue">{entry.data.area}</Badge>
+                <Badge>{entry.data.level}</Badge>
+              </div>
+              <h3>{entry.data.title}</h3>
+              <p>{entry.data.description}</p>
+              <span>{formatDate(entry.data.updated ?? entry.data.date, locale)}</span>
+              <div class="tags">
+                {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+              </div>
+            </article>
+          </Card>
+        )) : <Card>{t.empty}</Card>}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .knowledge-shell {
+    display: grid;
+    grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
+    gap: clamp(24px, 5vw, 48px);
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .knowledge-nav {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    display: grid;
+    gap: 10px;
+    padding: 16px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .knowledge-nav p {
+    margin: 0 0 8px;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .knowledge-nav a,
+  .knowledge-nav span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .stack,
+  .knowledge-card {
+    display: grid;
+    gap: 18px;
+  }
+
+  .knowledge-card div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+    line-height: 0.96;
+  }
+
+  p,
+  span {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 900px) {
+    .knowledge-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .knowledge-nav {
+      position: static;
+    }
+  }
+</style>

@@ -1,0 +1,51 @@
+---
+import { getLocalePath, localeLabels, locales, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  alternates?: { locale: Locale; path: string }[];
+}
+
+const { locale, alternates = [] } = Astro.props;
+
+function getHref(item: Locale) {
+  return alternates.find((alternate) => alternate.locale === item)?.path ?? getLocalePath(item);
+}
+---
+
+<div class="locale-switcher" aria-label="Language">
+  {locales.map((item) => (
+    <a
+      class:list={['focus-ring', item === locale && 'is-active']}
+      href={getHref(item)}
+      aria-current={item === locale ? 'true' : undefined}
+    >
+      {localeLabels[item]}
+    </a>
+  ))}
+</div>
+
+<style>
+  .locale-switcher {
+    display: inline-flex;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  a {
+    padding: 8px 10px;
+    border-right: var(--border-width) solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  a:last-child {
+    border-right: 0;
+  }
+
+  .is-active {
+    background: var(--color-accent-3);
+    color: #111111;
+  }
+</style>

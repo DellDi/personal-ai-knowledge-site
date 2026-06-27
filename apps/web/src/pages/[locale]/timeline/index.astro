@@ -1,0 +1,62 @@
+---
+import Badge from '../../../components/Badge.astro';
+import Card from '../../../components/Card.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatDate, getPublishedEntries } from '../../../lib/content';
+import { locales, type Locale } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const entries = await getPublishedEntries('timeline', locale);
+---
+
+<BaseLayout locale={locale} title="Timeline" description="Project and content evolution timeline." canonicalPath={`/${locale}/timeline`}>
+  <section class="container page-section">
+    <SectionHeader title="Timeline" description="A dated trail for content, product, and platform evolution." />
+    <div class="stack">
+      {entries.map((entry) => (
+        <Card>
+          <article>
+            <Badge tone="accent">{entry.data.kind}</Badge>
+            <h3>{entry.data.title}</h3>
+            <p>{entry.data.description}</p>
+            <span>{formatDate(entry.data.date, locale)}</span>
+          </article>
+        </Card>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-section {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .stack,
+  article {
+    display: grid;
+    gap: 18px;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3.2rem);
+  }
+
+  p,
+  span {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  span {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+</style>

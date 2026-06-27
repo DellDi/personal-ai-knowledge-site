@@ -1,0 +1,84 @@
+---
+import { getLocalePath, ui, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = ui[locale];
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <p class="kicker">Content Platform</p>
+      <h2>{t.siteName}</h2>
+      <p>{t.siteDescription}</p>
+    </div>
+    <nav aria-label="Footer">
+      {t.nav.map((item) => <a href={getLocalePath(locale, item.href)}>{item.label}</a>)}
+      <a href="/rss.xml">RSS</a>
+      <a href="/podcast/rss.xml">Podcast RSS</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: auto;
+    border-top: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+    gap: 32px;
+    padding-block: clamp(36px, 6vw, 72px);
+  }
+
+  .kicker {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h2 {
+    max-width: 620px;
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: clamp(2.2rem, 7vw, 5.2rem);
+    line-height: 0.95;
+  }
+
+  p {
+    max-width: 620px;
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.6;
+  }
+
+  nav {
+    display: grid;
+    align-content: start;
+    gap: 9px;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    font-weight: 700;
+  }
+
+  nav a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 760px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

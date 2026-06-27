@@ -1,0 +1,54 @@
+---
+import Card from '../components/Card.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { defaultLocale, ui } from '../lib/i18n';
+
+const t = ui[defaultLocale];
+---
+
+<BaseLayout locale={defaultLocale} title={t.adminTitle} description={t.adminIntro} canonicalPath="/admin" noindex>
+  <section class="container admin-page">
+    <SectionHeader title={t.adminTitle} description={t.adminIntro} />
+    <div class="grid">
+      <Card>
+        <h2>Information Architecture</h2>
+        <p>Dashboard, content calendar, collection editor, review queue, media library, and settings.</p>
+      </Card>
+      <Card>
+        <h2>Reserved Boundary</h2>
+        <p>No auth, no writes, and no CMS adapter in V1. This page only keeps naming and design space stable.</p>
+      </Card>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .admin-page {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

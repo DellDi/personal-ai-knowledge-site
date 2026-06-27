@@ -1,0 +1,43 @@
+---
+import Card from '../../../components/Card.astro';
+import ResourceCard from '../../../components/ResourceCard.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getPublishedEntries } from '../../../lib/content';
+import { locales, ui, type Locale } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const entries = await getPublishedEntries('resources', locale);
+const t = ui[locale];
+---
+
+<BaseLayout locale={locale} title={t.nav[6].label} description="Tools, books, links, and references." canonicalPath={`/${locale}/resources`}>
+  <section class="container page-section">
+    <SectionHeader title={t.nav[6].label} description="Useful tools, links, books, repos, and courses grouped by long-term value." />
+    <div class="grid">
+      {entries.length > 0 ? entries.map((entry) => <ResourceCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-section {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

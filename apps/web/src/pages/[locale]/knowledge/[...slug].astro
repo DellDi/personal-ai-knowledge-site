@@ -1,0 +1,21 @@
+---
+import { getCollection, render } from 'astro:content';
+import EntryLayout from '../../../layouts/EntryLayout.astro';
+import type { PublicEntry } from '../../../lib/content';
+import type { Locale } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('knowledge', ({ data }) => data.status === 'published');
+  return entries.map((entry) => ({
+    params: { locale: entry.data.lang, slug: entry.data.slug },
+    props: { entry, locale: entry.data.lang },
+  }));
+}
+
+const { entry, locale } = Astro.props as { entry: PublicEntry; locale: Locale };
+const { Content, headings } = await render(entry);
+---
+
+<EntryLayout collection="knowledge" entry={entry} locale={locale} headings={headings}>
+  <Content />
+</EntryLayout>

@@ -1,0 +1,77 @@
+---
+import Card from '../../../components/Card.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import Tag from '../../../components/Tag.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { collectionNames, getEntriesByTag, getEntryPath, getTags } from '../../../lib/content';
+import { locales, type Locale } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const paths = await Promise.all(
+    locales.map(async (locale) => {
+      const tags = await getTags(locale);
+      return tags.map((tag) => ({ params: { locale, tag }, props: { locale, tag } }));
+    }),
+  );
+  return paths.flat();
+}
+
+const { locale, tag } = Astro.props as { locale: Locale; tag: string };
+const entries = await getEntriesByTag(locale, tag);
+---
+
+<BaseLayout locale={locale} title={`#${tag}`} description={`Content tagged ${tag}`} canonicalPath={`/${locale}/tags/${tag}`}>
+  <section class="container page-section">
+    <SectionHeader title={`#${tag}`} description="Published content connected by this tag." />
+    <div class="stack">
+      {entries.map(({ collection, entry }) => (
+        <Card href={getEntryPath(collection, entry)}>
+          <article>
+            <p>{collectionNames[locale][collection]}</p>
+            <h2>{entry.data.title}</h2>
+            <span>{entry.data.description}</span>
+            <div>{entry.data.tags.map((item) => <Tag tag={item} locale={locale} />)}</div>
+          </article>
+        </Card>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-section {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .stack,
+  article {
+    display: grid;
+    gap: 16px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 5vw, 3.4rem);
+    line-height: 0.96;
+  }
+
+  span {
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>

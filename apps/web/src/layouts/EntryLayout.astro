@@ -1,0 +1,126 @@
+---
+import type { PublicCollection, PublicEntry } from '../lib/content';
+import Badge from '../components/Badge.astro';
+import Breadcrumb from '../components/Breadcrumb.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import Tag from '../components/Tag.astro';
+import BaseLayout from './BaseLayout.astro';
+import {
+  collectionBasePaths,
+  collectionNames,
+  formatDate,
+  getCollectionPath,
+  getTranslationAlternates,
+} from '../lib/content';
+import { getLocalePath, ui, type Locale } from '../lib/i18n';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  collection: PublicCollection;
+  entry: PublicEntry;
+  locale: Locale;
+  headings: Heading[];
+}
+
+const { collection, entry, locale, headings } = Astro.props;
+const alternates = await getTranslationAlternates(collection, entry);
+const date = formatDate(entry.data.date, locale);
+---
+
+<BaseLayout
+  locale={locale}
+  title={entry.data.title}
+  description={entry.data.description}
+  canonicalPath={`/${locale}${collectionBasePaths[collection]}/${entry.data.slug}`}
+  alternates={alternates.length > 0 ? alternates : undefined}
+>
+  <article class="entry-shell container">
+    <div class="entry-main">
+      <Breadcrumb
+        items={[
+          { label: ui[locale].nav[0].label, href: getLocalePath(locale) },
+          { label: collectionNames[locale][collection], href: getCollectionPath(collection, locale) },
+          { label: entry.data.title },
+        ]}
+      />
+      <header class="entry-header">
+        <div class="entry-meta">
+          <Badge tone="accent">{collectionNames[locale][collection]}</Badge>
+          {date && <span>{date}</span>}
+        </div>
+        <h1>{entry.data.title}</h1>
+        <p>{entry.data.description}</p>
+        <div class="tags">
+          {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+        </div>
+      </header>
+      <div class="prose">
+        <slot />
+      </div>
+    </div>
+    <TableOfContents headings={headings} />
+  </article>
+</BaseLayout>
+
+<style>
+  .entry-shell {
+    display: grid;
+    grid-template-columns: minmax(0, var(--content)) minmax(180px, 240px);
+    gap: clamp(24px, 5vw, 56px);
+    padding-block: clamp(36px, 7vw, 84px);
+  }
+
+  .entry-main {
+    min-width: 0;
+  }
+
+  .entry-header {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 38px;
+    padding-bottom: 28px;
+    border-bottom: var(--border-width) solid var(--color-border);
+  }
+
+  .entry-meta,
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .entry-meta span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+
+  h1 {
+    max-width: 900px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 11vw, 7.5rem);
+    line-height: 0.9;
+  }
+
+  .entry-header p {
+    max-width: 720px;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: clamp(1.05rem, 2vw, 1.25rem);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 1080px) {
+    .entry-shell {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

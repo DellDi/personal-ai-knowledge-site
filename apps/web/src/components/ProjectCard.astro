@@ -1,0 +1,71 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Card from './Card.astro';
+import Tag from './Tag.astro';
+import { getEntryPath } from '../lib/content';
+import { type Locale } from '../lib/i18n';
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  locale: Locale;
+}
+
+const { entry, locale } = Astro.props;
+---
+
+<Card href={getEntryPath('projects', entry)}>
+  <article class="project-card">
+    <p>{entry.data.role ?? 'Project'}</p>
+    <h3>{entry.data.title}</h3>
+    <span>{entry.data.description}</span>
+    <div class="stack">
+      {entry.data.stack.map((item) => <strong>{item}</strong>)}
+    </div>
+    <div class="tags">
+      {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+    </div>
+  </article>
+</Card>
+
+<style>
+  .project-card {
+    display: grid;
+    gap: 14px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4vw, 2.8rem);
+    line-height: 1;
+  }
+
+  span {
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  .stack,
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  strong {
+    padding: 5px 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-accent-3);
+    color: #111111;
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+  }
+</style>

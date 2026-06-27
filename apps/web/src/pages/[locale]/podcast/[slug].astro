@@ -1,0 +1,37 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import EntryLayout from '../../../layouts/EntryLayout.astro';
+import type { Locale } from '../../../lib/i18n';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('podcast', ({ data }) => data.status === 'published');
+  return entries.map((entry) => ({
+    params: { locale: entry.data.lang, slug: entry.data.slug },
+    props: { entry, locale: entry.data.lang },
+  }));
+}
+
+const { entry, locale } = Astro.props as { entry: CollectionEntry<'podcast'>; locale: Locale };
+const { Content, headings } = await render(entry);
+---
+
+<EntryLayout collection="podcast" entry={entry} locale={locale} headings={headings}>
+  <div class="audio-shell">
+    <audio controls preload="metadata" src={entry.data.audio}></audio>
+  </div>
+  <Content />
+</EntryLayout>
+
+<style>
+  .audio-shell {
+    margin-bottom: 28px;
+    padding: 16px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  audio {
+    width: 100%;
+  }
+</style>

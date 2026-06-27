@@ -1,0 +1,49 @@
+---
+import Button from '../components/Button.astro';
+import Card from '../components/Card.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { defaultLocale, getLocalePath } from '../lib/i18n';
+---
+
+<BaseLayout locale={defaultLocale} title="Language" description="Choose a language for the content platform." canonicalPath="/">
+  <section class="language-entry container">
+    <Card>
+      <p>Personal AI Knowledge Site</p>
+      <h1>Choose language</h1>
+      <div class="actions">
+        <Button href={getLocalePath('zh-CN')} variant="primary">中文</Button>
+        <Button href={getLocalePath('en')} variant="quiet">English</Button>
+      </div>
+    </Card>
+  </section>
+</BaseLayout>
+
+<style>
+  .language-entry {
+    min-height: 58vh;
+    display: grid;
+    align-items: center;
+    padding-block: clamp(48px, 8vw, 96px);
+  }
+
+  p {
+    margin: 0 0 10px;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0 0 24px;
+    font-family: var(--font-display);
+    font-size: clamp(3.4rem, 11vw, 8rem);
+    line-height: 0.88;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>

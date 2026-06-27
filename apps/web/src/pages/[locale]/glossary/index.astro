@@ -1,0 +1,43 @@
+---
+import Card from '../../../components/Card.astro';
+import GlossaryItem from '../../../components/GlossaryItem.astro';
+import SectionHeader from '../../../components/SectionHeader.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getPublishedEntries } from '../../../lib/content';
+import { locales, ui, type Locale } from '../../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const entries = await getPublishedEntries('glossary', locale);
+const t = ui[locale];
+---
+
+<BaseLayout locale={locale} title={t.nav[7].label} description="Terms and concept definitions." canonicalPath={`/${locale}/glossary`}>
+  <section class="container page-section">
+    <SectionHeader title={t.nav[7].label} description="A small but growing vocabulary for agents, data, architecture, and product systems." />
+    <div class="grid">
+      {entries.length > 0 ? entries.map((entry) => <GlossaryItem entry={entry} />) : <Card>{t.empty}</Card>}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-section {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  @media (max-width: 760px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,5 +1,12 @@
 # Planning
 
-This directory is reserved for future product, content, and architecture planning.
+The initial planning direction has been promoted into structured Agile and architecture documents:
 
-No technical architecture has been finalized yet.
+- `docs/agile/product-vision.md`
+- `docs/agile/roadmap.md`
+- `docs/architecture/content-model.md`
+- `docs/architecture/ui-system.md`
+- `docs/architecture/i18n.md`
+- `docs/architecture/deployment.md`
+
+This folder remains available for raw planning notes and imported research.

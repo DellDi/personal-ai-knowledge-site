@@ -1,0 +1,190 @@
+---
+import ArticleCard from '../../components/ArticleCard.astro';
+import Badge from '../../components/Badge.astro';
+import Button from '../../components/Button.astro';
+import Card from '../../components/Card.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import TopicCard from '../../components/TopicCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedEntries } from '../../lib/content';
+import { getLocalePath, locales, ui, type Locale } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const t = ui[locale];
+const podcasts = await getPublishedEntries('podcast', locale);
+const posts = await getPublishedEntries('posts', locale);
+const topics = await getPublishedEntries('topics', locale);
+const projects = await getPublishedEntries('projects', locale);
+const knowledge = await getPublishedEntries('knowledge', locale);
+const featuredTopic = topics[0];
+---
+
+<BaseLayout locale={locale} title={t.siteName} description={t.siteDescription} canonicalPath={`/${locale}/`}>
+  <section class="hero container">
+    <div class="hero-copy">
+      <Badge tone="accent">{t.homeKicker}</Badge>
+      <h1>{t.homeTitle}</h1>
+      <p>{t.homeIntro}</p>
+      <div class="hero-actions">
+        <Button href={getLocalePath(locale, '/knowledge')}>Knowledge Base</Button>
+        <Button href={getLocalePath(locale, '/search')} variant="quiet">Search</Button>
+      </div>
+    </div>
+    <Card class="hero-aside">
+      <p>{t.latestPodcast}</p>
+      {podcasts[0] ? (
+        <>
+          <h2>{podcasts[0].data.title}</h2>
+          <span>{podcasts[0].data.description}</span>
+          <Button href={getLocalePath(locale, `/podcast/${podcasts[0].data.slug}`)} variant="secondary">{t.listen}</Button>
+        </>
+      ) : (
+        <span>{t.empty}</span>
+      )}
+    </Card>
+  </section>
+
+  <section class="container section">
+    <SectionHeader eyebrow={t.featured} title={featuredTopic?.data.title ?? t.featured} description={featuredTopic?.data.description ?? t.empty} />
+    {featuredTopic && <TopicCard entry={featuredTopic} locale={locale} />}
+  </section>
+
+  <section class="container section">
+    <SectionHeader title={t.knowledgeAreas} description="AI Agent / Architecture / Data Engineering / Frontend / Product / Operations" />
+    <div class="area-grid">
+      {['ai-agent', 'architecture', 'data-engineering', 'frontend', 'product', 'operations'].map((area) => (
+        <Card href={getLocalePath(locale, '/knowledge')}>
+          <span>{area}</span>
+          <strong>{knowledge.filter((item) => item.data.area === area).length}</strong>
+        </Card>
+      ))}
+    </div>
+  </section>
+
+  <section class="container section two-col">
+    <div>
+      <SectionHeader title={t.latestPosts} />
+      <div class="stack">
+        {posts.length > 0 ? posts.slice(0, 2).map((entry) => <ArticleCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
+      </div>
+    </div>
+    <div>
+      <SectionHeader title="Projects" />
+      <div class="stack">
+        {projects.length > 0 ? projects.slice(0, 2).map((entry) => <ProjectCard entry={entry} locale={locale} />) : <Card>{t.empty}</Card>}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+    gap: clamp(24px, 5vw, 56px);
+    align-items: stretch;
+    padding-block: clamp(48px, 8vw, 92px);
+  }
+
+  .hero-copy {
+    display: grid;
+    align-content: center;
+    gap: 22px;
+  }
+
+  h1 {
+    max-width: 1000px;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(3.4rem, 10vw, 8.8rem);
+    line-height: 0.86;
+  }
+
+  .hero-copy p {
+    max-width: 720px;
+    margin: 0;
+    color: var(--color-muted);
+    font-size: clamp(1.06rem, 2vw, 1.3rem);
+    line-height: 1.55;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .hero-aside {
+    display: grid;
+    align-content: start;
+    gap: 18px;
+  }
+
+  .hero-aside p {
+    margin: 0;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .hero-aside h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 0.95;
+  }
+
+  .hero-aside span {
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  .section {
+    padding-block: clamp(36px, 7vw, 76px);
+  }
+
+  .area-grid,
+  .two-col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .area-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .area-grid :global(.card) {
+    display: grid;
+    gap: 16px;
+  }
+
+  .area-grid span {
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+
+  .area-grid strong {
+    font-family: var(--font-display);
+    font-size: 4rem;
+    line-height: 0.9;
+  }
+
+  .stack {
+    display: grid;
+    gap: 20px;
+  }
+
+  @media (max-width: 900px) {
+    .hero,
+    .two-col,
+    .area-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

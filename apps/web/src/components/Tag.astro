@@ -1,0 +1,33 @@
+---
+import { type Locale } from '../lib/i18n';
+
+interface Props {
+  tag: string;
+  locale: Locale;
+}
+
+const { tag, locale } = Astro.props;
+---
+
+<a class="tag focus-ring" href={`/${locale}/tags/${encodeURIComponent(tag)}`}>#{tag}</a>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 5px 9px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-strong);
+    color: var(--color-muted);
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+
+  .tag:hover {
+    background: var(--color-accent-3);
+    color: #111111;
+  }
+</style>

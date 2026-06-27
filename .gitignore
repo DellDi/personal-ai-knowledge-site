@@ -2,6 +2,13 @@
 node_modules/
 dist/
 build/
+.astro/
+.cache/
+.pagefind/
+.vercel/
+.netlify/
+coverage/
+.turbo/
 .env
 .env.*
 !.env.example

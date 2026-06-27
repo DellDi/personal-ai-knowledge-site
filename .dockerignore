@@ -1,0 +1,12 @@
+.git
+.DS_Store
+node_modules
+apps/*/node_modules
+apps/*/dist
+apps/*/.astro
+.cache
+.pagefind
+coverage
+.env
+.env.*
+!.env.example

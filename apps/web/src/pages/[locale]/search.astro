@@ -1,0 +1,128 @@
+---
+import SectionHeader from '../../components/SectionHeader.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { locales, ui, type Locale } from '../../lib/i18n';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const t = ui[locale];
+---
+
+<BaseLayout locale={locale} title={t.nav[8].label} description="Search the content platform." canonicalPath={`/${locale}/search`}>
+  <section class="container search-page">
+    <SectionHeader title={t.nav[8].label} description={t.searchPlaceholder} />
+    <div class="search-box hard-card">
+      <label for="site-search">{t.searchPlaceholder}</label>
+      <input id="site-search" type="search" autocomplete="off" data-locale={locale} placeholder={t.searchPlaceholder} />
+      <p id="search-status">{t.searchEmpty}</p>
+      <div id="search-results" class="results"></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const input = document.querySelector<HTMLInputElement>('#site-search');
+  const results = document.querySelector<HTMLDivElement>('#search-results');
+  const status = document.querySelector<HTMLParagraphElement>('#search-status');
+  const locale = input?.dataset.locale;
+  let pagefind: any;
+
+  async function loadPagefind() {
+    if (pagefind) return pagefind;
+    try {
+      const runtimeImport = new Function('specifier', 'return import(specifier)');
+      pagefind = await runtimeImport('/pagefind/pagefind.js');
+      return pagefind;
+    } catch {
+      return null;
+    }
+  }
+
+  input?.addEventListener('input', async () => {
+    const query = input.value.trim();
+    if (!results || !status) return;
+    results.innerHTML = '';
+    if (query.length < 2) {
+      status.hidden = false;
+      return;
+    }
+
+    const pf = await loadPagefind();
+    if (!pf) {
+      status.hidden = false;
+      return;
+    }
+
+    const search = await pf.search(query);
+    const hydrated = await Promise.all(search.results.slice(0, 8).map((result: any) => result.data()));
+    const filtered = hydrated.filter((item: any) => item.url.startsWith(`/${locale}/`));
+    status.hidden = filtered.length > 0;
+    status.textContent = filtered.length === 0 ? 'No results.' : '';
+    results.innerHTML = filtered
+      .map((item: any) => `<a class="result-card" href="${item.url}"><strong>${item.meta.title}</strong><span>${item.excerpt}</span></a>`)
+      .join('');
+  });
+</script>
+
+<style>
+  .search-page {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .search-box {
+    display: grid;
+    gap: 14px;
+    padding: clamp(18px, 4vw, 32px);
+  }
+
+  label {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  input {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 14px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface-strong);
+    color: var(--color-ink);
+    font-size: 1rem;
+  }
+
+  input:focus-visible {
+    outline: 3px solid var(--color-accent-3);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  .results {
+    display: grid;
+    gap: 12px;
+  }
+
+  :global(.result-card) {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface-strong);
+  }
+
+  :global(.result-card strong) {
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+  }
+
+  :global(.result-card span) {
+    color: var(--color-muted);
+    line-height: 1.45;
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Card from './Card.astro';
+import Tag from './Tag.astro';
+import { getEntryPath } from '../lib/content';
+import { type Locale } from '../lib/i18n';
+
+interface Props {
+  entry: CollectionEntry<'resources'>;
+  locale: Locale;
+}
+
+const { entry, locale } = Astro.props;
+---
+
+<Card href={entry.data.url ?? getEntryPath('resources', entry)}>
+  <article class="resource-card">
+    <p>{entry.data.type}</p>
+    <h3>{entry.data.title}</h3>
+    <span>{entry.data.description}</span>
+    <div>
+      {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+    </div>
+  </article>
+</Card>
+
+<style>
+  .resource-card {
+    display: grid;
+    gap: 12px;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-accent-2);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    line-height: 1;
+  }
+
+  span {
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+</style>

@@ -1,0 +1,132 @@
+---
+import ThemeToggle from './ThemeToggle';
+import LocaleSwitcher from './LocaleSwitcher.astro';
+import { getLocalePath, ui, type Locale } from '../lib/i18n';
+
+interface Props {
+  locale: Locale;
+  alternates?: { locale: Locale; path: string }[];
+}
+
+const { locale, alternates = [] } = Astro.props;
+const t = ui[locale];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand focus-ring" href={getLocalePath(locale)} aria-label={t.siteName}>
+      <span>AI</span>
+      <strong>Knowledge</strong>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      {t.nav.map((item) => (
+        <a class="focus-ring" href={getLocalePath(locale, item.href)}>{item.label}</a>
+      ))}
+    </nav>
+    <div class="header-actions">
+      <LocaleSwitcher locale={locale} alternates={alternates} />
+      <ThemeToggle client:load />
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: var(--border-width) solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg) 92%, transparent);
+    backdrop-filter: blur(10px);
+  }
+
+  .header-inner {
+    min-height: 64px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: stretch;
+    border: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-hard-sm);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .brand span,
+  .brand strong {
+    padding: 8px 9px;
+  }
+
+  .brand span {
+    background: var(--color-accent);
+    color: #111111;
+    border-right: var(--border-width) solid var(--color-border);
+  }
+
+  .brand strong {
+    background: var(--color-surface);
+    color: var(--color-ink);
+  }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    justify-content: center;
+  }
+
+  .nav a {
+    padding: 8px 2px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .nav a:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  :global(.theme-toggle) {
+    width: 39px;
+    height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-hard-sm);
+    cursor: pointer;
+  }
+
+  @media (max-width: 940px) {
+    .header-inner {
+      grid-template-columns: 1fr auto;
+      padding-block: 10px;
+    }
+
+    .nav {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+  }
+</style>
