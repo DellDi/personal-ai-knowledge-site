@@ -6,6 +6,17 @@
 
 ![首页](./docs/images/home.png)
 
+## 技术栈
+
+- Astro （静态站点生成器）
+- React （前端框架）
+- TypeScript （类型检查）
+- Tailwind CSS （样式框架）
+- Payload CMS （内容管理系统）
+- PostgreSQL （数据库）
+- MinIO （对象存储）
+- Docker （容器化）
+
 ## 当前状态
 
 项目已经从第一版静态站骨架推进到“前台内容体验 + CMS 后台试点 + 发布工作流基础闭环”阶段：
