@@ -2,7 +2,6 @@ import { buildConfig, CollectionConfig } from 'payload';
 import { postgresAdapter } from '@payloadcms/db-postgres';
 import { s3Storage } from '@payloadcms/storage-s3';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
-import { SlateToLexicalFeature } from '@payloadcms/richtext-lexical/migrate';
 import path from 'node:path';
 import sharp from 'sharp';
 import { fileURLToPath } from 'node:url';
@@ -57,12 +56,7 @@ export default buildConfig({
       : {}),
   },
   collections: [users, posts, podcast, knowledge, topics, projects, resources, glossary, timeline, media],
-  editor: lexicalEditor({
-    features: ({ defaultFeatures }) => [
-      ...defaultFeatures,
-      SlateToLexicalFeature({}),
-    ],
-  }),
+  editor: lexicalEditor({}),
   secret: process.env.PAYLOAD_SECRET ?? 'payload_secret_change_me',
   sharp,
   typescript: {

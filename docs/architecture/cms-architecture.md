@@ -17,7 +17,7 @@ apps/cms（Payload 3.x + Next.js standalone）
 - Next.js 16（admin UI 运行时，由 `@payloadcms/next` 提供）
 - PostgreSQL 16（`@payloadcms/db-postgres`）
 - S3 storage（`@payloadcms/storage-s3`，MinIO / 阿里云 OSS）
-- Lexical 富文本编辑器（`@payloadcms/richtext-lexical`，保留 Slate 历史数据迁移兼容）
+- Lexical 富文本编辑器（`@payloadcms/richtext-lexical`）
 
 ## 目录结构
 
