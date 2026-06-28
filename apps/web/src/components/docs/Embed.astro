@@ -1,0 +1,70 @@
+---
+interface Props {
+  src: string;
+  title?: string;
+  ratio?: '16-9' | '4-3' | '1-1';
+}
+
+const { src, title, ratio = '16-9' } = Astro.props;
+const validHosts = ['youtube.com', 'youtu.be', 'player.bilibili.com', 'player.vimeo.com'];
+let safe = false;
+try {
+  const u = new URL(src);
+  safe = validHosts.some((h) => u.hostname.endsWith(h));
+} catch {
+  safe = false;
+}
+---
+
+{safe ? (
+  <figure class="embed" data-pagefind-ignore>
+    <div class:list={['embed-frame', `embed-${ratio}`]}>
+      <iframe src={src} title={title ?? '嵌入内容'} loading="lazy" allowfullscreen style="border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+    </div>
+    {title && <figcaption>{title}</figcaption>}
+  </figure>
+) : (
+  <p class="embed-blocked">嵌入源不在白名单内，已拒绝渲染。</p>
+)}
+
+<style>
+  .embed {
+    margin: 1.8rem 0;
+  }
+
+  .embed-frame {
+    position: relative;
+    border: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-hard-sm);
+    overflow: hidden;
+    background: var(--color-code-bg);
+  }
+
+  .embed-16-9 { aspect-ratio: 16 / 9; }
+  .embed-4-3 { aspect-ratio: 4 / 3; }
+  .embed-1-1 { aspect-ratio: 1 / 1; }
+
+  .embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  figcaption {
+    margin-top: 10px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .embed-blocked {
+    padding: 14px 16px;
+    border: var(--border-width) solid var(--color-border);
+    background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+  }
+</style>

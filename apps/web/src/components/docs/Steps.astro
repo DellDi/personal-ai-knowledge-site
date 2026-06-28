@@ -1,0 +1,47 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = '操作步骤' } = Astro.props;
+---
+
+<ol class="steps" aria-label={title}>
+  <slot />
+</ol>
+
+<style>
+  .steps {
+    counter-reset: step;
+    padding: 0;
+    margin: 1.6rem 0;
+    list-style: none;
+    display: grid;
+    gap: 14px;
+  }
+
+  .steps :global(li) {
+    position: relative;
+    counter-increment: step;
+    padding: 16px 18px 16px 56px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  .steps :global(li)::before {
+    content: counter(step, decimal-leading-zero);
+    position: absolute;
+    left: 14px;
+    top: 14px;
+    font-family: var(--font-mono);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    line-height: 1;
+  }
+
+  .steps :global(li :last-child) {
+    margin-bottom: 0;
+  }
+</style>

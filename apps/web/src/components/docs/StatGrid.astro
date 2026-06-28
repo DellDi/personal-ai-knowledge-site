@@ -1,0 +1,70 @@
+---
+interface StatItem {
+  value: string;
+  label: string;
+}
+
+interface Props {
+  items: StatItem[];
+  columns?: 2 | 3 | 4;
+}
+
+const { items, columns = 3 } = Astro.props;
+---
+
+<div class:list={['stat-grid', `stat-cols-${columns}`]}>  {items.map((item) => (
+    <div class="stat-cell">
+      <strong>{item.value}</strong>
+      <span>{item.label}</span>
+    </div>
+  ))}
+</div>
+
+<style>
+  .stat-grid {
+    display: grid;
+    gap: 0;
+    margin: 1.8rem 0;
+    border: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  .stat-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .stat-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .stat-cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+  .stat-cell {
+    padding: 18px 16px;
+    border-right: var(--border-width) solid var(--color-border);
+    border-bottom: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    display: grid;
+    gap: 4px;
+  }
+
+  .stat-cell:nth-child(2n) { border-right-width: 0; }
+  .stat-cols-3 .stat-cell:nth-child(2n) { border-right-width: var(--border-width); }
+  .stat-cols-3 .stat-cell:nth-child(3n) { border-right-width: 0; }
+  .stat-cols-4 .stat-cell:nth-child(4n) { border-right-width: 0; }
+
+  strong {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 0.9;
+    color: var(--color-accent);
+  }
+
+  span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  @media (max-width: 640px) {
+    .stat-grid { grid-template-columns: 1fr 1fr !important; }
+    .stat-cell { border-right-width: var(--border-width) !important; }
+    .stat-cell:nth-child(2n) { border-right-width: 0 !important; }
+  }
+</style>

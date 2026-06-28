@@ -42,13 +42,16 @@ docker compose up --build
 ## 目录结构
 
 ```txt
-apps/web                         Astro 主站
+apps/web                         Astro 前台（读侧）
+apps/cms                         Payload CMS 后台（写侧，Next.js + Payload 3.x）
+packages/content-contract        内容契约层（共享类型/枚举/Block 契约，单一事实源）
 docs/agile                       Markdown 项目管理：路线图、史诗、故事、迭代
 docs/architecture                架构文档和平台决策
+infra/docker-compose.yml         开发环境后端服务栈（PostgreSQL + MinIO + CMS）
 .skills/astro-content-platform   项目专用 Agent Skill
 AGENTS.md                        Agent 开发约束
-Dockerfile                       生产静态镜像
-docker-compose.yml               本地生产部署预览
+Dockerfile                       前台生产静态镜像
+docker-compose.yml               前台本地生产部署预览
 nginx/default.conf               Nginx 静态服务配置
 ```
 

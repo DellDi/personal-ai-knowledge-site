@@ -179,6 +179,87 @@ export async function getTranslationAlternates(collection: PublicCollection, ent
   }));
 }
 
+export interface RelatedEntry {
+  collection: PublicCollection;
+  entry: PublicEntry;
+  score: number;
+}
+
+export async function getRelatedEntries(
+  collection: PublicCollection,
+  entry: PublicEntry,
+  locale: Locale,
+  limit = 3,
+): Promise<RelatedEntry[]> {
+  const all = await getAllPublishedEntries(locale);
+  const sourceTags = new Set(entry.data.tags);
+
+  return all
+    .filter((item) => {
+      const sameEntry = item.entry.id === entry.id;
+      const sameTranslation = item.entry.data.translationKey === entry.data.translationKey;
+      return !sameEntry && !sameTranslation;
+    })
+    .map((item) => {
+      const overlap = item.entry.data.tags.filter((tag) => sourceTags.has(tag)).length;
+      const collectionBoost = item.collection === collection ? 1 : 0;
+      return {
+        collection: item.collection,
+        entry: item.entry,
+        score: overlap * 2 + collectionBoost,
+      };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit);
+}
+
+export interface KnowledgeTreeNode {
+  area: string;
+  entries: CollectionEntry<'knowledge'>[];
+}
+
+export async function getKnowledgeTree(locale: Locale): Promise<KnowledgeTreeNode[]> {
+  const entries = await getPublishedEntries('knowledge', locale);
+  const areas = [...new Set(entries.map((entry) => entry.data.area))];
+
+  return areas.map((area) => ({
+    area,
+    entries: entries
+      .filter((entry) => entry.data.area === area)
+      .sort((a, b) => {
+        const aOrder = a.data.order ?? Number.MAX_SAFE_INTEGER;
+        const bOrder = b.data.order ?? Number.MAX_SAFE_INTEGER;
+        if (aOrder !== bOrder) return aOrder - bOrder;
+        const bDate = b.data.date?.getTime() ?? 0;
+        const aDate = a.data.date?.getTime() ?? 0;
+        return bDate - aDate;
+      }),
+  }));
+}
+
+export interface KnowledgeNeighbors {
+  prev?: CollectionEntry<'knowledge'>;
+  next?: CollectionEntry<'knowledge'>;
+}
+
+export async function getKnowledgeNeighbors(
+  entry: CollectionEntry<'knowledge'>,
+  locale: Locale,
+): Promise<KnowledgeNeighbors> {
+  const tree = await getKnowledgeTree(locale);
+  const node = tree.find((item) => item.area === entry.data.area);
+  if (!node) return {};
+
+  const index = node.entries.findIndex((item) => item.id === entry.id);
+  if (index === -1) return {};
+
+  return {
+    prev: index > 0 ? node.entries[index - 1] : undefined,
+    next: index < node.entries.length - 1 ? node.entries[index + 1] : undefined,
+  };
+}
+
 export function getEntryPath(collection: PublicCollection, entry: PublicEntry) {
   return `/${entry.data.lang}${collectionBasePaths[collection]}/${entry.data.slug}`;
 }

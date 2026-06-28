@@ -4,7 +4,7 @@ import Card from '../../../components/Card.astro';
 import SectionHeader from '../../../components/SectionHeader.astro';
 import Tag from '../../../components/Tag.astro';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { formatDate, getEntryPath, getPublishedEntries, knowledgeAreaLabels, knowledgeLevelLabels } from '../../../lib/content';
+import { formatDate, getEntryPath, getKnowledgeTree, knowledgeAreaLabels, knowledgeLevelLabels } from '../../../lib/content';
 import { locales, ui, type Locale } from '../../../lib/i18n';
 
 export function getStaticPaths() {
@@ -12,37 +12,53 @@ export function getStaticPaths() {
 }
 
 const { locale } = Astro.props as { locale: Locale };
-const entries = await getPublishedEntries('knowledge', locale);
-const areas = [...new Set(entries.map((entry) => entry.data.area))];
+const tree = await getKnowledgeTree(locale);
 const t = ui[locale];
 ---
 
 <BaseLayout locale={locale} title={t.nav[3].label} description={t.knowledgeDescription} canonicalPath={`/${locale}/knowledge`}>
   <section class="container knowledge-shell">
-    <aside class="knowledge-nav">
-      <p>{t.nav[3].label}</p>
-      {areas.length > 0 ? areas.map((area) => <a href={`#${area}`}>{knowledgeAreaLabels[locale][area]}</a>) : <span>{t.empty}</span>}
-    </aside>
+    <details class="knowledge-nav" open>
+      <summary class="knowledge-nav-toggle">{t.knowledgeTreeTitle}</summary>
+      <div class="knowledge-nav-body">
+        {tree.length > 0 ? tree.map((node) => (
+          <div class="tree-group">
+            <a href={`#${node.area}`}>{knowledgeAreaLabels[locale][node.area]}</a>
+            <ul>
+              {node.entries.map((entry) => (
+                <li>
+                  <a href={getEntryPath('knowledge', entry)}>{entry.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )) : <span>{t.empty}</span>}
+      </div>
+    </details>
     <div>
       <SectionHeader title={t.nav[3].label} description={t.knowledgeDescription} />
-      <div class="stack">
-        {entries.length > 0 ? entries.map((entry) => (
-          <Card href={getEntryPath('knowledge', entry)}>
-            <article class="knowledge-card" id={entry.data.area}>
-              <div>
-                <Badge tone="blue">{knowledgeAreaLabels[locale][entry.data.area]}</Badge>
-                <Badge>{knowledgeLevelLabels[locale][entry.data.level]}</Badge>
-              </div>
-              <h3>{entry.data.title}</h3>
-              <p>{entry.data.description}</p>
-              <span>{formatDate(entry.data.updated ?? entry.data.date, locale)}</span>
-              <div class="tags">
-                {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
-              </div>
-            </article>
-          </Card>
-        )) : <Card>{t.empty}</Card>}
-      </div>
+      {tree.length > 0 ? tree.map((node) => (
+        <section id={node.area} class="area-section">
+          <h2>{knowledgeAreaLabels[locale][node.area]}</h2>
+          <div class="stack">
+            {node.entries.map((entry) => (
+              <Card href={getEntryPath('knowledge', entry)}>
+                <article class="knowledge-card">
+                  <div>
+                    <Badge>{knowledgeLevelLabels[locale][entry.data.level]}</Badge>
+                  </div>
+                  <h3>{entry.data.title}</h3>
+                  <p>{entry.data.description}</p>
+                  <span>{formatDate(entry.data.updated ?? entry.data.date, locale)}</span>
+                  <div class="tags">
+                    {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+                  </div>
+                </article>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )) : <Card>{t.empty}</Card>}
     </div>
   </section>
 </BaseLayout>
@@ -50,7 +66,7 @@ const t = ui[locale];
 <style>
   .knowledge-shell {
     display: grid;
-    grid-template-columns: minmax(200px, 280px) minmax(0, 1fr);
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
     gap: clamp(24px, 5vw, 48px);
     padding-block: clamp(42px, 8vw, 88px);
   }
@@ -59,31 +75,89 @@ const t = ui[locale];
     position: sticky;
     top: 96px;
     align-self: start;
-    display: grid;
-    gap: 10px;
-    padding: 16px;
+    padding: 0;
     border: var(--border-width) solid var(--color-border);
     background: var(--color-surface);
   }
 
-  .knowledge-nav p {
-    margin: 0 0 8px;
+  .knowledge-nav-toggle {
+    display: block;
+    padding: 14px 16px;
     color: var(--color-accent);
     font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .knowledge-nav-toggle::-webkit-details-marker {
+    display: none;
+  }
+
+  .knowledge-nav-toggle::after {
+    content: "▾";
+    float: right;
+  }
+
+  .knowledge-nav-body {
+    display: grid;
+    gap: 16px;
+    padding: 0 16px 16px;
+  }
+
+  .tree-group {
+    display: grid;
+    gap: 8px;
+  }
+
+  .tree-group > a {
+    color: var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
     font-weight: 700;
   }
 
-  .knowledge-nav a,
-  .knowledge-nav span {
+  .tree-group ul {
+    display: grid;
+    gap: 6px;
+    padding: 0 0 0 12px;
+    margin: 0;
+    list-style: none;
+    border-left: 1px solid var(--color-border);
+  }
+
+  .tree-group li a {
     color: var(--color-muted);
-    font-family: var(--font-mono);
     font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .tree-group li a:hover {
+    color: var(--color-ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .area-section {
+    margin-top: 32px;
+  }
+
+  .area-section:first-of-type {
+    margin-top: 0;
+  }
+
+  .area-section h2 {
+    margin: 0 0 18px;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
+    line-height: 1;
   }
 
   .stack,
   .knowledge-card {
     display: grid;
-    gap: 18px;
+    gap: 16px;
   }
 
   .knowledge-card div {
@@ -95,8 +169,8 @@ const t = ui[locale];
   h3 {
     margin: 0;
     font-family: var(--font-display);
-    font-size: clamp(1.8rem, 5vw, 3.2rem);
-    line-height: 0.96;
+    font-size: clamp(1.5rem, 4vw, 2.6rem);
+    line-height: 1;
   }
 
   p,
@@ -109,6 +183,12 @@ const t = ui[locale];
   span {
     font-family: var(--font-mono);
     font-size: 0.78rem;
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   @media (max-width: 900px) {

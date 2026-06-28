@@ -1,0 +1,97 @@
+---
+title: 用 Astro + MDX 构建可维护的文档组件系统
+description: 复盘我在本站搭建一套可复用文档组件的过程，覆盖 Callout、Steps、StatGrid、CompareTable 等组件的设计取舍和 MDX 全局注入方案。
+lang: zh-CN
+translationKey: mdx-component-system
+slug: mdx-component-system
+date: 2025-06-28
+tags:
+  - Astro
+  - MDX
+  - 前端
+status: published
+featured: false
+category: 前端工程
+series: 内容平台工程化
+---
+
+import { Callout, Steps, StatGrid, CompareTable, Quote } from '../../../components/docs';
+
+## 为什么不只是写 Markdown
+
+纯 Markdown 写技术文档够用，但写到我自己的知识库和复盘文章时，会遇到几个反复出现的需求：
+
+- 想在一段说明旁边加一个醒目的“注意”框
+- 想把操作步骤编号化，而不是用 `1. 2. 3.` 凑数
+- 想放一组统计数字，而不是手写表格
+- 想做两个方案的对比表，高亮推荐列
+
+这些用纯 Markdown 都能做到，但每次都要手写 HTML 或重复粘贴，维护成本高。MDX 的价值在这里：**让文档复用组件，而不是复制粘贴 HTML**。
+
+## 我设计的组件清单
+
+<StatGrid
+  items={[
+    { value: '9', label: '文档组件' },
+    { value: '0', label: '需要 import 的次数' },
+    { value: '1', label: '配置入口' },
+    { value: '100%', label: '黑夜模式覆盖' }
+  ]}
+  columns={4}
+/>
+
+这些组件全部放在 `apps/web/src/components/docs/` 下，通过 `astro.config.mjs` 的 `mdx({ components })` 全局注入，任何 `.mdx` 文件直接用，不用 import。
+
+## 关键组件：Callout
+
+<Callout variant="tip" title="设计取舍">
+  Callout 我做了四种变体：`info`（说明）、`tip`（建议）、`warning`（注意）、`danger`（风险）。颜色用左侧粗边框区分，不靠图标，保持编辑式野兽派的硬边框语言。
+</Callout>
+
+<Callout variant="warning">
+  不要在 Callout 里嵌套 Callout。文档组件是平铺的，嵌套会让阅读层次混乱。
+</Callout>
+
+## 关键组件：Steps
+
+把操作流程编号化，比手写有序列表更稳定：
+
+<Steps>
+  <li>在 `astro.config.mjs` 的 `mdx()` 配置里传入 `components` 对象</li>
+  <li>key 是组件名，value 是组件路径（相对于项目根）</li>
+  <li>在任意 `.mdx` 文件里直接用 `<Callout>`，无需 import</li>
+  <li>运行 `pnpm build` 验证全局注入生效</li>
+</Steps>
+
+## 关键组件：CompareTable
+
+做技术选型时，对比表比文字描述清晰得多：
+
+<CompareTable
+  caption="文档组件方案对比"
+  columns={[
+    { key: 'feature', label: '能力' },
+    { key: 'global', label: '全局注入', highlight: true },
+    { key: 'manual', label: '手动 import' }
+  ]}
+  rows={[
+    { feature: '书写成本', global: '零 import', manual: '每篇都要 import' },
+    { feature: '一致性', global: '统一入口管理', manual: '容易漏 import' },
+    { feature: '可发现性', global: '需要文档清单', manual: '看文件头就知道' },
+    { feature: '适用场景', global: '站点级组件库', manual: '一次性组件' }
+  ]}
+/>
+
+## 为什么选全局注入而不是手动 import
+
+<Quote author="我的取舍" source="本站架构记录">
+  对于一个站点级的文档组件库，全局注入的书写成本最低。代价是可发现性弱——读者不知道有哪些组件可用。所以我用一篇专门的文章（就是这篇）作为组件清单的入口。
+</Quote>
+
+## 这套组件后续会怎么演进
+
+这套组件同时是未来 CMS 动态内容 Block 渲染层的基础。当 CMS 接入后，后台存的是结构化 Block（`callout` / `code` / `audio` 等），前台用 BlockRenderer 按 type 映射到这些组件。所以现在把组件设计好，后面 CMS 接入时直接复用，不用重写。
+
+<Callout variant="info">
+  组件清单和 Block 契约会在 `packages/content-contract` 里统一定义，保证 MDX 组件和 CMS Block 两端用同一套类型源。
+</Callout>

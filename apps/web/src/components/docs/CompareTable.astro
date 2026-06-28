@@ -1,0 +1,107 @@
+---
+interface Column {
+  key: string;
+  label: string;
+  highlight?: boolean;
+}
+
+interface Props {
+  columns: Column[];
+  rows: Record<string, string>[];
+  caption?: string;
+}
+
+const { columns, rows, caption } = Astro.props;
+---
+
+<figure class="compare">
+  {caption && <figcaption>{caption}</figcaption>}
+  <div class="compare-scroll">
+    <table>
+      <thead>
+        <tr>
+          {columns.map((col) => (
+            <th class:list={[col.highlight ? 'col-highlight' : '']}>{col.label}</th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            {columns.map((col) => (
+              <td class:list={[col.highlight ? 'col-highlight' : '']}>{row[col.key]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</figure>
+
+<style>
+  .compare {
+    margin: 1.8rem 0;
+  }
+
+  figcaption {
+    margin-bottom: 10px;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+  }
+
+  .compare-scroll {
+    overflow-x: auto;
+    border: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+  }
+
+  th,
+  td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  th:last-child,
+  td:last-child {
+    border-right: 0;
+  }
+
+  thead th {
+    background: var(--color-ink);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  tbody tr:hover td {
+    background: var(--color-surface-strong);
+  }
+
+  .col-highlight {
+    background: color-mix(in srgb, var(--color-accent-3) 18%, transparent);
+  }
+
+  thead .col-highlight {
+    background: var(--color-accent);
+    color: #111111;
+  }
+</style>

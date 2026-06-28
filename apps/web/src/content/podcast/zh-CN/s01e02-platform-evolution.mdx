@@ -1,0 +1,88 @@
+---
+title: S01E02｜内容平台从静态到动态的演进
+description: 第二期播客，聊聊为什么纯静态撑不住长期内容运营，以及前后台分离架构的决策过程。
+lang: zh-CN
+translationKey: podcast-platform-evolution
+slug: s01e02-platform-evolution
+date: 2025-06-28
+tags:
+  - 播客
+  - 架构
+  - CMS
+status: published
+featured: false
+episode: 2
+season: 1
+audio: /audio/s01e02-placeholder.mp3
+duration: 38:42
+cover: /images/podcast/s01e02-cover.svg
+transcript: true
+hosts:
+  - 站长
+guests: []
+timeline:
+  - time: '00:00'
+    label: 开场：纯静态的天花板
+  - time: '06:20'
+    label: 读写分离：Astro 负责读，CMS 负责写
+  - time: '15:40'
+    label: 为什么选 Payload 而不是 Strapi / Directus
+  - time: '22:10'
+    label: 内容契约层：解决 schema 双写漂移
+  - time: '29:30'
+    label: 结构化 Block 而不是运行时 MDX
+  - time: '35:00'
+    label: 结尾：分阶段演进，不要一步到位
+resources:
+  - label: 内容平台前后台分离架构记录
+    url: /zh-CN/knowledge/content-platform-architecture
+    note: 本期架构方案的完整文字版
+  - label: 内容平台技术选型决策记录
+    url: /zh-CN/knowledge/platform-tech-selection
+    note: 各层选型的对比表和决策依据
+  - label: 个人内容站的架构演进
+    url: /zh-CN/posts/content-platform-evolution
+    note: 从静态到动态的复盘文章
+---
+
+import { AudioPlayer, Callout, Quote } from '../../../components/docs';
+
+## 本期简介
+
+第二期，继续一个人录。主题是内容平台的架构演进——为什么纯静态撑不住长期内容运营，以及我把站点升级成前后台分离的决策过程。
+
+## 时间轴
+
+时间轴见右侧组件，本期共 38 分钟，分六个节点。
+
+## 文字稿
+
+<AudioPlayer src="/audio/s01e02-placeholder.mp3" title="S01E02 内容平台从静态到动态的演进" duration="38:42" />
+
+**开场**：第一期聊了 AI Agent 工程化，这期聊我自己。我做一个个人内容站，最初用 Astro 纯静态，跑得很好。但当我想长期维护时，发现几个硬限制。
+
+<Callout variant="warning" title="纯静态的天花板">
+  内容只能在 Git 里写、没有草稿预览发布状态机、媒体塞 Git 越来越重、评论搜索 AI 检索没有落点。这不是 Astro 的问题，是纯静态模式的天花板。
+</Callout>
+
+**读写分离**：我没放弃 Astro，而是把它定位成读侧。另起一个 CMS 作为写侧。Astro 负责快、轻、SEO 好；CMS 负责编辑、草稿、审核、媒体库。
+
+**为什么选 Payload**：
+
+<Quote author="选型理由" source="技术选型决策记录">
+  Payload 的 Code-first 风格适合研发背景的人长期维护，Block 工程化控制力最强。Directus 更适合快速搭后台，Strapi 更适合通用 CMS 场景。
+</Quote>
+
+**内容契约层**：最大的风险是 Astro 的 schema 和 CMS 的 collection 定义两套源漂移。我加了一层 `content-contract`，导出共享类型和字段枚举，两端各自适配，当作单一事实源。
+
+**结构化 Block**：动态内容不存成 MDX 让前台运行时编译，而是存成结构化 Block（richText / callout / code / audio 等），前台用 BlockRenderer 按类型渲染。
+
+<Callout variant="tip">
+  这套 Block 渲染层的基础就是现在 MDX 里用的文档组件。现在把组件设计好，后面 CMS 接入时直接复用，不用重写。
+</Callout>
+
+**结尾**：分阶段演进，不要一步到位。先把静态骨架跑稳，再接 CMS 单集合试点，再全量迁移。每一步都有可回退的验证点。
+
+## 本期提到的资源
+
+资源链接见右侧组件。架构记录和选型决策建议搭配收听。

@@ -1,9 +1,25 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import {
+  CONTENT_STATUSES,
+  KNOWLEDGE_AREAS,
+  KNOWLEDGE_LEVELS,
+  RESOURCE_TYPES,
+  TIMELINE_KINDS,
+} from '@personal-ai-knowledge-site/content-contract';
+import { cmsLoader } from './lib/cms-loader';
 
 const lang = z.enum(['zh-CN', 'en']);
-const status = z.enum(['draft', 'published', 'archived']).default('draft');
+const status = z.enum(CONTENT_STATUSES).default('draft');
+
+function postsLoader() {
+  const cmsURL = process.env.CMS_API_URL;
+  if (cmsURL) {
+    return cmsLoader({ collection: 'posts', apiURL: cmsURL, graceful: true });
+  }
+  return glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' });
+}
 
 const common = {
   title: z.string(),
@@ -31,11 +47,28 @@ const podcast = defineCollection({
     transcript: z.boolean().default(true),
     hosts: z.array(z.string()).default([]),
     guests: z.array(z.string()).default([]),
+    timeline: z
+      .array(
+        z.object({
+          time: z.string(),
+          label: z.string(),
+        }),
+      )
+      .default([]),
+    resources: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.string(),
+          note: z.string().optional(),
+        }),
+      )
+      .default([]),
   }),
 });
 
 const posts = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  loader: postsLoader(),
   schema: z.object({
     ...common,
     date: z.coerce.date(),
@@ -48,17 +81,8 @@ const knowledge = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/knowledge' }),
   schema: z.object({
     ...common,
-    area: z.enum([
-      'ai-agent',
-      'architecture',
-      'data-engineering',
-      'frontend',
-      'product',
-      'operations',
-      'management',
-      'tools',
-    ]),
-    level: z.enum(['basic', 'intermediate', 'advanced']).default('intermediate'),
+    area: z.enum(KNOWLEDGE_AREAS),
+    level: z.enum(KNOWLEDGE_LEVELS).default('intermediate'),
     order: z.number().optional(),
   }),
 });
@@ -93,7 +117,7 @@ const resources = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/resources' }),
   schema: z.object({
     ...common,
-    type: z.enum(['tool', 'book', 'article', 'video', 'repo', 'course']),
+    type: z.enum(RESOURCE_TYPES),
     url: z.string().optional(),
   }),
 });
@@ -111,7 +135,7 @@ const timeline = defineCollection({
   schema: z.object({
     ...common,
     date: z.coerce.date(),
-    kind: z.enum(['milestone', 'release', 'learning']).default('milestone'),
+    kind: z.enum(TIMELINE_KINDS).default('milestone'),
   }),
 });
 

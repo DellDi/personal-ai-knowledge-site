@@ -15,3 +15,10 @@
 - [ ] 亮色、黑夜、跟随系统主题可用
 - [ ] canonical 和 hreflang 存在
 - [ ] 中文页面可见文案不被英文概念主导
+- [ ] 详情页 JSON-LD 注入（Article / PodcastEpisode / BreadcrumbList）
+- [ ] og:image 和 twitter:image 存在
+- [ ] 每集合至少 1 篇 published 内容进入 RSS 与 Pagefind
+- [ ] 播客详情页时间轴和资源组件渲染
+- [ ] 知识库文档树侧边栏可折叠
+- [ ] 知识库详情页上下篇导航展示
+- [ ] 详情页底部相关内容推荐展示

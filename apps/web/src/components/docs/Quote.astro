@@ -1,0 +1,73 @@
+---
+interface Props {
+  author?: string;
+  source?: string;
+  url?: string;
+}
+
+const { author, source, url } = Astro.props;
+---
+
+<blockquote class="quote">
+  <slot />
+  {(author || source) && (
+    <footer>
+      {author && <cite>{author}</cite>}
+      {source && (url ? <a href={url} rel="noopener noreferrer" target="_blank">{source} →</a> : <span>{source}</span>)}
+    </footer>
+  )}
+</blockquote>
+
+<style>
+  .quote {
+    margin: 1.8rem 0;
+    padding: 20px 22px;
+    border: var(--border-width) solid var(--color-border);
+    border-left-width: 6px;
+    border-left-color: var(--color-accent);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  .quote :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .quote :global(p) {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  cite {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    font-style: normal;
+  }
+
+  footer a,
+  footer span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  footer a:hover {
+    color: var(--color-accent-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

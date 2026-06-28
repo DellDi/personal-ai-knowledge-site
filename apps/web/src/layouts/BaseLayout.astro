@@ -9,6 +9,8 @@ interface Alternate {
   path: string;
 }
 
+type JsonLd = Record<string, unknown>;
+
 interface Props {
   locale: Locale;
   title: string;
@@ -16,6 +18,8 @@ interface Props {
   noindex?: boolean;
   canonicalPath?: string;
   alternates?: Alternate[];
+  jsonLd?: JsonLd | JsonLd[];
+  ogImage?: string;
 }
 
 const {
@@ -25,11 +29,15 @@ const {
   noindex = false,
   canonicalPath = Astro.url.pathname,
   alternates = locales.map((item) => ({ locale: item, path: swapLocale(Astro.url.pathname, item) })),
+  jsonLd,
+  ogImage = '/og-default.svg',
 } = Astro.props;
 
 const site = Astro.site ?? new URL('https://example.com');
 const canonical = new URL(canonicalPath, site).toString();
 const pageTitle = title === ui[locale].siteName ? title : `${title} | ${ui[locale].siteName}`;
+const ogImageUrl = new URL(ogImage, site).toString();
+const jsonLdList = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
@@ -64,7 +72,9 @@ const pageTitle = title === ui[locale].siteName ? title : `${title} | ${ui[local
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={ogImageUrl} />
     <meta name="theme-color" content="#111111" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -72,6 +82,9 @@ const pageTitle = title === ui[locale].siteName ? title : `${title} | ${ui[local
       href="https://fonts.googleapis.com/css2?family=Newsreader:wght@400;600;700;800&family=Public+Sans:wght@400;500;700;800&family=Space+Mono:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    {jsonLdList.map((node) => (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(node)} />
+    ))}
   </head>
   <body>
     <a class="skip-link" href="#main">{ui[locale].skipToContent}</a>

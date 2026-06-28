@@ -1,0 +1,72 @@
+---
+import Badge from '../Badge.astro';
+
+interface Props {
+  src: string;
+  title?: string;
+  duration?: string;
+  download?: string;
+}
+
+const { src, title, duration, download } = Astro.props;
+---
+
+<div class="audio-player" data-pagefind-ignore>
+  <div class="audio-meta">
+    <Badge tone="accent">音频</Badge>
+    {title && <strong>{title}</strong>}
+    {duration && <span class="audio-duration">{duration}</span>}
+  </div>
+  <audio controls preload="metadata" src={src} />
+  {download && <a class="audio-download focus-ring" href={download} download>下载音频</a>}
+</div>
+
+<style>
+  .audio-player {
+    margin: 1.6rem 0;
+    padding: 18px 20px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hard-sm);
+    display: grid;
+    gap: 12px;
+  }
+
+  .audio-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .audio-meta strong {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+  }
+
+  .audio-duration {
+    margin-left: auto;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  audio {
+    width: 100%;
+  }
+
+  .audio-download {
+    justify-self: start;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-strong);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  .audio-download:hover {
+    background: var(--color-accent-3);
+    color: #111111;
+  }
+</style>

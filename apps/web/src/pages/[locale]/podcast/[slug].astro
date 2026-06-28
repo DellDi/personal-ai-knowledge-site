@@ -1,6 +1,8 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import EntryLayout from '../../../layouts/EntryLayout.astro';
+import PodcastResources from '../../../components/PodcastResources.astro';
+import PodcastTimeline from '../../../components/PodcastTimeline.astro';
 import type { Locale } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
@@ -20,6 +22,10 @@ const { Content, headings } = await render(entry);
     <audio controls preload="metadata" src={entry.data.audio}></audio>
   </div>
   <Content />
+  <div slot="after-content">
+    <PodcastTimeline entry={entry} locale={locale} />
+    <PodcastResources entry={entry} locale={locale} />
+  </div>
 </EntryLayout>
 
 <style>

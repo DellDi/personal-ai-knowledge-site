@@ -33,11 +33,11 @@ type NavItem = {
 
 export const ui = {
   'zh-CN': {
-    siteName: 'AI 知识实践站',
+    siteName: 'DellDi的信息内容栈',
     siteDescription: '用于呈现个人品牌、项目实践、知识体系与技能储备的个人内容站。',
     skipToContent: '跳到正文',
-    brandPrimary: 'AI',
-    brandSecondary: '知识实践',
+    brandPrimary: 'DellDi',
+    brandSecondary: '信息内容栈',
     footerKicker: '个人内容站',
     nav: [
       { label: '首页', href: '/' },
@@ -51,7 +51,7 @@ export const ui = {
       { label: '搜索', href: '/search' },
     ] satisfies NavItem[],
     homeKicker: 'Astro 内容平台',
-    homeTitle: '把我的项目实践、知识体系和技能储备沉淀成一个可检索的个人内容站。',
+    homeTitle: 'DellDi的信息内容栈',
     homeIntro:
       '第一版先服务个人展示和自我沉淀：对外呈现我是谁、在做什么、积累了哪些 AI/工程/产品实践，以及后续可复用的知识资产。',
     featured: '精选内容',
@@ -85,13 +85,21 @@ export const ui = {
     podcastRss: '播客 RSS',
     adminTitle: '后台管理预留',
     adminIntro: '这里是未来内容运营后台的预留入口，当前只保留信息架构，不包含登录、写入或管理能力。',
+    relatedTitle: '相关内容',
+    knowledgeTreeTitle: '知识库目录',
+    knowledgeTreeToggle: '展开 / 收起目录',
+    podcastTimeline: '时间轴',
+    podcastResources: '本期资源',
+    podcastTranscript: '文字稿',
+    prevEntry: '上一篇',
+    nextEntry: '下一篇',
   },
   en: {
-    siteName: 'AI Knowledge Practice',
+    siteName: "DellDi's Information Content Stack",
     siteDescription: 'A personal content site for brand presence, project practice, knowledge assets, and skill inventory.',
     skipToContent: 'Skip to content',
-    brandPrimary: 'AI',
-    brandSecondary: 'Practice',
+    brandPrimary: 'DellDi',
+    brandSecondary: "Information Content Stack",
     footerKicker: 'Personal content site',
     nav: [
       { label: 'Home', href: '/' },
@@ -104,8 +112,8 @@ export const ui = {
       { label: 'Glossary', href: '/glossary' },
       { label: 'Search', href: '/search' },
     ] satisfies NavItem[],
-    homeKicker: 'Astro knowledge platform',
-    homeTitle: 'A personal site for projects, knowledge assets, and skill inventory.',
+    homeKicker: "DellDi's Information Content And Knowledge Stack",
+    homeTitle: "DellDi's Information Content And Knowledge Stack",
     homeIntro:
       'This site exists to present the owner, archive personal work, and keep reusable knowledge visible over time.',
     featured: 'Featured',
@@ -139,5 +147,13 @@ export const ui = {
     podcastRss: 'Podcast RSS',
     adminTitle: 'Admin Reserved',
     adminIntro: 'A reserved entry for future editorial operations. Chinese content operations are the priority.',
+    relatedTitle: 'Related content',
+    knowledgeTreeTitle: 'Knowledge index',
+    knowledgeTreeToggle: 'Toggle index',
+    podcastTimeline: 'Timeline',
+    podcastResources: 'Episode resources',
+    podcastTranscript: 'Transcript',
+    prevEntry: 'Previous',
+    nextEntry: 'Next',
   },
 } as const;

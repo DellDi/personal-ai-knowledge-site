@@ -1,0 +1,85 @@
+---
+import type { RelatedEntry } from '../lib/content';
+import { collectionNames, getEntryPath } from '../lib/content';
+import { ui, type Locale } from '../lib/i18n';
+
+interface Props {
+  items: RelatedEntry[];
+  locale: Locale;
+}
+
+const { items, locale } = Astro.props;
+const t = ui[locale];
+---
+
+{items.length > 0 && (
+  <section class="related">
+    <p>{t.relatedTitle}</p>
+    <ul>
+      {items.map(({ collection, entry }) => (
+        <li>
+          <a class="related-link focus-ring" href={getEntryPath(collection, entry)}>
+            <span class="related-kind">{collectionNames[locale][collection]}</span>
+            <strong>{entry.data.title}</strong>
+            <span class="related-desc">{entry.data.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .related {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: var(--border-width) solid var(--color-border);
+  }
+
+  p {
+    margin: 0 0 16px;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  ul {
+    display: grid;
+    gap: 14px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .related-link {
+    display: grid;
+    gap: 6px;
+    padding: 16px 18px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .related-link:hover {
+    background: var(--color-surface-strong);
+  }
+
+  .related-kind {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    font-weight: 700;
+  }
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.15;
+  }
+
+  .related-desc {
+    color: var(--color-muted);
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+</style>

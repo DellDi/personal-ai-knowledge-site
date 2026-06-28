@@ -1,7 +1,9 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import type { PublicCollection, PublicEntry } from '../lib/content';
 import Badge from '../components/Badge.astro';
 import Breadcrumb from '../components/Breadcrumb.astro';
+import RelatedEntries from '../components/RelatedEntries.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import Tag from '../components/Tag.astro';
 import BaseLayout from './BaseLayout.astro';
@@ -10,8 +12,10 @@ import {
   collectionNames,
   formatDate,
   getCollectionPath,
+  getRelatedEntries,
   getTranslationAlternates,
 } from '../lib/content';
+import { buildArticleJsonLd, buildBreadcrumbJsonLd, buildPodcastEpisodeJsonLd } from '../lib/seo';
 import { getLocalePath, ui, type Locale } from '../lib/i18n';
 
 interface Heading {
@@ -30,6 +34,24 @@ interface Props {
 const { collection, entry, locale, headings } = Astro.props;
 const alternates = await getTranslationAlternates(collection, entry);
 const date = formatDate(entry.data.date, locale);
+const related = await getRelatedEntries(collection, entry, locale);
+
+const site = Astro.site ?? new URL('https://example.com');
+const breadcrumbItems = [
+  { label: ui[locale].nav[0].label, href: getLocalePath(locale) },
+  { label: collectionNames[locale][collection], href: getCollectionPath(collection, locale) },
+  { label: entry.data.title },
+];
+const jsonLd =
+  collection === 'podcast'
+    ? [
+        buildPodcastEpisodeJsonLd(entry as CollectionEntry<'podcast'>, site, locale),
+        buildBreadcrumbJsonLd(breadcrumbItems, site),
+      ]
+    : [
+        buildArticleJsonLd(collection, entry, site, locale),
+        buildBreadcrumbJsonLd(breadcrumbItems, site),
+      ];
 ---
 
 <BaseLayout
@@ -38,16 +60,11 @@ const date = formatDate(entry.data.date, locale);
   description={entry.data.description}
   canonicalPath={`/${locale}${collectionBasePaths[collection]}/${entry.data.slug}`}
   alternates={alternates.length > 0 ? alternates : undefined}
+  jsonLd={jsonLd}
 >
   <article class="entry-shell container">
     <div class="entry-main">
-      <Breadcrumb
-        items={[
-          { label: ui[locale].nav[0].label, href: getLocalePath(locale) },
-          { label: collectionNames[locale][collection], href: getCollectionPath(collection, locale) },
-          { label: entry.data.title },
-        ]}
-      />
+      <Breadcrumb items={breadcrumbItems} />
       <header class="entry-header">
         <div class="entry-meta">
           <Badge tone="accent">{collectionNames[locale][collection]}</Badge>
@@ -62,6 +79,8 @@ const date = formatDate(entry.data.date, locale);
       <div class="prose">
         <slot />
       </div>
+      <slot name="after-content" />
+      <RelatedEntries items={related} locale={locale} />
     </div>
     <TableOfContents headings={headings} />
   </article>

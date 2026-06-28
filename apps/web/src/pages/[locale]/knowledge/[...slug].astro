@@ -1,7 +1,8 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import EntryLayout from '../../../layouts/EntryLayout.astro';
-import type { PublicEntry } from '../../../lib/content';
+import EntryNav from '../../../components/EntryNav.astro';
+import { getKnowledgeNeighbors } from '../../../lib/content';
 import type { Locale } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
@@ -12,10 +13,14 @@ export async function getStaticPaths() {
   }));
 }
 
-const { entry, locale } = Astro.props as { entry: PublicEntry; locale: Locale };
+const { entry, locale } = Astro.props as { entry: CollectionEntry<'knowledge'>; locale: Locale };
 const { Content, headings } = await render(entry);
+const neighbors = await getKnowledgeNeighbors(entry, locale);
 ---
 
 <EntryLayout collection="knowledge" entry={entry} locale={locale} headings={headings}>
   <Content />
+  <div slot="after-content">
+    <EntryNav prev={neighbors.prev} next={neighbors.next} locale={locale} collection="knowledge" />
+  </div>
 </EntryLayout>

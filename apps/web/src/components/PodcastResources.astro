@@ -1,0 +1,93 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { ui, type Locale } from '../lib/i18n';
+
+interface Props {
+  entry: CollectionEntry<'podcast'>;
+  locale: Locale;
+}
+
+const { entry, locale } = Astro.props;
+const t = ui[locale];
+const resources = entry.data.resources;
+---
+
+{resources.length > 0 && (
+  <section class="podcast-resources" aria-label={t.podcastResources}>
+    <p>{t.podcastResources}</p>
+    <ul>
+      {resources.map((item) => (
+        <li>
+          <a class="resource-row focus-ring" href={item.url}>
+            <span class="resource-label">{item.label}</span>
+            {item.note && <span class="resource-note">{item.note}</span>}
+            <span class="resource-url" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  .podcast-resources {
+    margin-top: 36px;
+    padding: 20px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  p {
+    margin: 0 0 14px;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  ul {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .resource-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-strong);
+  }
+
+  .resource-row:hover {
+    background: var(--color-accent-3);
+  }
+
+  .resource-label {
+    grid-column: 1;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 0.96rem;
+  }
+
+  .resource-note {
+    grid-column: 1;
+    color: var(--color-muted);
+    font-size: 0.84rem;
+    line-height: 1.45;
+  }
+
+  .resource-url {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-weight: 700;
+  }
+</style>

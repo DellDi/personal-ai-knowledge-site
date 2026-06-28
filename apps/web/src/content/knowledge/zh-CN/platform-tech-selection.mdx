@@ -1,0 +1,112 @@
+---
+title: 内容平台技术选型决策记录
+description: 记录本站从静态框架、CMS、数据库、对象存储到搜索索引的完整选型过程，含对比表和决策依据。
+lang: zh-CN
+translationKey: platform-tech-selection
+slug: platform-tech-selection
+date: 2025-06-28
+updated: 2025-06-28
+tags:
+  - 架构
+  - 技术选型
+  - CMS
+status: published
+featured: false
+area: architecture
+level: intermediate
+order: 2
+---
+
+import { Callout, Steps, StatGrid, CompareTable, Quote } from '../../../components/docs';
+
+## 选型原则
+
+<Callout variant="info" title="原则">
+  每一层选型都遵循“读侧和写侧分开，两边用最合适的工具”。不追求单框架大而全，而是让每个工具做它最擅长的事。
+</Callout>
+
+## 前台框架：为什么是 Astro
+
+<CompareTable
+  caption="前台框架对比"
+  columns={[
+    { key: 'feature', label: '维度' },
+    { key: 'astro', label: 'Astro', highlight: true },
+    { key: 'next', label: 'Next.js' },
+    { key: 'nuxt', label: 'Nuxt' }
+  ]}
+  rows={[
+    { feature: '定位', astro: '内容驱动', next: '全栈应用', nuxt: '全栈应用' },
+    { feature: '默认 JS 量', astro: '零', next: '较多', nuxt: '较多' },
+    { feature: 'SEO', astro: '静态最优', next: '需配置', nuxt: '需配置' },
+    { feature: 'MDX 支持', astro: '原生集成', next: '需插件', nuxt: '需插件' },
+    { feature: 'Content Collections', astro: '原生', next: '无', nuxt: '无' }
+  ]}
+/>
+
+Astro 的 Content Collections 是决定性因素：它给内容加了 schema 校验层，让“内容结构”成为一等公民。
+
+## CMS：为什么是 Payload
+
+<CompareTable
+  caption="CMS 方案对比"
+  columns={[
+    { key: 'feature', label: '维度' },
+    { key: 'payload', label: 'Payload', highlight: true },
+    { key: 'directus', label: 'Directus' },
+    { key: 'strapi', label: 'Strapi' }
+  ]}
+  rows={[
+    { feature: '风格', payload: 'TypeScript Code-first', directus: '数据库优先', strapi: '通用 CMS' },
+    { feature: 'Block 工程', payload: '强', directus: '中', strapi: '中' },
+    { feature: '长期扩展', payload: '适合研发维护', directus: '适合快速搭', strapi: '适合通用场景' },
+    { feature: 'PostgreSQL', payload: '原生', directus: '原生', strapi: '支持' }
+  ]}
+/>
+
+Payload 的 Code-first 风格适合我这种研发背景的人长期维护，Block 工程化控制力最强。
+
+## 数据库：为什么直接 PostgreSQL
+
+<Steps>
+  <li>本地用 docker-compose 起 PostgreSQL 16，开发生产同一镜像</li>
+  <li>避免 SQLite → PostgreSQL 的迁移折返</li>
+  <li>后续 pgvector 扩展直接复用同一实例做 AI 向量检索</li>
+</Steps>
+
+## 对象存储：为什么阿里云 OSS
+
+<StatGrid
+  items={[
+    { value: 'S3 兼容', label: 'Payload storage adapter 复用' },
+    { value: '国内快', label: '主受众访问延迟低' },
+    { value: 'MinIO', label: '开发期本地替身' }
+  ]}
+  columns={3}
+/>
+
+<Callout variant="warning">
+  开发期用 MinIO 起在 docker-compose，生产切换阿里云 OSS。两者都走 S3 兼容协议，Payload 的 storage adapter 用同一份配置，切换只改环境变量。
+</Callout>
+
+## 搜索：分阶段
+
+<CompareTable
+  caption="搜索方案分阶段"
+  columns={[
+    { key: 'phase', label: '阶段' },
+    { key: 'tool', label: '工具', highlight: true },
+    { key: 'scope', label: '适用范围' }
+  ]}
+  rows={[
+    { phase: '第一阶段', tool: 'Pagefind', scope: '静态页面搜索' },
+    { phase: '第二阶段', tool: 'Meilisearch', scope: '动态内容检索' },
+    { phase: '第三阶段', tool: 'pgvector', scope: 'AI 语义检索' }
+  ]}
+/>
+
+## 决策汇总
+
+<Quote author="选型结论" source="本站架构记录">
+  Astro 前台 + Payload CMS 后台 + PostgreSQL + 阿里云 OSS + Pagefind（起步）/ Meilisearch（升级）/ pgvector（AI）。每一层都用最合适的工具，通过 content-contract 契约层统一类型源。
+</Quote>

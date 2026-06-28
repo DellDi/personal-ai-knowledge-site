@@ -1,0 +1,60 @@
+---
+import Badge from '../Badge.astro';
+
+interface Props {
+  language?: string;
+  filename?: string;
+  code: string;
+}
+
+const { language, filename, code } = Astro.props;
+---
+
+<figure class="code-block" data-pagefind-ignore>
+  <figcaption>
+    {filename && <span>{filename}</span>}
+    {language && <Badge>{language}</Badge>}
+  </figcaption>
+  <pre><code>{code}</code></pre>
+</figure>
+
+<style>
+  .code-block {
+    margin: 1.6rem 0;
+    border: var(--border-width) solid var(--color-border);
+    box-shadow: var(--shadow-hard-sm);
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 14px;
+    background: var(--color-surface);
+    border-bottom: var(--border-width) solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  figcaption span {
+    color: var(--color-muted);
+  }
+
+  pre {
+    margin: 0;
+    padding: 16px 18px;
+    overflow-x: auto;
+    background: var(--color-code-bg);
+  }
+
+  pre code {
+    padding: 0;
+    background: transparent;
+    color: var(--color-code-ink);
+    font-family: var(--font-mono);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+</style>

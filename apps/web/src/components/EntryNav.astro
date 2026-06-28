@@ -1,0 +1,91 @@
+---
+import type { PublicEntry } from '../lib/content';
+import { getEntryPath } from '../lib/content';
+import { ui, type Locale } from '../lib/i18n';
+
+interface Props {
+  prev?: PublicEntry;
+  next?: PublicEntry;
+  locale: Locale;
+  collection: Parameters<typeof getEntryPath>[0];
+}
+
+const { prev, next, locale, collection } = Astro.props;
+const t = ui[locale];
+---
+
+{(prev || next) && (
+  <nav class="entry-nav" aria-label={t.relatedTitle}>
+    {prev && (
+      <a class="nav-card nav-prev focus-ring" href={getEntryPath(collection, prev)}>
+        <span>{t.prevEntry}</span>
+        <strong>{prev.data.title}</strong>
+      </a>
+    )}
+    {next && (
+      <a class="nav-card nav-next focus-ring" href={getEntryPath(collection, next)}>
+        <span>{t.nextEntry}</span>
+        <strong>{next.data.title}</strong>
+      </a>
+    )}
+  </nav>
+)}
+
+<style>
+  .entry-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 40px;
+  }
+
+  .nav-card {
+    display: grid;
+    gap: 8px;
+    padding: 16px 18px;
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+
+  .nav-card:hover {
+    background: var(--color-surface-strong);
+  }
+
+  .nav-next {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .nav-card:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .nav-prev:only-child {
+    grid-column: 1 / -1;
+    text-align: left;
+  }
+
+  span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    font-weight: 700;
+  }
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.2;
+  }
+
+  @media (max-width: 600px) {
+    .entry-nav {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-next {
+      grid-column: 1;
+      text-align: left;
+    }
+  }
+</style>
