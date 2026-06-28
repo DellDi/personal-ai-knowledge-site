@@ -2,6 +2,7 @@
 import { getCollection, render, type CollectionEntry } from 'astro:content';
 import EntryLayout from '../../../layouts/EntryLayout.astro';
 import EntryNav from '../../../components/EntryNav.astro';
+import BlockRenderer from '../../../components/docs/BlockRenderer.astro';
 import { getKnowledgeNeighbors } from '../../../lib/content';
 import type { Locale } from '../../../lib/i18n';
 
@@ -16,10 +17,12 @@ export async function getStaticPaths() {
 const { entry, locale } = Astro.props as { entry: CollectionEntry<'knowledge'>; locale: Locale };
 const { Content, headings } = await render(entry);
 const neighbors = await getKnowledgeNeighbors(entry, locale);
+const blocks = entry.data.contentBlocks;
 ---
 
 <EntryLayout collection="knowledge" entry={entry} locale={locale} headings={headings}>
   <Content />
+  {blocks && blocks.length > 0 && <BlockRenderer blocks={blocks} />}
   <div slot="after-content">
     <EntryNav prev={neighbors.prev} next={neighbors.next} locale={locale} collection="knowledge" />
   </div>

@@ -1,88 +1,9 @@
-import type { CollectionConfig, Field, Block } from 'payload';
+import type { CollectionConfig } from 'payload';
 import {
   CONTENT_STATUSES,
   LANGS,
 } from '@personal-ai-knowledge-site/content-contract';
-
-const calloutBlock: Block = {
-  slug: 'calloutBlock',
-  fields: [
-    { name: 'variant', type: 'select', required: true, defaultValue: 'info', options: ['info', 'tip', 'warning', 'danger'] },
-    { name: 'title', type: 'text' },
-    { name: 'content', type: 'textarea', required: true },
-  ],
-};
-
-const codeBlockField: Block = {
-  slug: 'codeBlock',
-  fields: [
-    { name: 'language', type: 'text' },
-    { name: 'filename', type: 'text' },
-    { name: 'code', type: 'textarea', required: true },
-  ],
-};
-
-const quoteBlock: Block = {
-  slug: 'quoteBlock',
-  fields: [
-    { name: 'content', type: 'textarea', required: true },
-    { name: 'author', type: 'text' },
-    { name: 'source', type: 'text' },
-    { name: 'url', type: 'text' },
-  ],
-};
-
-const stepsBlock: Block = {
-  slug: 'stepsBlock',
-  fields: [
-    { name: 'title', type: 'text' },
-    {
-      name: 'items',
-      type: 'array',
-      required: true,
-      fields: [{ name: 'text', type: 'textarea', required: true }],
-    },
-  ],
-};
-
-const statGridBlock: Block = {
-  slug: 'statGridBlock',
-  fields: [
-    { name: 'columns', type: 'number', defaultValue: 3 },
-    {
-      name: 'items',
-      type: 'array',
-      required: true,
-      fields: [
-        { name: 'value', type: 'text', required: true },
-        { name: 'label', type: 'text', required: true },
-      ],
-    },
-  ],
-};
-
-const compareTableBlock: Block = {
-  slug: 'compareTableBlock',
-  fields: [
-    { name: 'caption', type: 'text' },
-    {
-      name: 'columns',
-      type: 'array',
-      required: true,
-      fields: [
-        { name: 'key', type: 'text', required: true },
-        { name: 'label', type: 'text', required: true },
-        { name: 'highlight', type: 'checkbox', defaultValue: false },
-      ],
-    },
-    {
-      name: 'rows',
-      type: 'array',
-      required: true,
-      fields: [{ name: 'data', type: 'json', required: true }],
-    },
-  ],
-};
+import { sharedBlocks } from './shared-blocks';
 
 export const posts: CollectionConfig = {
   slug: 'posts',
@@ -114,7 +35,7 @@ export const posts: CollectionConfig = {
       options: [...CONTENT_STATUSES],
     },
     { name: 'featured', type: 'checkbox', defaultValue: false },
-    { name: 'date', type: 'date' },
+    { name: 'date', type: 'date', required: true },
     { name: 'updated', type: 'date' },
     { name: 'tags', type: 'text', hasMany: true, defaultValue: [] },
     {
@@ -129,7 +50,7 @@ export const posts: CollectionConfig = {
     {
       name: 'contentBlocks',
       type: 'blocks',
-      blocks: [calloutBlock, codeBlockField, quoteBlock, stepsBlock, statGridBlock, compareTableBlock],
+      blocks: sharedBlocks,
     },
     {
       name: 'author',

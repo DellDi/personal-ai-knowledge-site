@@ -4,7 +4,7 @@
 
 ## 当前阶段
 
-项目已经从“Astro 静态个人内容站”推进到“前台内容体验完成 + CMS 后台单集合试点”阶段。
+项目已经从“Astro 静态个人内容站”推进到“前台内容体验完成 + CMS 后台全集合试点”阶段。
 
 当前主线不是继续堆页面，而是把个人内容站升级成可长期运营的个人内容资产系统：
 
@@ -30,25 +30,27 @@
 - Article、PodcastEpisode、Breadcrumb JSON-LD 已接入。
 - 默认 OG 图和 twitter:image 已接入。
 - 文档组件系统已建立：Callout、Figure、Steps、StatGrid、CompareTable、Quote、AudioPlayer、Embed、CodeBlock。
+- posts / knowledge 已支持 CMS 结构化 Block 的 BlockRenderer 渲染。
 
 ### 后台与内容契约
 
 - `packages/content-contract` 已建立，提供共享枚举、collection 字段类型和 Block 契约。
 - `apps/cms` 已建立 Payload CMS 3.x 后台基座。
-- CMS 当前包含 users、posts、media 三个 collection。
-- `infra/docker-compose.yml` 已建立 PostgreSQL + MinIO + CMS 开发栈。
+- CMS 当前包含 users、posts、podcast、knowledge、topics、projects、resources、glossary、timeline、media collection。
+- `infra/docker-compose.local.yml` 已建立 PostgreSQL + MinIO + CMS 本地开发栈。
+- `infra/docker-compose.prod.yml` 已建立 PostgreSQL + CMS + Nginx 前台生产运行栈，生产媒体走阿里云 OSS。
 - posts collection 已支持草稿版本、S3 媒体配置和结构化 Block 字段。
 
 ## 进行中
 
-### Astro ↔ CMS 单集合试点
+### Astro ↔ CMS 全集合试点
 
 - `apps/web/src/lib/cms-loader.ts` 已实现 Astro 7 Loader。
-- posts 集合已支持 `CMS_API_URL` 条件切换：
-  - 未设置 `CMS_API_URL`：使用本地 MDX。
-  - 设置 `CMS_API_URL`：从 Payload REST API 拉取 published posts。
-- CMS 不可达时 5 秒超时并优雅降级，不阻塞构建。
-- CMS richText 和 Block 当前先转换成 Markdown，再走 Content Collections schema 校验。
+- 8 个集合已支持 `CMS_API_URL` 条件加载：
+  - 未设置 `CMS_API_URL`：只使用本地 MDX / Markdown。
+  - 设置 `CMS_API_URL`：先使用本地内容，再叠加 Payload published 内容。
+- CMS 不可达时 5 秒超时并优雅降级，保留本地内容，不阻塞构建。
+- Payload blocks 会在 loader 层规范化为前台 `Block` 契约。
 
 ### /admin 状态页
 
@@ -58,21 +60,22 @@
 
 ## 未完成 / 待验证
 
-- 本地 Docker 后端栈仍需完整验证：`docker compose -f infra/docker-compose.yml up --build`。
+- 本地 Docker 后端栈仍需完整验证：`docker compose -f infra/docker-compose.local.yml up --build`。
+- 生产 Docker 栈仍需服务器验证：`docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms`。
 - CMS 登录、posts CRUD、图片上传、Payload API 读取仍需真实环境联调。
-- 使用真实 CMS 数据构建 Astro 页面仍需端到端验收。
+- 使用真实 CMS 数据构建 Astro 页面仍需端到端验收，尤其是 BlockRenderer 和 OSS 媒体 URL。
 - Pagefind 目前是基础搜索；集合筛选、标签筛选和内容地图页仍未完成。
-- 其余 7 个集合仍走本地 glob loader，尚未迁入 CMS。
-- CMS Block 到前台正式 BlockRenderer 尚未实现，目前是 Markdown 转换过渡方案。
+- 其余集合虽然已可从 CMS 加载 richText 正文，但 BlockRenderer 暂时只在 posts / knowledge 详情页启用。
 - 草稿预览、发布 Webhook、重建流程、评论、Meilisearch、AI RAG 仍是后续目标。
 
 ## 当前优先级
 
 ### P0
 
-- 让 `infra/docker-compose.yml` 在本机完整跑通。
+- 让 `infra/docker-compose.local.yml` 在本机完整跑通。
 - 打通 Payload CMS 登录、posts 新建、图片上传。
 - 用真实 CMS posts 数据验证 Astro 构建、列表页、详情页、RSS、Sitemap、Pagefind。
+- 用阿里云 OSS 测一轮生产 S3_* 配置，确认上传 URL 与前台渲染。
 
 ### P1
 
@@ -82,10 +85,10 @@
 
 ### P2
 
-- 设计 SPRINT-005：其余集合迁移、BlockRenderer、CMS 与本地 MDX 混合共存策略。
+- 设计 SPRINT-006：发布工作流、webhook 重建、草稿预览策略。
 - 设计内容导出 JSON，为后续搜索升级和 AI RAG 做准备。
 
 ## 代码状态
 
 - 最新已提交节点：`9db2eca`，引入内容契约层、CMS 后台基座、内容体验增强和 MDX 文档组件系统。
-- 当前工作区包含 SPRINT-004 相关未提交变更：cmsLoader 超时降级、admin 状态页、CMS loader 文档和 Agile 任务。
+- 当前工作区包含 SPRINT-004/005 相关未提交变更：cmsLoader 混合加载、BlockRenderer、全集合 CMS collection、admin 状态页、本地/生产部署拆分和相关文档。

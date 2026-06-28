@@ -1,7 +1,8 @@
 import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
+import { glob, type Loader } from 'astro/loaders';
 import { z } from 'astro/zod';
 import {
+  BLOCK_TYPES,
   CONTENT_STATUSES,
   KNOWLEDGE_AREAS,
   KNOWLEDGE_LEVELS,
@@ -13,12 +14,44 @@ import { cmsLoader } from './lib/cms-loader';
 const lang = z.enum(['zh-CN', 'en']);
 const status = z.enum(CONTENT_STATUSES).default('draft');
 
-function postsLoader() {
+const blockSchema = z.union([
+  z.object({ type: z.literal('richText'), content: z.string() }),
+  z.object({ type: z.literal('callout'), variant: z.enum(['info', 'tip', 'warning', 'danger']), title: z.string().optional(), content: z.string() }),
+  z.object({ type: z.literal('code'), language: z.string().optional(), filename: z.string().optional(), code: z.string() }),
+  z.object({ type: z.literal('audio'), src: z.string(), title: z.string().optional(), duration: z.string().optional(), download: z.string().optional() }),
+  z.object({ type: z.literal('image'), src: z.string(), alt: z.string(), caption: z.string().optional(), source: z.string().optional() }),
+  z.object({ type: z.literal('quote'), content: z.string(), author: z.string().optional(), source: z.string().optional(), url: z.string().optional() }),
+  z.object({ type: z.literal('embed'), src: z.string(), title: z.string().optional(), ratio: z.enum(['16-9', '4-3', '1-1']).optional() }),
+  z.object({ type: z.literal('steps'), title: z.string().optional(), items: z.array(z.string()) }),
+  z.object({ type: z.literal('statGrid'), columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(), items: z.array(z.object({ value: z.string(), label: z.string() })) }),
+  z.object({ type: z.literal('compareTable'), caption: z.string().optional(), columns: z.array(z.object({ key: z.string(), label: z.string(), highlight: z.boolean().optional() })), rows: z.array(z.record(z.string(), z.string())) }),
+]);
+
+const contentBlocksField = z.array(blockSchema).optional();
+
+void BLOCK_TYPES;
+
+function collectionLoader(slug: string, passthroughFields: string[] = []) {
+  const localLoader = glob({ pattern: '**/*.{md,mdx}', base: `./src/content/${slug}` });
   const cmsURL = process.env.CMS_API_URL;
   if (cmsURL) {
-    return cmsLoader({ collection: 'posts', apiURL: cmsURL, graceful: true });
+    const remoteLoader = cmsLoader({
+      collection: slug,
+      apiURL: cmsURL,
+      graceful: true,
+      clearStore: false,
+      passthroughFields,
+    });
+
+    return {
+      name: `hybrid-${slug}`,
+      async load(ctx) {
+        await localLoader.load(ctx);
+        await remoteLoader.load(ctx);
+      },
+    } satisfies Loader;
   }
-  return glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' });
+  return localLoader;
 }
 
 const common = {
@@ -35,7 +68,7 @@ const common = {
 };
 
 const podcast = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/podcast' }),
+  loader: collectionLoader('podcast', ['timeline', 'resources', 'episode', 'season', 'audio', 'duration', 'cover', 'transcript', 'hosts', 'guests']),
   schema: z.object({
     ...common,
     date: z.coerce.date(),
@@ -68,27 +101,29 @@ const podcast = defineCollection({
 });
 
 const posts = defineCollection({
-  loader: postsLoader(),
+  loader: collectionLoader('posts', ['contentBlocks']),
   schema: z.object({
     ...common,
     date: z.coerce.date(),
     category: z.string(),
     series: z.string().optional(),
+    contentBlocks: contentBlocksField,
   }),
 });
 
 const knowledge = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/knowledge' }),
+  loader: collectionLoader('knowledge', ['area', 'level', 'order', 'contentBlocks']),
   schema: z.object({
     ...common,
     area: z.enum(KNOWLEDGE_AREAS),
     level: z.enum(KNOWLEDGE_LEVELS).default('intermediate'),
     order: z.number().optional(),
+    contentBlocks: contentBlocksField,
   }),
 });
 
 const topics = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/topics' }),
+  loader: collectionLoader('topics', ['items', 'hero']),
   schema: z.object({
     ...common,
     items: z.array(z.string()).default([]),
@@ -97,7 +132,7 @@ const topics = defineCollection({
 });
 
 const projects = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
+  loader: collectionLoader('projects', ['role', 'stack', 'links']),
   schema: z.object({
     ...common,
     role: z.string().optional(),
@@ -114,7 +149,7 @@ const projects = defineCollection({
 });
 
 const resources = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/resources' }),
+  loader: collectionLoader('resources', ['type', 'url']),
   schema: z.object({
     ...common,
     type: z.enum(RESOURCE_TYPES),
@@ -123,7 +158,7 @@ const resources = defineCollection({
 });
 
 const glossary = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/glossary' }),
+  loader: collectionLoader('glossary', ['aliases']),
   schema: z.object({
     ...common,
     aliases: z.array(z.string()).default([]),
@@ -131,7 +166,7 @@ const glossary = defineCollection({
 });
 
 const timeline = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/timeline' }),
+  loader: collectionLoader('timeline', ['kind']),
   schema: z.object({
     ...common,
     date: z.coerce.date(),

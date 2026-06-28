@@ -1,46 +1,80 @@
 # 内容 Loader
 
-## 数据源选择
+## 数据源模式
 
-posts 集合支持两种数据源，通过环境变量 `CMS_API_URL` 切换：
+8 个公开内容集合都使用 `collectionLoader(slug, passthroughFields)`：
 
-| 模式 | 条件 | 数据源 | 适用场景 |
-|---|---|---|---|
-| 本地 MDX | `CMS_API_URL` 未设置 | `apps/web/src/content/posts/` 下的 `.md`/`.mdx` | 开发期、CMS 未接入 |
-| CMS API | `CMS_API_URL` 已设置 | Payload REST API | CMS 已接入、生产 |
+| 条件 | 行为 | 结果 |
+|---|---|---|
+| 未设置 `CMS_API_URL` | 只使用本地 glob loader | 读取 `apps/web/src/content/<collection>` |
+| 已设置 `CMS_API_URL` | 先加载本地 glob，再叠加 CMS loader | 本地 MDX 与 CMS published 内容混合共存 |
+| CMS 不可达 | 保留本地 glob 内容，记录 warning | 构建不中断，公开站点不变空 |
 
-其余 7 个集合（podcast / knowledge / topics / projects / resources / glossary / timeline）仍使用 glob loader，后续 SPRINT-005 逐步迁移。
+这保证 CMS 是增强数据源，不是前台构建的单点依赖。
 
 ## cmsLoader 实现
 
 位于 `apps/web/src/lib/cms-loader.ts`，实现 Astro 7 的 `Loader` 接口：
 
-1. 从 `{CMS_API_URL}/posts` 分页拉取 `status: published` 内容
-2. 把 Payload 的 richText content 转成 Markdown
-3. 把结构化 Block（calloutBlock / codeBlock / quoteBlock 等）转成 Markdown
-4. 用 `context.parseData` 走 zod schema 校验（复用 Content Collections 的 schema）
-5. 用 `context.renderMarkdown` 渲染成 HTML
-6. 写入 `context.store`
+1. 从 `{CMS_API_URL}/{collection}` 分页拉取 `status: published` 内容。
+2. 把 Payload richText content 转成 Markdown。
+3. 把 Payload block 的 `blockType` 规范化成前台契约里的 `type`。
+4. 把上传关系字段（如 `cover` / `hero`）规范化为 URL 字符串。
+5. 用 `context.parseData` 走 zod schema 校验。
+6. 用 `context.renderMarkdown` 渲染正文。
+7. 写入 `context.store`。
 
-## 优雅降级
+## Block 规范化
 
-当 CMS 不可达时（5 秒超时），cmsLoader 记录警告并返回空数据，不阻塞构建。这让前台在没有后端的环境下也能正常构建。
+Payload 返回的 block 形态类似：
 
-## 信号
+```json
+{ "blockType": "calloutBlock", "variant": "tip", "content": "..." }
+```
+
+前台 `BlockRenderer` 期望：
+
+```json
+{ "type": "callout", "variant": "tip", "content": "..." }
+```
+
+所以 loader 负责转换：
+
+| Payload blockType | 前台 type |
+|---|---|
+| calloutBlock | callout |
+| codeBlock | code |
+| audioBlock | audio |
+| imageBlock | image |
+| quoteBlock | quote |
+| embedBlock | embed |
+| stepsBlock | steps |
+| statGridBlock | statGrid |
+| compareTableBlock | compareTable |
+
+## 详情页渲染
+
+posts 和 knowledge 详情页使用组合渲染：
+
+```astro
+<Content />
+{blocks && blocks.length > 0 && <BlockRenderer blocks={blocks} />}
+```
+
+- `Content` 渲染本地 MDX 或 CMS richText。
+- `BlockRenderer` 渲染 CMS 结构化 blocks。
+
+其余集合当前先渲染 richText / Markdown 正文；后续可按需要扩展 BlockRenderer。
+
+## 环境变量
 
 - `CMS_API_URL`：Payload REST API 基址，如 `http://localhost:3000/api`
-- `CMS_API_TOKEN`：可选 JWT token，用于读取草稿
+- `CMS_API_TOKEN`：可选 JWT token，用于认证读取
 - `CMS_ADMIN_URL`：admin 跳转地址，默认 `http://localhost:3000/admin`
-
-## 站内 /admin 看板
-
-`apps/web/src/pages/admin.astro`（noindex）展示：
-- CMS 后台跳转链接
-- 当前数据源模式（本地 MDX / CMS API）
-- 已发布 posts 数量
 
 ## 设计约束
 
-- schema 校验不绕过：CMS 内容同样走 zod schema
-- `status: published` 过滤在 CMS 查询和 loader 两端都生效
-- `translationKey` 关联逻辑在 `lib/content.ts` 统一处理，对数据源透明
+- schema 校验不绕过：CMS 内容同样走 zod schema。
+- `status: published` 在 CMS 查询和公开页面两侧都过滤。
+- 本地内容和 CMS 内容不要使用同一语言、同一集合、同一 slug，否则会产生重复路由。
+- `translationKey` 关联逻辑在 `lib/content.ts` 统一处理，对数据源透明。

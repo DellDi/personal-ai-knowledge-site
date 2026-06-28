@@ -1,0 +1,97 @@
+name: personal-ai-knowledge-site-prod
+
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: cks-prod-postgres
+    env_file:
+      - ./env/production.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-content} -d $${POSTGRES_DB:-content_platform}"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    logging: *default-logging
+
+  cms:
+    build:
+      context: ..
+      dockerfile: apps/cms/Dockerfile
+    container_name: cks-prod-cms
+    env_file:
+      - ./env/production.env
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=512
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/access"]
+      interval: 30s
+      timeout: 3s
+      start_period: 30s
+      retries: 3
+    logging: *default-logging
+
+  web-build:
+    image: node:24-alpine
+    container_name: cks-prod-web-build
+    profiles:
+      - build
+    working_dir: /app
+    env_file:
+      - ./env/production.env
+    environment:
+      NODE_ENV: production
+      NODE_OPTIONS: --max-old-space-size=768
+      CMS_API_URL: http://cms:3000/api
+    depends_on:
+      cms:
+        condition: service_healthy
+    volumes:
+      - ..:/app
+      - web_dist:/app/apps/web/dist
+      - pnpm_store:/pnpm/store
+    command: >
+      sh -c "
+      corepack enable &&
+      pnpm config set store-dir /pnpm/store &&
+      pnpm install --frozen-lockfile &&
+      pnpm -C apps/web build
+      "
+    logging: *default-logging
+
+  web:
+    image: nginx:1.27-alpine
+    container_name: cks-prod-web
+    volumes:
+      - web_dist:/usr/share/nginx/html:ro
+      - ../nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "127.0.0.1:8080:80"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    logging: *default-logging
+
+volumes:
+  postgres_data:
+  web_dist:
+  pnpm_store:

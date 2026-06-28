@@ -1,4 +1,5 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
+import type { Block } from '@personal-ai-knowledge-site/content-contract';
 
 export interface CmsLoaderOptions {
   /** Payload collection slug, e.g. 'posts' */
@@ -11,6 +12,10 @@ export interface CmsLoaderOptions {
   limit?: number;
   /** Set true to silently return empty when CMS is unreachable. Defaults to true. */
   graceful?: boolean;
+  /** Clear the collection store before writing CMS docs. Defaults to true. */
+  clearStore?: boolean;
+  /** Extra field names to pass through from CMS docs into entry data. */
+  passthroughFields?: string[];
 }
 
 interface PayloadDoc {
@@ -68,54 +73,203 @@ function richTextToMarkdown(doc: unknown): string {
   return inner;
 }
 
-function blocksToMarkdown(blocks: unknown[]): string {
-  return blocks
-    .map((block) => {
-      const b = block as { blockType?: string; [key: string]: unknown };
-      switch (b.blockType) {
-        case 'calloutBlock': {
-          const variant = b.variant as string;
-          const title = b.title as string | undefined;
-          const content = b.content as string | undefined;
-          return `> **${title ?? variant}**\n> ${content ?? ''}\n`;
-        }
-        case 'codeBlock': {
-          const code = b.code as string | undefined;
-          const lang = b.language as string | undefined;
-          return `\`\`\`${lang ?? ''}\n${code ?? ''}\n\`\`\`\n`;
-        }
-        case 'quoteBlock': {
-          const content = b.content as string | undefined;
-          const author = b.author as string | undefined;
-          return `> ${content ?? ''}\n${author ? `> — ${author}\n` : ''}`;
-        }
-        case 'stepsBlock': {
-          const items = (b.items as { text?: string }[]) ?? [];
-          return items.map((item, i) => `${i + 1}. ${item.text ?? ''}`).join('\n') + '\n';
-        }
-        case 'statGridBlock': {
-          const items = (b.items as { value?: string; label?: string }[]) ?? [];
-          return items.map((item) => `- **${item.value ?? ''}** ${item.label ?? ''}`).join('\n') + '\n';
-        }
-        case 'compareTableBlock': {
-          const cols = (b.columns as { key?: string; label?: string }[]) ?? [];
-          const rows = (b.rows as { data?: Record<string, string> }[]) ?? [];
-          const header = `| ${cols.map((c) => c.label ?? '').join(' | ')} |`;
-          const divider = `| ${cols.map(() => '---').join(' | ')} |`;
-          const body = rows
-            .map((row) => `| ${cols.map((c) => row.data?.[c.key ?? ''] ?? '').join(' | ')} |`)
-            .join('\n');
-          return `${header}\n${divider}\n${body}\n`;
-        }
-        default:
-          return '';
-      }
-    })
-    .join('\n');
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function mediaURL(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (!isRecord(value)) return undefined;
+  const url = stringValue(value.url) ?? stringValue(value.filename);
+  if (!url) return undefined;
+  return url;
+}
+
+function blockColumns(value: unknown): 2 | 3 | 4 | undefined {
+  return value === 2 || value === 3 || value === 4 ? value : undefined;
+}
+
+function normalizeBlock(block: unknown): Block | undefined {
+  if (!isRecord(block)) return undefined;
+  const blockType = stringValue(block.blockType) ?? stringValue(block.type);
+
+  switch (blockType) {
+    case 'richText': {
+      const content = stringValue(block.content);
+      return content ? { type: 'richText', content } : undefined;
+    }
+    case 'callout':
+    case 'calloutBlock': {
+      const content = stringValue(block.content);
+      if (!content) return undefined;
+      const variant = block.variant === 'tip' || block.variant === 'warning' || block.variant === 'danger' ? block.variant : 'info';
+      return {
+        type: 'callout',
+        variant,
+        title: stringValue(block.title),
+        content,
+      };
+    }
+    case 'code':
+    case 'codeBlock': {
+      const code = stringValue(block.code);
+      return code
+        ? {
+            type: 'code',
+            language: stringValue(block.language),
+            filename: stringValue(block.filename),
+            code,
+          }
+        : undefined;
+    }
+    case 'audio':
+    case 'audioBlock': {
+      const src = mediaURL(block.src);
+      return src
+        ? {
+            type: 'audio',
+            src,
+            title: stringValue(block.title),
+            duration: stringValue(block.duration),
+            download: mediaURL(block.download),
+          }
+        : undefined;
+    }
+    case 'image':
+    case 'imageBlock': {
+      const src = mediaURL(block.src);
+      const alt = stringValue(block.alt);
+      return src && alt
+        ? {
+            type: 'image',
+            src,
+            alt,
+            caption: stringValue(block.caption),
+            source: stringValue(block.source),
+          }
+        : undefined;
+    }
+    case 'quote':
+    case 'quoteBlock': {
+      const content = stringValue(block.content);
+      return content
+        ? {
+            type: 'quote',
+            content,
+            author: stringValue(block.author),
+            source: stringValue(block.source),
+            url: stringValue(block.url),
+          }
+        : undefined;
+    }
+    case 'embed':
+    case 'embedBlock': {
+      const src = stringValue(block.src);
+      const ratio = block.ratio === '4-3' || block.ratio === '1-1' ? block.ratio : '16-9';
+      return src
+        ? {
+            type: 'embed',
+            src,
+            title: stringValue(block.title),
+            ratio,
+          }
+        : undefined;
+    }
+    case 'steps':
+    case 'stepsBlock': {
+      const items = Array.isArray(block.items)
+        ? block.items
+            .map((item) => {
+              if (typeof item === 'string') return item;
+              return isRecord(item) ? stringValue(item.text) : undefined;
+            })
+            .filter((item): item is string => Boolean(item))
+        : [];
+      return items.length > 0
+        ? {
+            type: 'steps',
+            title: stringValue(block.title),
+            items,
+          }
+        : undefined;
+    }
+    case 'statGrid':
+    case 'statGridBlock': {
+      const items = Array.isArray(block.items)
+        ? block.items
+            .map((item) => {
+              if (!isRecord(item)) return undefined;
+              const value = stringValue(item.value);
+              const label = stringValue(item.label);
+              return value && label ? { value, label } : undefined;
+            })
+            .filter((item): item is { value: string; label: string } => Boolean(item))
+        : [];
+      return items.length > 0
+        ? {
+            type: 'statGrid',
+            columns: blockColumns(block.columns),
+            items,
+          }
+        : undefined;
+    }
+    case 'compareTable':
+    case 'compareTableBlock': {
+      const columns = Array.isArray(block.columns)
+        ? block.columns
+            .map((column) => {
+              if (!isRecord(column)) return undefined;
+              const key = stringValue(column.key);
+              const label = stringValue(column.label);
+              return key && label ? { key, label, highlight: column.highlight === true } : undefined;
+            })
+            .filter((column): column is { key: string; label: string; highlight: boolean } => Boolean(column))
+        : [];
+      const rows = Array.isArray(block.rows)
+        ? block.rows
+            .map((row) => {
+              const data = isRecord(row) && isRecord(row.data) ? row.data : row;
+              if (!isRecord(data)) return undefined;
+              return Object.fromEntries(
+                Object.entries(data)
+                  .filter(([, value]) => value !== undefined && value !== null)
+                  .map(([key, value]) => [key, String(value)]),
+              );
+            })
+            .filter((row): row is Record<string, string> => Boolean(row))
+        : [];
+      return columns.length > 0 && rows.length > 0
+        ? {
+            type: 'compareTable',
+            caption: stringValue(block.caption),
+            columns,
+            rows,
+          }
+        : undefined;
+    }
+    default:
+      return undefined;
+  }
+}
+
+function normalizeBlocks(blocks: unknown): Block[] | undefined {
+  if (!Array.isArray(blocks)) return undefined;
+  const normalized = blocks.map(normalizeBlock).filter((block): block is Block => Boolean(block));
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+function normalizePassthroughField(field: string, value: unknown): unknown {
+  if (field === 'contentBlocks') return normalizeBlocks(value);
+  if (field === 'cover' || field === 'hero') return mediaURL(value);
+  return value;
 }
 
 export function cmsLoader(options: CmsLoaderOptions): Loader {
-  const { collection, limit = 100, graceful = true } = options;
+  const { collection, limit = 100, graceful = true, clearStore = true, passthroughFields = [] } = options;
 
   return {
     name: `cms-${collection}`,
@@ -125,8 +279,12 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
 
       if (!apiURL) {
         if (graceful) {
-          ctx.logger.warn(`CMS_API_URL 未设置，${collection} 集合将使用空数据。设置 CMS_API_URL 后从 Payload 拉取内容。`);
-          ctx.store.clear();
+          ctx.logger.warn(
+            clearStore
+              ? `CMS_API_URL 未设置，${collection} 集合将使用空数据。设置 CMS_API_URL 后从 Payload 拉取内容。`
+              : `CMS_API_URL 未设置，${collection} 集合保留现有内容。`,
+          );
+          if (clearStore) ctx.store.clear();
           return;
         }
         throw new Error(`cmsLoader 需要 apiURL 或 CMS_API_URL 环境变量`);
@@ -167,7 +325,7 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
           if (!body.nextPage) break;
         }
 
-        ctx.store.clear();
+        if (clearStore) ctx.store.clear();
 
         for (const doc of allDocs) {
           const id = doc.id;
@@ -175,26 +333,34 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
           if (doc.content) {
             markdown = richTextToMarkdown(doc.content);
           }
-          if (Array.isArray(doc.contentBlocks) && doc.contentBlocks.length > 0) {
-            markdown += '\n' + blocksToMarkdown(doc.contentBlocks);
+          const normalizedBlocks = normalizeBlocks(doc.contentBlocks);
+
+          const rawData: Record<string, unknown> = {
+            title: doc.title,
+            description: doc.description,
+            lang: doc.lang,
+            translationKey: doc.translationKey,
+            slug: doc.slug,
+            tags: doc.tags ?? [],
+            status: doc.status,
+            featured: doc.featured ?? false,
+            date: doc.date,
+            updated: doc.updated,
+            category: doc.category,
+            series: doc.series,
+          };
+          for (const field of passthroughFields) {
+            if (doc[field] !== undefined) {
+              rawData[field] = normalizePassthroughField(field, doc[field]);
+            }
+          }
+          if (passthroughFields.includes('contentBlocks') && normalizedBlocks) {
+            rawData.contentBlocks = normalizedBlocks;
           }
 
           const data = await ctx.parseData({
             id,
-            data: {
-              title: doc.title,
-              description: doc.description,
-              lang: doc.lang,
-              translationKey: doc.translationKey,
-              slug: doc.slug,
-              tags: doc.tags ?? [],
-              status: doc.status,
-              featured: doc.featured ?? false,
-              date: doc.date,
-              updated: doc.updated,
-              category: doc.category,
-              series: doc.series,
-            },
+            data: rawData,
           });
 
           let rendered: { html: string; metadata?: Record<string, unknown> } | undefined;
@@ -215,8 +381,12 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         if (graceful) {
-          ctx.logger.warn(`CMS 不可达，${collection} 集合使用空数据: ${message}`);
-          ctx.store.clear();
+          ctx.logger.warn(
+            clearStore
+              ? `CMS 不可达，${collection} 集合使用空数据: ${message}`
+              : `CMS 不可达，${collection} 集合保留现有内容: ${message}`,
+          );
+          if (clearStore) ctx.store.clear();
           return;
         }
         throw err;

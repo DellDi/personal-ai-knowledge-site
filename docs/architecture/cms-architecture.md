@@ -54,7 +54,7 @@ posts collection 的 `contentBlocks` 字段是结构化 Block 数组，对齐契
 - statGridBlock
 - compareTableBlock
 
-未来 Astro 端的 BlockRenderer 会按 type 映射到 `apps/web/src/components/docs/` 下的文档组件。
+Astro 端的 BlockRenderer 已按 type 映射到 `apps/web/src/components/docs/` 下的文档组件。当前 posts / knowledge 详情页启用 BlockRenderer，其余集合先渲染 richText / Markdown 正文。
 
 ## 访问控制
 

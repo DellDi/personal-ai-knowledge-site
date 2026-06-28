@@ -24,3 +24,5 @@
 - STORY-016 MDX 文档组件系统
 - STORY-017 cmsLoader 实现
 - STORY-018 admin 页改为 CMS 跳转 + 状态看板
+- STORY-019 BlockRenderer 渲染层
+- STORY-020 全集合条件 loader 与混合模式

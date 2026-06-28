@@ -86,7 +86,7 @@ Payload 的 Code-first 风格适合我这种研发背景的人长期维护，Blo
 />
 
 <Callout variant="warning">
-  开发期用 MinIO 起在 docker-compose，生产切换阿里云 OSS。两者都走 S3 兼容协议，Payload 的 storage adapter 用同一份配置，切换只改环境变量。
+  开发期用 MinIO 起在 docker-compose，生产使用阿里云 OSS。两者都走 S3 兼容协议，Payload 的 storage adapter 用同一份配置模型；切换后新上传写入 OSS，已有 MinIO 对象需要通过同步工具迁移。
 </Callout>
 
 ## 搜索：分阶段

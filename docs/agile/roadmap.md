@@ -9,8 +9,9 @@
 | 第一轮 | 平台骨架 | 已完成 | Astro 前台、内容集合、多语言、主题、RSS、Sitemap、Docker 静态部署、Agent/Agile 文档已落地 |
 | 第二轮 | 内容体验增强 | 已基本完成 | seed 内容、详情增强、知识库树、相关内容、JSON-LD、默认 OG 图已落地；高级搜索筛选仍待做 |
 | 第三轮 | CMS 后台基座 | 已完成基础实现 | Payload CMS、PostgreSQL、MinIO、内容契约层已落地；本地 Docker 联调仍需持续验证 |
-| 第四轮 | Astro ↔ CMS 试点 | 进行中 | posts 单集合 cmsLoader、5s 超时降级、admin 状态看板已实现，待真实 CMS 数据端到端验收 |
-| 第五轮以后 | 全集合迁移、发布流、评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
+| 第四轮 | Astro ↔ CMS 试点 | 已完成基础实现 | cmsLoader、5s 超时降级、admin 状态看板已实现 |
+| 第五轮 | Block 渲染层与全集合迁移 | 已完成基础实现 | BlockRenderer、全集合条件 loader、本地 + CMS 混合加载已落地，待真实 CMS 数据验收 |
+| 第六轮以后 | 发布流、评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
 
 ## 第一轮：平台骨架（已完成）
 
@@ -46,14 +47,14 @@
 - 引入 PostgreSQL 和对象存储（开发期 MinIO，生产阿里云 OSS）
 - `apps/cms` 已建 users / posts / media collection
 - posts collection 已支持 drafts、S3 媒体上传配置和结构化 Block 字段
-- `infra/docker-compose.yml` 已提供 postgres + minio + minio-init + cms
+- `infra/docker-compose.local.yml` 已提供 postgres + minio + minio-init + cms
 
 待验收：
 
-- `docker compose -f infra/docker-compose.yml up --build` 在本地完整跑通
+- `docker compose -f infra/docker-compose.local.yml up --build` 在本地完整跑通
 - CMS 登录、posts CRUD、图片上传端到端可用
 
-## 第四轮：Astro ↔ CMS 单集合试点（进行中）
+## 第四轮：Astro ↔ CMS 单集合试点（已完成基础实现）
 
 - `apps/web/src/lib/cms-loader.ts` 已实现 Astro 7 Loader 接口
 - `posts` 集合已支持 `CMS_API_URL` 条件切换：CMS API / 本地 MDX
@@ -67,12 +68,20 @@
 - 明确 CMS 草稿预览策略
 - 补充真实构建状态、搜索索引状态和最近发布内容
 
-## 第五轮：Block 渲染层与全集合迁移
+## 第五轮：Block 渲染层与全集合迁移（已完成基础实现）
 
 - content-contract 固定 Block 类型清单
-- apps/web 写 BlockRenderer + 各 Block 组件
-- 其余 7 集合迁入 Payload，schema 对齐
-- 本地 MDX 与 CMS 内容混合共存
+- apps/web 已新增 BlockRenderer，并映射到文档组件
+- 8 集合已使用条件 loader：本地 glob + CMS loader 混合加载
+- Payload CMS 已新增 podcast / knowledge / topics / projects / resources / glossary / timeline collection
+- posts / knowledge 详情页已支持 Content + BlockRenderer 组合渲染
+- Payload blockType 已在 cmsLoader 层规范化为前台 Block type
+
+待验收：
+
+- 使用真实 CMS 数据验证 8 集合列表页、详情页、RSS、Sitemap、Pagefind
+- 使用 OSS 媒体 URL 验证图片、音频、嵌入内容渲染
+- 决定是否把 BlockRenderer 扩展到 topics / projects / resources 等详情页
 
 ## 第六轮：发布工作流
 

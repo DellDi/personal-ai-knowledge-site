@@ -7,3 +7,4 @@ export { default as Quote } from './Quote.astro';
 export { default as AudioPlayer } from './AudioPlayer.astro';
 export { default as Embed } from './Embed.astro';
 export { default as CodeBlock } from './CodeBlock.astro';
+export { default as BlockRenderer } from './BlockRenderer.astro';

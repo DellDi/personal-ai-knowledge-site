@@ -12,7 +12,11 @@
     "build": "pnpm -C apps/web build",
     "preview": "pnpm -C apps/web preview",
     "check": "pnpm -C apps/web check",
-    "astro": "pnpm -C apps/web astro"
+    "astro": "pnpm -C apps/web astro",
+    "infra:local": "docker compose -f infra/docker-compose.local.yml up --build",
+    "infra:prod:up": "docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms",
+    "infra:prod:build-web": "docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build",
+    "infra:prod:web": "docker compose -f infra/docker-compose.prod.yml up -d web"
   },
   "packageManager": "pnpm@11.7.0"
 }

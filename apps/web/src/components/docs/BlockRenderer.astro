@@ -1,0 +1,69 @@
+---
+import type { Block } from '@personal-ai-knowledge-site/content-contract';
+import AudioPlayer from './AudioPlayer.astro';
+import Callout from './Callout.astro';
+import CodeBlock from './CodeBlock.astro';
+import CompareTable from './CompareTable.astro';
+import Embed from './Embed.astro';
+import Figure from './Figure.astro';
+import Quote from './Quote.astro';
+import StatGrid from './StatGrid.astro';
+import Steps from './Steps.astro';
+
+interface Props {
+  blocks: Block[];
+}
+
+const { blocks } = Astro.props;
+---
+
+{blocks.map((block) => {
+  switch (block.type) {
+    case 'richText':
+      return <div class="block-richtext prose-block" set:html={block.content} />;
+    case 'callout':
+      return (
+        <Callout variant={block.variant} title={block.title}>
+          {block.content}
+        </Callout>
+      );
+    case 'code':
+      return <CodeBlock language={block.language} filename={block.filename} code={block.code} />;
+    case 'audio':
+      return <AudioPlayer src={block.src} title={block.title} duration={block.duration} download={block.download} />;
+    case 'image':
+      return <Figure src={block.src} alt={block.alt} caption={block.caption} source={block.source} />;
+    case 'quote':
+      return (
+        <Quote author={block.author} source={block.source} url={block.url}>
+          {block.content}
+        </Quote>
+      );
+    case 'embed':
+      return <Embed src={block.src} title={block.title} ratio={block.ratio} />;
+    case 'steps':
+      return (
+        <Steps title={block.title}>
+          {block.items.map((item) => <li>{item}</li>)}
+        </Steps>
+      );
+    case 'statGrid':
+      return <StatGrid items={block.items} columns={block.columns} />;
+    case 'compareTable':
+      return <CompareTable caption={block.caption} columns={block.columns} rows={block.rows} />;
+    default:
+      return null;
+  }
+})}
+
+<style>
+  .prose-block {
+    line-height: 1.75;
+    font-size: 1.04rem;
+    margin: 1rem 0;
+  }
+
+  .prose-block :global(p:last-child) {
+    margin-bottom: 0;
+  }
+</style>

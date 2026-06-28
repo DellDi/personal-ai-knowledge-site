@@ -8,19 +8,40 @@ import { fileURLToPath } from 'node:url';
 import { posts } from './collections/posts';
 import { media } from './collections/media';
 import { users } from './collections/users';
+import {
+  podcast,
+  knowledge,
+  topics,
+  projects,
+  resources,
+  glossary,
+  timeline,
+} from './collections/content-collections';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
+const enableAutoLogin = process.env.PAYLOAD_ENABLE_AUTOLOGIN === 'true';
+const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000';
+const corsOrigins = process.env.PAYLOAD_CORS_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) ?? ['*'];
+const csrfOrigins =
+  process.env.PAYLOAD_CSRF_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) ?? [
+    'http://localhost:4321',
+    'http://localhost:3000',
+  ];
 
 export default buildConfig({
   admin: {
     user: 'users',
-    autoLogin: {
-      email: 'owner@example.com',
-      password: 'local-dev-only-password',
-    },
+    ...(enableAutoLogin
+      ? {
+          autoLogin: {
+            email: 'owner@example.com',
+            password: 'local-dev-only-password',
+          },
+        }
+      : {}),
   },
-  collections: [users, posts, media],
+  collections: [users, posts, podcast, knowledge, topics, projects, resources, glossary, timeline, media],
   editor: slateEditor({}),
   secret: process.env.PAYLOAD_SECRET ?? 'payload_secret_change_me',
   typescript: {
@@ -51,9 +72,9 @@ export default buildConfig({
       },
     }),
   ],
-  serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000',
-  cors: ['*'],
-  csrf: ['http://localhost:4321'],
+  serverURL,
+  cors: corsOrigins,
+  csrf: csrfOrigins,
 });
 
 export type { CollectionConfig };

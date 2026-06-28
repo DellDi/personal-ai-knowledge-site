@@ -20,7 +20,7 @@
 - Code-first / TypeScript 风格，适合研发背景长期维护
 - Block 工程化控制力强，支持结构化内容
 - PostgreSQL 原生支持，后续 pgvector 可复用
-- S3 兼容 storage adapter，开发期 MinIO / 生产阿里云 OSS 无缝切换
+- S3 兼容 storage adapter，开发期 MinIO / 生产阿里云 OSS 使用同一配置模型；切换后新上传写入新存储，旧对象需要迁移
 
 ## 已知限制
 

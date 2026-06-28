@@ -32,11 +32,23 @@
 
 ## CMS 试点
 
-- [ ] `docker compose -f infra/docker-compose.yml up --build`
+- [ ] `docker compose -f infra/docker-compose.local.yml up --build`
 - [ ] Payload CMS 可登录
 - [ ] posts collection 可新建、编辑、发布、下架
 - [ ] media collection 可上传图片到 MinIO
-- [ ] 设置 `CMS_API_URL` 后 posts 从 CMS 拉取，未设置时回退本地 MDX
-- [ ] CMS 不可达时 5s 超时优雅降级，不阻塞构建
+- [ ] 8 个 collection 可在 CMS 后台访问
+- [ ] 设置 `CMS_API_URL` 后本地 MDX 与 CMS published 内容混合加载
+- [ ] CMS 不可达时 5s 超时优雅降级，保留本地内容，不阻塞构建
 - [ ] admin 页展示 CMS 跳转和数据源模式
 - [ ] 使用真实 CMS posts 数据时，列表页、详情页、RSS、Sitemap、Pagefind 正常
+- [ ] posts / knowledge 的 contentBlocks 可通过 BlockRenderer 渲染
+
+## 生产部署
+
+- [ ] 复制 `infra/env/production.example.env` 为 `infra/env/production.env` 并替换密钥
+- [ ] `docker compose -f infra/docker-compose.prod.yml config` 通过
+- [ ] 生产栈不启动 MinIO
+- [ ] Payload CMS 使用阿里云 OSS 上传媒体成功
+- [ ] `web-build` 可从 CMS 拉取内容并生成前台静态产物
+- [ ] 1Panel / Nginx 将 `www` 反代到 `127.0.0.1:8080`
+- [ ] 1Panel / Nginx 将 `cms` 反代到 `127.0.0.1:3000`

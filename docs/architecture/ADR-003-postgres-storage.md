@@ -11,9 +11,9 @@
 
 ## 实现方式
 
-- 开发期 `infra/docker-compose.yml` 起 PostgreSQL 16 + MinIO
-- 生产切换阿里云 OSS，通过 S3 兼容协议接入
-- Payload 的 S3 storage adapter 用同一份配置，切换只改环境变量
+- 开发期 `infra/docker-compose.local.yml` 起 PostgreSQL 16 + MinIO
+- 生产使用阿里云 OSS，通过 S3 兼容协议接入
+- Payload 的 S3 storage adapter 用同一份配置模型；环境变量决定新上传写入哪个存储，已有对象需要单独同步
 - 后续 pgvector 扩展直接挂载到同一 PostgreSQL 实例，做 AI 向量检索
 
 ## 选型理由

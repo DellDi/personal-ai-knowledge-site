@@ -1,9 +1,9 @@
-name: personal-ai-knowledge-site-local-compat
+name: personal-ai-knowledge-site-local
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cks-postgres
+    container_name: cks-local-postgres
     environment:
       POSTGRES_DB: content_platform
       POSTGRES_USER: content
@@ -20,7 +20,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: cks-minio
+    container_name: cks-local-minio
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minio_admin
@@ -38,7 +38,7 @@ services:
 
   minio-init:
     image: minio/mc:latest
-    container_name: cks-minio-init
+    container_name: cks-local-minio-init
     depends_on:
       minio:
         condition: service_healthy
@@ -55,7 +55,7 @@ services:
     build:
       context: ..
       dockerfile: apps/cms/Dockerfile
-    container_name: cks-cms
+    container_name: cks-local-cms
     environment:
       NODE_ENV: development
       DATABASE_URI: postgres://content:content_password@postgres:5432/content_platform
