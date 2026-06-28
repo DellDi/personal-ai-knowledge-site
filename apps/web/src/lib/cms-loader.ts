@@ -1,5 +1,4 @@
 import type { Loader, LoaderContext } from 'astro/loaders';
-import type { RenderedContent } from 'astro';
 
 export interface CmsLoaderOptions {
   /** Payload collection slug, e.g. 'posts' */
@@ -150,7 +149,14 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
           url.searchParams.set('where[status][equals]', 'published');
           url.searchParams.set('depth', '2');
 
-          const res = await fetch(url, { headers });
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 5000);
+          let res: Response;
+          try {
+            res = await fetch(url, { headers, signal: controller.signal });
+          } finally {
+            clearTimeout(timeout);
+          }
           if (!res.ok) {
             throw new Error(`CMS 响应 ${res.status}: ${res.statusText}`);
           }
@@ -191,7 +197,7 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
             },
           });
 
-          let rendered: RenderedContent | undefined;
+          let rendered: { html: string; metadata?: Record<string, unknown> } | undefined;
           if (markdown.trim()) {
             rendered = await ctx.renderMarkdown(markdown);
           }

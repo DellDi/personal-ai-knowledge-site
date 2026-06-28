@@ -1,23 +1,52 @@
 ---
+import { getCollection } from 'astro:content';
+import Badge from '../components/Badge.astro';
+import Button from '../components/Button.astro';
 import Card from '../components/Card.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { defaultLocale, ui } from '../lib/i18n';
 
 const t = ui[defaultLocale];
+const cmsURL = import.meta.env.CMS_API_URL ?? process.env.CMS_API_URL;
+const cmsAdminURL = process.env.CMS_ADMIN_URL ?? 'http://localhost:3000/admin';
+
+let postsCount = 0;
+try {
+  const posts = await getCollection('posts', ({ data }) => data.status === 'published');
+  postsCount = posts.length;
+} catch {
+  postsCount = 0;
+}
+
+const modeLabel = cmsURL ? t.adminStatusModeCms : t.adminStatusModeLocal;
+const modeTone: 'accent' | 'blue' = cmsURL ? 'accent' : 'blue';
 ---
 
 <BaseLayout locale={defaultLocale} title={t.adminTitle} description={t.adminIntro} canonicalPath="/admin" noindex>
   <section class="container admin-page">
     <SectionHeader title={t.adminTitle} description={t.adminIntro} />
+
     <div class="grid">
       <Card>
-        <h2>信息架构预留</h2>
-        <p>后续可扩展为运营首页、内容日历、集合编辑、审核队列、媒体库和系统设置。</p>
+        <h2>{t.adminCmsLink}</h2>
+        <p>{t.adminCmsLinkHint}</p>
+        <Button href={cmsAdminURL} variant="primary">{t.adminCmsLink}</Button>
       </Card>
+
       <Card>
-        <h2>首版边界</h2>
-        <p>当前不接登录、不写入内容、不接 CMS，只保留后台管理的命名边界和设计空间。</p>
+        <h2>{t.adminStatusTitle}</h2>
+        <dl class="status-list">
+          <div>
+            <dt>{t.adminStatusPosts}</dt>
+            <dd><strong>{postsCount}</strong></dd>
+          </div>
+          <div>
+            <dt>{t.adminStatusMode}</dt>
+            <dd><Badge tone={modeTone}>{modeLabel}</Badge></dd>
+          </div>
+        </dl>
+        <p class="guide">{t.adminStatusGuide}</p>
       </Card>
     </div>
   </section>
@@ -41,9 +70,50 @@ const t = ui[defaultLocale];
   }
 
   p {
-    margin: 0;
+    margin: 0 0 18px;
     color: var(--color-muted);
     line-height: 1.55;
+  }
+
+  .guide {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .status-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .status-list > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  dt {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  dd {
+    margin: 0;
+  }
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
   }
 
   @media (max-width: 760px) {

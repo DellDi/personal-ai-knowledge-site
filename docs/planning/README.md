@@ -3,10 +3,13 @@
 初始规划已经整理到结构化的 Agile 和架构文档中：
 
 - `docs/agile/product-vision.md`
+- `docs/agile/project-status.md`
 - `docs/agile/roadmap.md`
 - `docs/architecture/content-model.md`
+- `docs/architecture/cms-architecture.md`
+- `docs/architecture/content-loader.md`
 - `docs/architecture/ui-system.md`
 - `docs/architecture/i18n.md`
 - `docs/architecture/deployment.md`
 
-这个目录保留给原始规划记录、调研材料和临时方案草稿。
+这个目录保留给原始规划记录、调研材料和临时方案草稿。当前项目进度以 `docs/agile/project-status.md` 和 `docs/agile/roadmap.md` 为准。

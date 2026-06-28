@@ -2,19 +2,23 @@
 
 ## 当前状态
 
-后台管理已接入 Payload CMS（`apps/cms`），子域 `cms.example.com` 独立部署。
+后台管理已接入 Payload CMS（`apps/cms`）作为写侧基座。开发环境通过 `infra/docker-compose.yml` 启动 PostgreSQL、MinIO 和 CMS；生产环境预期用独立 cms 子域部署。
 
 ## 站内 /admin 的定位
 
-`apps/web/src/pages/admin.astro` 当前是 noindex 静态壳页面。SPRINT-004 会改为：
-- 跳转入口：引导到 `cms.example.com`
-- 索引状态看板：显示最近发布、构建状态、搜索索引状态
+`apps/web/src/pages/admin.astro` 当前是 noindex 的轻量状态页，不承载真实登录和内容写入：
+
+- 跳转入口：引导到 Payload CMS 后台，地址由 `CMS_ADMIN_URL` 控制，默认 `http://localhost:3000/admin`
+- 数据源状态：展示当前 posts 数据源模式（本地 MDX / CMS API）和已发布 posts 数量
+- 试点提示：说明 `CMS_API_URL` 存在时 posts 从 CMS 拉取，未设置时回退本地 MDX
+
+后续再扩展最近发布、构建状态、搜索索引状态和发布检查清单。
 
 ## CMS 后台能力
 
-Payload CMS 提供的能力（`apps/cms`）：
+Payload CMS 当前提供的能力（`apps/cms`）：
 
-- 内容编辑（posts / knowledge / podcast 等 collection）
+- 内容编辑（当前已建 posts，后续迁移 knowledge / podcast 等 collection）
 - 草稿 / 发布版本管理（`versions.drafts`）
 - 媒体库（S3 上传，MinIO / 阿里云 OSS）
 - 权限控制（users auth）
@@ -30,3 +34,9 @@ Payload CMS 提供的能力（`apps/cms`）：
 - 搜索索引状态（后续）
 - 发布检查清单（后续）
 - 系统设置
+
+## 当前边界
+
+- 当前只做 posts 单集合试点，其余 7 个集合仍使用本地 glob loader。
+- 当前前台仍是静态生成，CMS 作为构建期数据源，不直接提供前台运行时 API。
+- 当前 Block 内容先转换成 Markdown 渲染；后续 SPRINT-005 再做正式 BlockRenderer。

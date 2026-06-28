@@ -1,6 +1,18 @@
 # 路线图
 
-## 第一轮：平台骨架
+更新时间：2026-06-28
+
+## 状态总览
+
+| 轮次 | 名称 | 状态 | 说明 |
+|---|---|---|---|
+| 第一轮 | 平台骨架 | 已完成 | Astro 前台、内容集合、多语言、主题、RSS、Sitemap、Docker 静态部署、Agent/Agile 文档已落地 |
+| 第二轮 | 内容体验增强 | 已基本完成 | seed 内容、详情增强、知识库树、相关内容、JSON-LD、默认 OG 图已落地；高级搜索筛选仍待做 |
+| 第三轮 | CMS 后台基座 | 已完成基础实现 | Payload CMS、PostgreSQL、MinIO、内容契约层已落地；本地 Docker 联调仍需持续验证 |
+| 第四轮 | Astro ↔ CMS 试点 | 进行中 | posts 单集合 cmsLoader、5s 超时降级、admin 状态看板已实现，待真实 CMS 数据端到端验收 |
+| 第五轮以后 | 全集合迁移、发布流、评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
+
+## 第一轮：平台骨架（已完成）
 
 - 在 `apps/web` 建立 Astro 主站
 - 建立 pnpm workspace
@@ -11,7 +23,7 @@
 - 使用 Docker Compose + Nginx 提供静态部署方案
 - 建立 `AGENTS.md`、项目 Skill、Markdown 项目管理和架构文档
 
-## 第二轮：内容体验增强
+## 第二轮：内容体验增强（已基本完成）
 
 - 8 个内容集合各补中文 seed 内容，覆盖文章、播客、知识库、专题、项目、资源、术语、时间线
 - 播客详情增强：结构化时间轴、本期资源链接、文字稿
@@ -19,46 +31,65 @@
 - 相关内容推荐：按语言、标签重叠度、同集合加权计算，所有详情页底部展示
 - Article、PodcastEpisode、Breadcrumb JSON-LD 注入，通过 `BaseLayout` 统一输出
 - OG 图片策略：默认 OG 图 `public/og-default.svg`，通过 `BaseLayout` 注入 og:image 与 twitter:image
-- Pagefind 搜索增加语言、集合和标签筛选
-- 相关内容推荐按语言、标签、专题和集合匹配
-- 增加内容地图和标签索引页
-- 设计 OG 图片策略
-- 完善发布检查清单
-- 决定后台管理方案：独立 `apps/admin`、外部 CMS 或 Git-based CMS
-- 设计 AI 检索导出契约：从 Content Collections 输出结构化 JSON
+- 发布检查清单已覆盖 SEO、主题、响应式、详情增强和 CMS 试点项
 
-## 第三轮：CMS 后台接入
+待补：
+
+- Pagefind 搜索增加集合筛选和标签筛选
+- 增加内容地图页
+- 增加标签索引页
+- AI 检索导出契约仍未实现，只保留方向
+
+## 第三轮：CMS 后台基座（基础实现已完成）
 
 - 新增 `apps/cms`（Payload CMS standalone）和 `packages/content-contract` 内容契约层
 - 引入 PostgreSQL 和对象存储（开发期 MinIO，生产阿里云 OSS）
-- 写 Astro 自定义 cmsLoader，从 CMS 拉内容并复用 Content Collections schema 校验
-- 站内 `/admin` 改为 CMS 跳转入口 + 索引/构建状态看板
-- 单集合试点（posts）走通 CMS 写入 → Astro 构建生成页面
+- `apps/cms` 已建 users / posts / media collection
+- posts collection 已支持 drafts、S3 媒体上传配置和结构化 Block 字段
+- `infra/docker-compose.yml` 已提供 postgres + minio + minio-init + cms
 
-## 第四轮：Block 渲染层与全集合迁移
+待验收：
+
+- `docker compose -f infra/docker-compose.yml up --build` 在本地完整跑通
+- CMS 登录、posts CRUD、图片上传端到端可用
+
+## 第四轮：Astro ↔ CMS 单集合试点（进行中）
+
+- `apps/web/src/lib/cms-loader.ts` 已实现 Astro 7 Loader 接口
+- `posts` 集合已支持 `CMS_API_URL` 条件切换：CMS API / 本地 MDX
+- CMS 不可达时 5s 超时并优雅降级，不阻塞构建
+- richText content 和结构化 Block 先转换成 Markdown，并继续走 zod schema 校验
+- `/admin` 已改为 CMS 跳转入口 + 数据源状态看板
+
+待验收：
+
+- 使用真实 Payload CMS 数据验证 posts 列表、详情、RSS、Sitemap、Pagefind
+- 明确 CMS 草稿预览策略
+- 补充真实构建状态、搜索索引状态和最近发布内容
+
+## 第五轮：Block 渲染层与全集合迁移
 
 - content-contract 固定 Block 类型清单
 - apps/web 写 BlockRenderer + 各 Block 组件
 - 其余 7 集合迁入 Payload，schema 对齐
 - 本地 MDX 与 CMS 内容混合共存
 
-## 第五轮：发布工作流
+## 第六轮：发布工作流
 
 - 草稿 / 预览 / 发布 / 下架状态机
 - Webhook 触发 Astro 重建
 - 预览走 Astro SSR 按需渲染
 - RSS / Sitemap / 搜索索引随构建更新
 
-## 第六轮：互动系统
+## 第七轮：互动系统
 
 - 评论 collection（pending / approved / rejected / spam）
 - 前台评论提交 API + 后台审核队列
 - 站内评论组件展示 approved 评论
 
-## 第七轮：搜索升级 + AI 知识索引
+## 第八轮：搜索升级 + AI 知识索引
 
 - Pagefind → Meilisearch（动态内容检索）
 - apps/worker 同步搜索索引
 - PostgreSQL + pgvector 切 chunk + embedding
 - AI 问答 endpoint，引用内容来源
-

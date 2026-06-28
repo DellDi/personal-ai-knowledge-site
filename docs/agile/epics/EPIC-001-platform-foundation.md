@@ -22,3 +22,5 @@
 - STORY-014 内容契约层
 - STORY-015 后端基座
 - STORY-016 MDX 文档组件系统
+- STORY-017 cmsLoader 实现
+- STORY-018 admin 页改为 CMS 跳转 + 状态看板

@@ -4,17 +4,18 @@
 
 ## 当前状态
 
-第一版平台骨架已完成：
+项目已经从第一版静态站骨架推进到“前台内容体验 + CMS 后台试点”阶段：
 
-- Astro 主站位于 `apps/web`
-- 中文表达优先，路由固定为 `/zh-CN`；英文 `/en` 先作为后续国际化预留
-- 内容集合覆盖播客、文章、知识库、专题、项目、资源、术语和时间线
-- 视觉方向为中文内容友好的编辑式野兽派，支持亮色、黑夜和跟随系统
-- 生产构建后生成 Pagefind 静态搜索索引
-- 提供 `/rss.xml`、`/podcast/rss.xml` 和 Sitemap
-- 提供 Docker Compose + Nginx 静态部署配置
-- `/admin` 是后台管理预留壳页面，当前不提供登录或写入能力
-- 已建立 `AGENTS.md`、项目 Skill、Agile Markdown 和架构文档
+- `apps/web` 是 Astro 前台读侧，已覆盖首页、播客、文章、知识库、专题、项目、资源、术语、时间线、标签、搜索、RSS、播客 RSS、Sitemap、404 和 `/admin`
+- 中文表达优先，主路由固定为 `/zh-CN`；英文 `/en` 作为后续国际化预留
+- 内容集合覆盖 8 类内容，公开页面只读取 `status: published`
+- 已补充中文 seed 内容、播客时间轴与资源、知识库树、上下篇导航、相关内容推荐、JSON-LD 和默认 OG 图
+- 已建立 `packages/content-contract`，让 Astro 与 CMS 共享语言、状态、知识区、资源类型和 Block 契约
+- `apps/cms` 已作为 Payload CMS 3.x 后台基座接入，包含 users / posts / media 三个 collection
+- `infra/docker-compose.yml` 提供 PostgreSQL + MinIO + CMS 的开发后端栈
+- `posts` 集合已进入 CMS 单集合试点：设置 `CMS_API_URL` 时从 Payload REST API 拉取，未设置时回退本地 MDX
+- `/admin` 当前是 noindex 的 CMS 跳转入口和数据源状态看板，不承载真实登录
+- Pagefind 搜索目前是基础搜索，语言过滤已在前端结果层处理；集合/标签筛选仍在后续迭代
 
 ## 常用命令
 
@@ -24,6 +25,8 @@ pnpm -C apps/web dev
 pnpm -C apps/web check
 pnpm -C apps/web build
 pnpm -C apps/web preview
+pnpm --filter @personal-ai-knowledge-site/cms typecheck
+pnpm --filter @personal-ai-knowledge-site/content-contract typecheck
 ```
 
 ## Docker 预览
@@ -38,6 +41,23 @@ docker compose up --build
 - `http://localhost:8080/en/`
 - `http://localhost:8080/rss.xml`
 - `http://localhost:8080/podcast/rss.xml`
+
+## 后端开发栈
+
+```bash
+docker compose -f infra/docker-compose.yml up --build
+```
+
+启动后访问：
+
+- `http://localhost:3000/admin`：Payload CMS 后台
+- `http://localhost:9001`：MinIO 控制台
+
+前台连接 CMS 试点：
+
+```bash
+CMS_API_URL=http://localhost:3000/api CMS_ADMIN_URL=http://localhost:3000/admin pnpm -C apps/web dev
+```
 
 ## 目录结构
 
@@ -58,6 +78,14 @@ nginx/default.conf               Nginx 静态服务配置
 ## 内容定位
 
 首版内容以个人展示和自我沉淀为主：对外呈现“我是谁、做过什么、在积累什么能力”，对内沉淀可复用的知识资产和技能储备。中文是当前主要表达语言，英文路由保留但不是当前内容主线；新增公开内容时，应优先保证中文标题、摘要、标签和页面描述完整。
+
+## 项目管理入口
+
+- 当前状态：`docs/agile/project-status.md`
+- 路线图：`docs/agile/roadmap.md`
+- 发布检查：`docs/agile/acceptance/release-checklist.md`
+- CMS 架构：`docs/architecture/cms-architecture.md`
+- 内容 Loader：`docs/architecture/content-loader.md`
 
 ## License
 
