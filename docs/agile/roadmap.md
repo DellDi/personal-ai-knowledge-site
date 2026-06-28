@@ -11,7 +11,8 @@
 | 第三轮 | CMS 后台基座 | 已完成基础实现 | Payload CMS、PostgreSQL、MinIO、内容契约层已落地；本地 Docker 联调仍需持续验证 |
 | 第四轮 | Astro ↔ CMS 试点 | 已完成基础实现 | cmsLoader、5s 超时降级、admin 状态看板已实现 |
 | 第五轮 | Block 渲染层与全集合迁移 | 已完成基础实现 | BlockRenderer、全集合条件 loader、本地 + CMS 混合加载已落地，待真实 CMS 数据验收 |
-| 第六轮以后 | 发布流、评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
+| 第六轮 | 发布工作流 | 已完成基础实现 | Payload webhook、Astro SSR 草稿预览、发布状态机、admin 发布看板、Node SSR 部署口子已落地，待服务器真实 webhook 联调 |
+| 第七轮以后 | 评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
 
 ## 第一轮：平台骨架（已完成）
 
@@ -60,7 +61,7 @@
 - `posts` 集合已支持 `CMS_API_URL` 条件切换：CMS API / 本地 MDX
 - CMS 不可达时 5s 超时并优雅降级，不阻塞构建
 - richText content 和结构化 Block 先转换成 Markdown，并继续走 zod schema 校验
-- `/admin` 已改为 CMS 跳转入口 + 数据源状态看板
+- `/zh-CN/admin` 已改为 CMS 跳转入口 + 数据源状态看板
 
 待验收：
 
@@ -83,12 +84,26 @@
 - 使用 OSS 媒体 URL 验证图片、音频、嵌入内容渲染
 - 决定是否把 BlockRenderer 扩展到 topics / projects / resources 等详情页
 
-## 第六轮：发布工作流
+## 第六轮：发布工作流（已完成基础实现）
 
 - 草稿 / 预览 / 发布 / 下架状态机
 - Webhook 触发 Astro 重建
 - 预览走 Astro SSR 按需渲染
 - RSS / Sitemap / 搜索索引随构建更新
+
+已落地：
+
+- Payload 8 个内容集合接入 afterChange / afterDelete publish hooks
+- `/preview/[collection]/[id]` SSR 草稿预览端点
+- `/zh-CN/admin` 发布运营看板：CMS 数据源、Webhook、预览端点、集合计数、最近发布、构建状态
+- `@astrojs/node` standalone 运行时和 `/healthz`
+- 生产 compose 前台从纯 Nginx 静态服务调整为 Astro Node server
+
+待服务器验证：
+
+- `REBUILD_WEBHOOK_URL` 指向真实部署脚本或 CI hook
+- `CMS_API_TOKEN` 读取非公开草稿
+- 发布 / 下架 / 删除后触发 `web-build` 并刷新前台
 
 ## 第七轮：互动系统
 

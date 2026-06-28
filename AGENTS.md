@@ -14,6 +14,10 @@
 - 生产构建：`pnpm -C apps/web build`
 - 本地预览：`pnpm -C apps/web preview`
 - Docker 预览：`docker compose up --build`
+- 本地后端栈：`pnpm infra:local`
+- 生产后端启动：`pnpm infra:prod:up`
+- 生产前台构建：`pnpm infra:prod:build-web`
+- 生产前台启动：`pnpm infra:prod:web`
 
 ## 核心规则
 
@@ -25,7 +29,9 @@
 - 内容结构以 `apps/web/src/content.config.ts` 为准，不允许绕过 schema。
 - 公开页面、RSS 和搜索入口只能读取 `status: published` 内容。
 - `/zh-CN` 是当前主入口；`/en` 只做国际化预留，不应反向主导个人站点表达。
-- `/admin` 当前只是 noindex 的后台管理预留壳，不实现登录、写入、审核或 CMS 接入。
+- `/zh-CN/admin` 和 `/en/admin` 当前是 noindex 的发布运营看板，不实现登录、写入或审核；真实写入进入 Payload CMS。
+- `/preview` 是 SSR 草稿预览端点，必须保持 noindex，不能进入导航、RSS、Sitemap 或搜索入口。
+- CMS 发布 hooks 只能通知外部重建入口，不要让 Astro 运行时直接执行系统命令。
 
 ## 内容规则
 
@@ -68,6 +74,7 @@
 
 - 运行 `pnpm -C apps/web check`。
 - 运行 `pnpm -C apps/web build`。
-- 检查 `/zh-CN/`、`/en/`、`/rss.xml`、`/podcast/rss.xml`、`/search` 和 `/admin`。
+- 检查 `/zh-CN/`、`/en/`、`/rss.xml`、`/podcast/rss.xml`、`/zh-CN/search` 和 `/zh-CN/admin`。
+- 修改发布工作流时检查 `/preview/[collection]/[id]`、`/healthz`、`REBUILD_WEBHOOK_URL` 和 `CMS_API_TOKEN` 相关文档。
 - UI 变更需检查 320px 移动端和 1440px 桌面端。
 - 修改路由、内容模型、部署或开发规则时，同步更新相关架构文档或 Agile Markdown。

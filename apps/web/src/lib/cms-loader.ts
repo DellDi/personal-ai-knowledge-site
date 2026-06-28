@@ -55,21 +55,26 @@ function resolveToken(opts: CmsLoaderOptions): string | undefined {
 
 function richTextToMarkdown(doc: unknown): string {
   if (typeof doc === 'string') return doc;
+  if (Array.isArray(doc)) return doc.map(richTextToMarkdown).join('');
   if (!doc || typeof doc !== 'object') return '';
-  const node = doc as { type?: string; children?: unknown[]; text?: string; format?: string };
-  if (node.type === 'text' && typeof node.text === 'string') {
+  const node = doc as { type?: string; children?: unknown[]; text?: string; format?: string; url?: string };
+  if (typeof node.text === 'string') {
+    if (node.type === 'code') return `\`${node.text}\``;
     return node.text;
   }
   const children = Array.isArray(node.children) ? node.children : [];
   const inner = children.map(richTextToMarkdown).join('');
-  if (node.type === 'paragraph') return `${inner}\n\n`;
+  const heading = node.type?.match(/^h([1-6])$/);
+  if (heading) return `${'#'.repeat(Number(heading[1]))} ${inner.trim()}\n\n`;
+  if (!node.type || node.type === 'paragraph') return `${inner}\n\n`;
   if (node.type === 'heading') {
     const level = (node.format && /^\d+$/.test(node.format) ? Number(node.format) : 2) as number;
-    return `${'#'.repeat(Math.min(Math.max(level, 1), 6))} ${inner}\n\n`;
+    return `${'#'.repeat(Math.min(Math.max(level, 1), 6))} ${inner.trim()}\n\n`;
   }
-  if (node.type === 'list') return `${inner}\n`;
-  if (node.type === 'list-item-child') return `- ${inner}\n`;
-  if (node.type === 'link') return `[${inner}]`;
+  if (node.type === 'list' || node.type === 'ul' || node.type === 'ol') return `${inner}\n`;
+  if (node.type === 'list-item-child' || node.type === 'li') return `- ${inner.trim()}\n`;
+  if (node.type === 'blockquote') return `> ${inner.trim()}\n\n`;
+  if (node.type === 'link') return node.url ? `[${inner}](${node.url})` : inner;
   return inner;
 }
 

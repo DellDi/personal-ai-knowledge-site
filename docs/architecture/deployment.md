@@ -2,7 +2,8 @@
 
 ## 部署原则
 
-- 前台保持静态优先：Astro 构建出 `dist`，由 Nginx 服务。
+- 前台保持静态优先：Astro 构建出 `dist/client`、`dist/client/pagefind` 和 `dist/server`，由 Astro Node server 服务。
+- 草稿预览需要 SSR：`/preview` 不能只靠 Nginx 静态目录托管。
 - CMS 独立常驻：Payload CMS 只负责写入、草稿、媒体、API。
 - 数据库只存结构化数据：PostgreSQL 不暴露公网。
 - 媒体生产走阿里云 OSS：生产不部署 MinIO。
@@ -35,8 +36,8 @@ CMS_API_URL=http://localhost:3000/api CMS_ADMIN_URL=http://localhost:3000/admin 
 www.example.com
   -> 1Panel / Nginx
   -> 127.0.0.1:8080
-  -> Nginx container
-  -> Astro dist
+  -> Astro Node container
+  -> dist/client + dist/server
 
 cms.example.com
   -> 1Panel / Nginx
@@ -62,8 +63,9 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 
 - `postgres` 与 `cms` 是常驻服务。
 - `web-build` 是一次性构建任务，不常驻。
-- `web` 是 Nginx 静态服务，读取 `web_dist` volume。
+- `web` 是 Astro Node server，读取 `web_dist` volume 并启动 `node dist/server/entry.mjs`。
 - `cms` 和 `web` 只绑定 `127.0.0.1`，公网入口交给 1Panel / Nginx。
+- 每次 CMS 内容发布后，推荐由 webhook 触发 `web-build`，再重启或滚动更新 `web`。
 
 ## 环境变量
 
@@ -78,6 +80,11 @@ PAYLOAD_ENABLE_AUTOLOGIN=false
 PAYLOAD_PUBLIC_SERVER_URL=https://cms.example.com
 PAYLOAD_CORS_ORIGINS=https://www.example.com,https://cms.example.com
 PAYLOAD_CSRF_ORIGINS=https://www.example.com,https://cms.example.com
+
+CMS_API_URL=http://cms:3000/api
+CMS_ADMIN_URL=https://cms.example.com/admin
+CMS_API_TOKEN=your-preview-token
+REBUILD_WEBHOOK_URL=https://deploy.example.com/hooks/rebuild-personal-site
 
 S3_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
 S3_REGION=oss-cn-hangzhou
@@ -110,9 +117,22 @@ psql "postgres://content:YOUR_PASSWORD@YOUR_PROD_HOST:5432/content_platform" < c
 
 如果本地只是测试上传，直接丢弃 MinIO 数据，生产重新上传即可。
 
+## 发布重建
+
+Payload CMS 的发布 hooks 会在内容发布、下架或删除时向 `REBUILD_WEBHOOK_URL` 发送 JSON payload。这个 URL 应该指向受保护的部署编排入口，例如服务器脚本或 CI/CD deploy hook。
+
+推荐重建命令：
+
+```bash
+docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
+docker compose -f infra/docker-compose.prod.yml up -d web
+```
+
+第一版不让 Astro 进程直接执行重建命令，避免把前台运行时变成远程命令执行入口。
+
 ## 健康检查
 
-- 前台 Nginx：`/healthz`
+- 前台 Astro Node server：`/healthz`
 - CMS：`/api/access`
 - PostgreSQL：`pg_isready`
 
@@ -120,7 +140,8 @@ psql "postgres://content:YOUR_PASSWORD@YOUR_PROD_HOST:5432/content_platform" < c
 
 当前生产栈适合 2C2G 轻量服务器：
 
-- Nginx 静态前台
+- 1Panel / Nginx 反代
+- Astro Node 前台
 - Payload CMS
 - PostgreSQL
 - OSS 外部媒体存储

@@ -22,7 +22,9 @@ pnpm -C apps/web preview
 - 亮色、黑夜和跟随系统主题
 - 生产构建后生成 Pagefind 搜索索引
 - RSS、播客 RSS 和 Sitemap
-- `/admin` 后台管理预留入口
+- `/admin` 发布运营看板
+- `/preview/[collection]/[id]` CMS 草稿预览端点
+- `/healthz` 运行时健康检查
 
 ## 文案规则
 

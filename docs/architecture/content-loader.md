@@ -69,8 +69,9 @@ posts 和 knowledge 详情页使用组合渲染：
 ## 环境变量
 
 - `CMS_API_URL`：Payload REST API 基址，如 `http://localhost:3000/api`
-- `CMS_API_TOKEN`：可选 JWT token，用于认证读取
+- `CMS_API_TOKEN`：可选 JWT token，用于构建期认证读取和 SSR 草稿预览
 - `CMS_ADMIN_URL`：admin 跳转地址，默认 `http://localhost:3000/admin`
+- `REBUILD_WEBHOOK_URL`：CMS 发布 hook 的外部重建通知地址，由 Payload 环境读取
 
 ## 设计约束
 

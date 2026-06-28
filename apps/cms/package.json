@@ -8,9 +8,12 @@
   },
   "scripts": {
     "dev": "next dev --port 3000",
-    "build": "next build",
+    "build": "payload generate:importmap && next build",
     "start": "next start --port 3000",
     "typecheck": "tsc --noEmit",
+    "db:init": "tsx scripts/init-db.ts",
+    "seed:profile": "tsx scripts/seed-profile.ts",
+    "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types"
   },
   "dependencies": {
@@ -30,6 +33,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "tsx": "^4.22.4",
     "typescript": "^5.9.3"
   }
 }

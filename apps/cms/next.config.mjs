@@ -1,7 +1,6 @@
-import type { NextConfig } from 'next';
 import { withPayload } from '@payloadcms/next/withPayload';
 
-const config: NextConfig = withPayload({
+const config = withPayload({
   reactStrictMode: true,
   transpilePackages: ['payload', '@payloadcms/*'],
 });

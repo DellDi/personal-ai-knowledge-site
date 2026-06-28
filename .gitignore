@@ -2,6 +2,7 @@
 node_modules/
 dist/
 build/
+.next/
 .astro/
 .cache/
 .pagefind/
@@ -9,6 +10,8 @@ build/
 .netlify/
 coverage/
 .turbo/
+*.tsbuildinfo
+*.swp
 .env
 .env.*
 !.env.example

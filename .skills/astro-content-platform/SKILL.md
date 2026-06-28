@@ -1,6 +1,6 @@
 ---
 name: astro-content-platform
-description: 修改本项目 Astro 个人内容站时使用，包括个人品牌展示、知识沉淀、技能储备、项目案例、内容集合、多语言预留、黑夜模式、播客、文章、知识库、专题、资源库、术语库、SEO、RSS、搜索、Docker 部署、后台管理预留和 UI 组件。
+description: 修改本项目 Astro 个人内容站时使用，包括个人品牌展示、知识沉淀、技能储备、项目案例、内容集合、多语言预留、黑夜模式、播客、文章、知识库、专题、资源库、术语库、SEO、RSS、搜索、Docker 部署、Payload CMS、发布工作流、草稿预览、后台看板和 UI 组件。
 ---
 
 # Astro 个人内容站 Skill
@@ -12,6 +12,7 @@ description: 修改本项目 Astro 个人内容站时使用，包括个人品牌
 - 新增 MDX 内容组件
 - 建设播客、文章、知识库、专题、项目案例、资源库、术语库或时间线
 - 调整 SEO、RSS、Sitemap、Pagefind、主题、Docker 或后台预留
+- 调整 Payload CMS、发布 webhook、草稿预览或 `/zh-CN/admin` 发布看板
 - 重构 UI 组件和页面文案
 
 ## 必读参考
@@ -24,6 +25,7 @@ description: 修改本项目 Astro 个人内容站时使用，包括个人品牌
 - `docs/architecture/seo-search-rss.md`
 - `docs/architecture/deployment.md`
 - `docs/architecture/admin-design.md`
+- `docs/architecture/publish-workflow.md`
 - `docs/agile/roadmap.md`
 
 ## 开发规则
@@ -38,7 +40,9 @@ description: 修改本项目 Astro 个人内容站时使用，包括个人品牌
 - 每个公开路由必须具备 SEO 基础信息。
 - 每个可见模块必须响应式可用。
 - 保留 `/zh-CN` 和 `/en` 的显式路径前缀。
-- `/admin` 在真实鉴权和写入能力实现前必须保持 noindex。
+- `/zh-CN/admin` 和 `/en/admin` 是发布运营看板，不承载真实写入，必须保持 noindex。
+- `/preview` 是 SSR 草稿预览端点，必须保持 noindex，不进入公开导航、RSS、Sitemap 或搜索。
+- 发布 webhook 只通知外部部署入口，不在 Astro 运行时内直接执行系统命令。
 
 ## 验收
 

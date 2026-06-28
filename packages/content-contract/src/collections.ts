@@ -6,8 +6,8 @@ import type {
   KnowledgeLevel,
   ResourceType,
   TimelineKind,
-} from './enums.js';
-import type { Block } from './blocks.js';
+} from './enums';
+import type { Block } from './blocks';
 
 export interface CommonFields {
   title: string;

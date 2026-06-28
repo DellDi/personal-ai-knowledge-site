@@ -7,15 +7,43 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "jsx": "preserve",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node"],
-    "plugins": [{ "name": "next" }],
+    "jsx": "react-jsx",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "node"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@payload-config": ["./src/payload.config.ts"],
-      "@payloadcms/next/importMap": ["./importMap.ts"]
-    }
+      "@payload-config": [
+        "./src/payload.config.ts"
+      ],
+      "@payloadcms/next/importMap": [
+        "./importMap.ts"
+      ]
+    },
+    "allowJs": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
-  "include": ["src", "next-env.d.ts", ".next/types/**/*.ts", "importMap.ts"],
-  "exclude": ["node_modules", "dist", ".next"]
+  "include": [
+    "src",
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "importMap.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".next"
+  ]
 }

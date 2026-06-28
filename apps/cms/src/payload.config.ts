@@ -5,18 +5,28 @@ import { slateEditor } from '@payloadcms/richtext-slate';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { posts } from './collections/posts';
+import { posts as postsRaw } from './collections/posts';
 import { media } from './collections/media';
 import { users } from './collections/users';
 import {
-  podcast,
-  knowledge,
-  topics,
-  projects,
-  resources,
-  glossary,
-  timeline,
+  podcast as podcastRaw,
+  knowledge as knowledgeRaw,
+  topics as topicsRaw,
+  projects as projectsRaw,
+  resources as resourcesRaw,
+  glossary as glossaryRaw,
+  timeline as timelineRaw,
 } from './collections/content-collections';
+import { withPublishHooks } from './hooks';
+
+const posts = withPublishHooks(postsRaw);
+const podcast = withPublishHooks(podcastRaw);
+const knowledge = withPublishHooks(knowledgeRaw);
+const topics = withPublishHooks(topicsRaw);
+const projects = withPublishHooks(projectsRaw);
+const resources = withPublishHooks(resourcesRaw);
+const glossary = withPublishHooks(glossaryRaw);
+const timeline = withPublishHooks(timelineRaw);
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -32,6 +42,9 @@ const csrfOrigins =
 export default buildConfig({
   admin: {
     user: 'users',
+    importMap: {
+      importMapFile: path.resolve(dirname, '../importMap.ts'),
+    },
     ...(enableAutoLogin
       ? {
           autoLogin: {

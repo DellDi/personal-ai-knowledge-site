@@ -1,0 +1,392 @@
+---
+import Badge from '../../components/Badge.astro';
+import Button from '../../components/Button.astro';
+import Card from '../../components/Card.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { locales, ui, type Locale } from '../../lib/i18n';
+import {
+  collectionNames,
+  formatDate,
+  getAllPublishedEntries,
+  getEntryPath,
+  publicCollections,
+  type PublicCollection,
+} from '../../lib/content';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale }, props: { locale } }));
+}
+
+const { locale } = Astro.props as { locale: Locale };
+const t = ui[locale];
+const cmsURL = process.env.CMS_API_URL ?? import.meta.env.CMS_API_URL;
+const cmsAdminURL = process.env.CMS_ADMIN_URL ?? 'http://localhost:3000/admin';
+const webhookURL = process.env.REBUILD_WEBHOOK_URL ?? import.meta.env.REBUILD_WEBHOOK_URL;
+const buildGeneratedAt = new Intl.DateTimeFormat(locale, {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+  timeZone: 'Asia/Shanghai',
+}).format(new Date());
+const buildMode = import.meta.env.PROD ? t.adminBuildModeProduction : t.adminBuildModeDevelopment;
+
+const publishedEntries = await getAllPublishedEntries(locale);
+const collectionCounts = publicCollections.map((collection) => ({
+  collection,
+  label: collectionNames[locale][collection],
+  count: publishedEntries.filter((item) => item.collection === collection).length,
+}));
+const totalPublished = publishedEntries.length;
+const recentPublished = publishedEntries.slice(0, 6);
+
+const modeLabel = cmsURL ? t.adminStatusModeCms : t.adminStatusModeLocal;
+const modeTone: 'accent' | 'blue' = cmsURL ? 'accent' : 'blue';
+
+const sourceRows = [
+  {
+    label: t.adminSourceStatus,
+    value: modeLabel,
+    tone: modeTone,
+    detail: cmsURL ? cmsURL : t.adminStatusGuide,
+  },
+  {
+    label: t.adminWebhookStatus,
+    value: webhookURL ? t.adminConfigured : t.adminNotConfigured,
+    tone: webhookURL ? 'accent' : 'neutral',
+    detail: webhookURL ? 'REBUILD_WEBHOOK_URL' : 'REBUILD_WEBHOOK_URL',
+  },
+  {
+    label: t.adminPreviewStatus,
+    value: cmsURL ? t.adminEnabled : t.adminWaitingCms,
+    tone: cmsURL ? 'accent' : 'neutral',
+    detail: '/preview/{collection}/{id}',
+  },
+  {
+    label: t.adminSearchIndexStatus,
+    value: import.meta.env.PROD ? t.adminEnabled : t.adminWaitingCms,
+    tone: import.meta.env.PROD ? 'accent' : 'neutral',
+    detail: t.adminSearchIndexHint,
+  },
+] satisfies {
+  label: string;
+  value: string;
+  tone: 'accent' | 'blue' | 'neutral';
+  detail: string;
+}[];
+
+function collectionPath(collection: PublicCollection) {
+  return `/${locale}${collection === 'posts' ? '/posts' : collection === 'podcast' ? '/podcast' : `/${collection}`}`;
+}
+---
+
+<BaseLayout locale={locale} title={t.adminTitle} description={t.adminIntro} canonicalPath={`/${locale}/admin`} noindex>
+  <section class="container admin-page">
+    <SectionHeader title={t.adminTitle} description={t.adminIntro} />
+
+    <div class="admin-grid">
+      <Card>
+        <h2>{t.adminCmsLink}</h2>
+        <p>{t.adminCmsLinkHint}</p>
+        <div class="actions">
+          <Button href={cmsAdminURL} variant="primary">{t.adminCmsLink}</Button>
+          <Badge tone={modeTone}>{modeLabel}</Badge>
+        </div>
+      </Card>
+
+      <Card>
+        <h2>{t.adminStatusTitle}</h2>
+        <dl class="status-list compact">
+          {sourceRows.map((row) => (
+            <div>
+              <dt>{row.label}</dt>
+              <dd>
+                <Badge tone={row.tone}>{row.value}</Badge>
+                <span>{row.detail}</span>
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </Card>
+
+      <div class="span-2">
+        <Card>
+          <div class="card-heading">
+            <div>
+              <h2>{t.adminCollectionCounts}</h2>
+              <p>{t.adminStatusGuide}</p>
+            </div>
+            <div class="total">
+              <span>{t.adminTotalPublished}</span>
+              <strong>{totalPublished}</strong>
+            </div>
+          </div>
+
+          <div class="count-grid">
+            {collectionCounts.map((item) => (
+              <a class="count-item focus-ring" href={collectionPath(item.collection)}>
+                <span>{item.label}</span>
+                <strong>{item.count}</strong>
+              </a>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card>
+        <h2>{t.adminRecentPublished}</h2>
+        {recentPublished.length > 0 ? (
+          <ol class="recent-list">
+            {recentPublished.map(({ collection, entry }) => (
+              <li>
+                <a class="recent-link focus-ring" href={getEntryPath(collection, entry)}>
+                  <span class="recent-title">{entry.data.title}</span>
+                  <span class="recent-meta">
+                    {collectionNames[locale][collection]} / {formatDate(entry.data.date ?? entry.data.updated, locale)}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p class="empty">{t.adminNoRecentPublished}</p>
+        )}
+      </Card>
+
+      <Card>
+        <h2>{t.adminBuildStatus}</h2>
+        <dl class="status-list">
+          <div>
+            <dt>{t.adminBuildMode}</dt>
+            <dd><Badge tone={import.meta.env.PROD ? 'accent' : 'blue'}>{buildMode}</Badge></dd>
+          </div>
+          <div>
+            <dt>{t.adminRuntimeSsr}</dt>
+            <dd><Badge tone="accent">{t.adminEnabled}</Badge></dd>
+          </div>
+          <div>
+            <dt>{t.adminPreviewEndpoint}</dt>
+            <dd><code>/preview/posts/&lt;id&gt;</code></dd>
+          </div>
+          <div>
+            <dt>{t.adminBuildGeneratedAt}</dt>
+            <dd><time datetime={new Date().toISOString()}>{buildGeneratedAt}</time></dd>
+          </div>
+        </dl>
+      </Card>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .admin-page {
+    padding-block: clamp(42px, 8vw, 88px);
+  }
+
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .span-2 {
+    grid-column: 1 / -1;
+  }
+
+  h2 {
+    margin: 0 0 12px;
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.5rem);
+  }
+
+  p {
+    margin: 0 0 18px;
+    color: var(--color-muted);
+    line-height: 1.55;
+  }
+
+  .actions,
+  .card-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .actions {
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .status-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+
+  .status-list > div {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .status-list.compact > div {
+    display: grid;
+    grid-template-columns: minmax(120px, 160px) minmax(0, 1fr);
+    align-items: center;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .status-list.compact > div:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  dt {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  dd {
+    display: inline-flex;
+    max-width: min(100%, 520px);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: 0;
+    text-align: right;
+  }
+
+  .status-list.compact dd {
+    max-width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  dd span,
+  dd code,
+  time {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+  }
+
+  strong {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .total {
+    display: grid;
+    justify-items: end;
+    gap: 6px;
+    min-width: 118px;
+  }
+
+  .total span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .count-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .count-item {
+    display: flex;
+    min-height: 76px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    border: var(--border-width) solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .count-item span {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .recent-list {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .recent-link {
+    display: grid;
+    gap: 6px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-border-soft);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .recent-list li:last-child .recent-link {
+    border-bottom: 0;
+  }
+
+  .recent-title {
+    font-weight: 800;
+    line-height: 1.35;
+  }
+
+  .recent-meta,
+  .empty {
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 760px) {
+    .admin-grid,
+    .count-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .status-list > div,
+    dd {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .status-list.compact > div {
+      grid-template-columns: 1fr;
+    }
+
+    .status-list.compact dd {
+      width: 100%;
+    }
+
+    .card-heading {
+      display: grid;
+    }
+
+    .total {
+      justify-items: start;
+    }
+  }
+</style>

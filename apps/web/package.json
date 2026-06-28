@@ -7,18 +7,19 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build && pagefind --site dist",
+    "build": "astro build && pagefind --site dist/client --output-path dist/client/pagefind",
     "preview": "astro preview",
     "check": "astro check",
     "astro": "astro"
   },
   "dependencies": {
-    "@personal-ai-knowledge-site/content-contract": "workspace:*",
     "@astrojs/check": "^0.9.9",
     "@astrojs/mdx": "^7.0.0",
+    "@astrojs/node": "^11.0.0",
     "@astrojs/react": "^6.0.0",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.3",
+    "@personal-ai-knowledge-site/content-contract": "workspace:*",
     "@tailwindcss/vite": "^4.3.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

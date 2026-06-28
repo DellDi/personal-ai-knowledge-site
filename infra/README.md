@@ -7,7 +7,7 @@
 | 文件 | 用途 |
 |---|---|
 | `docker-compose.local.yml` | 本地开发：PostgreSQL + MinIO + Payload CMS |
-| `docker-compose.prod.yml` | 生产运行：PostgreSQL + Payload CMS + Nginx 静态前台 |
+| `docker-compose.prod.yml` | 生产运行：PostgreSQL + Payload CMS + Astro Node 前台 |
 | `docker-compose.yml` | 旧命令兼容入口，等同本地开发栈 |
 | `env/local.example.env` | 本地环境变量说明 |
 | `env/production.example.env` | 生产环境变量模板 |
@@ -20,11 +20,27 @@
 docker compose -f infra/docker-compose.local.yml up --build
 ```
 
+本地会先运行一次 `cms-init`，用源码版 Payload 通过 `db.push` 同步开发数据库结构；初始化成功后，再启动 production 运行态的 CMS 容器。生产环境不能依赖本地 `db.push` 行为。
+
+如果本机 `3000` 已被其他项目占用，可以临时改 CMS 暴露端口：
+
+```bash
+CMS_HOST_PORT=3001 docker compose -f infra/docker-compose.local.yml up --build
+```
+
 启动后访问：
 
 - Payload CMS 后台：http://localhost:3000/admin
 - MinIO 控制台：http://localhost:9001（minio_admin / minio_admin_password）
 - PostgreSQL：localhost:5432（content / content_password / content_platform）
+
+本地 CMS 初始化账号：`owner@example.com` / `local-dev-only-password`。该账号只用于本地开发，生产环境必须关闭 `PAYLOAD_ENABLE_AUTOLOGIN` 并创建正式管理员。
+
+如果只想重新同步本地数据库结构，可以单独执行：
+
+```bash
+docker compose -f infra/docker-compose.local.yml up --build cms-init
+```
 
 前台连接本地 CMS：
 
@@ -44,21 +60,25 @@ cp infra/env/production.example.env infra/env/production.env
 
 编辑 `infra/env/production.env`，替换数据库密码、Payload secret、正式域名、OSS bucket 和密钥。
 
+`docker-compose.prod.yml` 的 `production.env` 在 `config` 校验时可缺省，便于本地检查；真实部署前仍必须创建并填写该文件。
+
 2. 启动数据库和 CMS：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms
 ```
 
-3. 构建前台静态产物：
+生产环境需要在首次启动或内容模型变更后执行数据库迁移/初始化；不要用本地 `db.push` 代替生产迁移。
+
+3. 构建前台产物：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
 ```
 
-`web-build` 会在 compose 网络内用 `CMS_API_URL=http://cms:3000/api` 构建 Astro 前台，并把 `apps/web/dist` 写入 `web_dist` volume。
+`web-build` 会在 compose 网络内用 `CMS_API_URL=http://cms:3000/api` 构建 Astro 前台，并把 `dist/client`、`dist/client/pagefind` 和 `dist/server` 写入 `web_dist` volume。
 
-4. 启动前台 Nginx：
+4. 启动前台 Astro Node server：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml up -d web
@@ -114,3 +134,14 @@ psql "postgres://content:YOUR_PASSWORD@YOUR_PROD_HOST:5432/content_platform" < c
 - 生产 CMS 关闭 `PAYLOAD_ENABLE_AUTOLOGIN`。
 - Docker 日志限制在 `docker-compose.prod.yml` 中控制。
 - 2C2G 服务器上不建议再常驻 Meilisearch、向量库或 AI 推理服务。
+
+## 发布重建
+
+CMS 发布 hooks 使用 `REBUILD_WEBHOOK_URL` 通知外部部署入口。这个入口应由服务器脚本、CI/CD 或受保护的内部服务承接，然后执行：
+
+```bash
+docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
+docker compose -f infra/docker-compose.prod.yml up -d web
+```
+
+Astro 前台进程只负责服务公开页面、`/preview` 和 `/healthz`，不直接执行系统重建命令。

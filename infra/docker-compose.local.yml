@@ -51,20 +51,21 @@ services:
       "
     restart: "no"
 
-  cms:
+  cms-init:
     build:
       context: ..
       dockerfile: apps/cms/Dockerfile
-    container_name: cks-local-cms
+      target: init
+    container_name: cks-local-cms-init
     environment:
       NODE_ENV: development
       DATABASE_URI: postgres://content:content_password@postgres:5432/content_platform
       PAYLOAD_SECRET: payload_secret_change_me
       PAYLOAD_ENABLE_AUTOLOGIN: "true"
-      PAYLOAD_PUBLIC_SELF_PATH: http://localhost:3000
-      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
-      PAYLOAD_CORS_ORIGINS: "http://localhost:4321,http://localhost:3000"
-      PAYLOAD_CSRF_ORIGINS: "http://localhost:4321,http://localhost:3000"
+      PAYLOAD_PUBLIC_SELF_PATH: http://localhost:${CMS_HOST_PORT:-3000}
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:${CMS_HOST_PORT:-3000}
+      PAYLOAD_CORS_ORIGINS: "http://localhost:4321,http://localhost:${CMS_HOST_PORT:-3000}"
+      PAYLOAD_CSRF_ORIGINS: "http://localhost:4321,http://localhost:${CMS_HOST_PORT:-3000}"
       S3_ENDPOINT: http://minio:9000
       S3_REGION: us-east-1
       S3_BUCKET: content-platform
@@ -78,8 +79,39 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+    restart: "no"
+
+  cms:
+    build:
+      context: ..
+      dockerfile: apps/cms/Dockerfile
+    container_name: cks-local-cms
+    environment:
+      NODE_ENV: production
+      DATABASE_URI: postgres://content:content_password@postgres:5432/content_platform
+      PAYLOAD_SECRET: payload_secret_change_me
+      PAYLOAD_ENABLE_AUTOLOGIN: "true"
+      PAYLOAD_PUBLIC_SELF_PATH: http://localhost:${CMS_HOST_PORT:-3000}
+      PAYLOAD_PUBLIC_SERVER_URL: http://localhost:${CMS_HOST_PORT:-3000}
+      PAYLOAD_CORS_ORIGINS: "http://localhost:4321,http://localhost:${CMS_HOST_PORT:-3000}"
+      PAYLOAD_CSRF_ORIGINS: "http://localhost:4321,http://localhost:${CMS_HOST_PORT:-3000}"
+      S3_ENDPOINT: http://minio:9000
+      S3_REGION: us-east-1
+      S3_BUCKET: content-platform
+      S3_ACCESS_KEY_ID: minio_admin
+      S3_SECRET_ACCESS_KEY: minio_admin_password
+      S3_FORCE_PATH_STYLE: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      cms-init:
+        condition: service_completed_successfully
     ports:
-      - "3000:3000"
+      - "${CMS_HOST_PORT:-3000}:3000"
 
 volumes:
   postgres_data:

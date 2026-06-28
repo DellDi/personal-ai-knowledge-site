@@ -1,3 +1,3 @@
-export * from './enums.js';
-export * from './blocks.js';
-export * from './collections.js';
+export * from './enums';
+export * from './blocks';
+export * from './collections';

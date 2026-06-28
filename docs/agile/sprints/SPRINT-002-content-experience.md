@@ -18,6 +18,6 @@
 
 - `pnpm -C apps/web check` 通过
 - `pnpm -C apps/web build` 通过，Pagefind 索引生成
-- `/zh-CN/`、`/en/`、`/rss.xml`、`/podcast/rss.xml`、`/search`、`/admin` 在 320px 和 1440px 无横向溢出
+- `/zh-CN/`、`/en/`、`/rss.xml`、`/podcast/rss.xml`、`/zh-CN/search`、`/zh-CN/admin` 在 320px 和 1440px 无横向溢出
 - 每集合至少 1 篇 published 内容进入 RSS 与 Pagefind
 - 详情页 JSON-LD 正确注入（Article / PodcastEpisode / BreadcrumbList）

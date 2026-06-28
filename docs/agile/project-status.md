@@ -4,11 +4,11 @@
 
 ## 当前阶段
 
-项目已经从“Astro 静态个人内容站”推进到“前台内容体验完成 + CMS 后台全集合试点”阶段。
+项目已经从“Astro 静态个人内容站”推进到“前台内容体验完成 + CMS 后台全集合试点 + 发布工作流基础闭环”阶段。
 
 当前主线不是继续堆页面，而是把个人内容站升级成可长期运营的个人内容资产系统：
 
-- 前台负责展示、阅读、搜索、RSS、SEO 和静态发布。
+- 前台负责展示、阅读、搜索、RSS、SEO、静态优先发布和 SSR 草稿预览。
 - CMS 负责后续写入、草稿、媒体、审核和内容生命周期。
 - 内容契约层负责让 Astro 与 CMS 共享字段、枚举和 Block 类型，降低 schema 漂移风险。
 
@@ -20,7 +20,7 @@
 - 8 个内容集合已建立：podcast、posts、knowledge、topics、projects、resources、glossary、timeline。
 - 已有中文 seed 内容，页面能覆盖首页、列表页、详情页、标签页、搜索页、RSS、播客 RSS、Sitemap、404。
 - 亮色、黑夜、跟随系统主题已落地。
-- Docker + Nginx 静态部署配置已落地。
+- Docker 部署配置已落地；前台当前使用 Astro Node server 运行静态优先产物和 SSR 预览端点。
 
 ### 内容体验
 
@@ -52,11 +52,14 @@
 - CMS 不可达时 5 秒超时并优雅降级，保留本地内容，不阻塞构建。
 - Payload blocks 会在 loader 层规范化为前台 `Block` 契约。
 
-### /admin 状态页
+### 发布工作流
 
-- `/admin` 已从纯预留壳调整为 noindex 状态页。
-- 当前展示 CMS 后台跳转、posts 数量和数据源模式。
-- 后续再补真实构建状态、搜索索引状态、最近发布内容和发布检查入口。
+- Payload 8 个内容集合已接入发布 hooks。
+- `REBUILD_WEBHOOK_URL` 未配置时不影响 CMS 保存；配置后发布、下架、删除会发送 webhook payload。
+- Astro 已新增 `/preview/[collection]/[id]` 和 `/preview?collection=&id=` SSR 草稿预览端点。
+- 预览端点使用 `CMS_API_URL` / `CMS_API_TOKEN` 读取 CMS 草稿，并保持 noindex。
+- `/zh-CN/admin` 已从纯预留壳调整为 noindex 发布运营看板，展示 CMS 跳转、数据源、Webhook、预览端点、搜索索引、构建状态、集合计数和最近发布；`/en/admin` 保留英文看板。
+- `/healthz` 已作为 Web 运行时健康检查端点。
 
 ## 未完成 / 待验证
 
@@ -66,7 +69,7 @@
 - 使用真实 CMS 数据构建 Astro 页面仍需端到端验收，尤其是 BlockRenderer 和 OSS 媒体 URL。
 - Pagefind 目前是基础搜索；集合筛选、标签筛选和内容地图页仍未完成。
 - 其余集合虽然已可从 CMS 加载 richText 正文，但 BlockRenderer 暂时只在 posts / knowledge 详情页启用。
-- 草稿预览、发布 Webhook、重建流程、评论、Meilisearch、AI RAG 仍是后续目标。
+- 真实服务器 webhook 重建、评论、Meilisearch、AI RAG 仍是后续目标。
 
 ## 当前优先级
 
@@ -79,16 +82,15 @@
 
 ### P1
 
-- 完善 `/admin` 状态看板：最近发布、构建状态、搜索索引状态。
 - 补充 CMS 试点使用说明和环境变量说明。
-- 做 posts 的草稿预览策略设计。
+- 在服务器上联调 `REBUILD_WEBHOOK_URL` 到部署脚本或 CI hook。
+- 使用真实 `CMS_API_TOKEN` 验证草稿预览读取非公开内容。
 
 ### P2
 
-- 设计 SPRINT-006：发布工作流、webhook 重建、草稿预览策略。
 - 设计内容导出 JSON，为后续搜索升级和 AI RAG 做准备。
 
 ## 代码状态
 
 - 最新已提交节点：`9db2eca`，引入内容契约层、CMS 后台基座、内容体验增强和 MDX 文档组件系统。
-- 当前工作区包含 SPRINT-004/005 相关未提交变更：cmsLoader 混合加载、BlockRenderer、全集合 CMS collection、admin 状态页、本地/生产部署拆分和相关文档。
+- 当前工作区包含 SPRINT-004/005/006 相关未提交变更：cmsLoader 混合加载、BlockRenderer、全集合 CMS collection、发布 hooks、SSR 草稿预览、admin 发布看板、本地/生产部署拆分和相关文档。

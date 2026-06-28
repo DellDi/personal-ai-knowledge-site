@@ -10,7 +10,7 @@
 - richText content + 结构化 Block 转 Markdown，经 `context.renderMarkdown` 渲染
 - `content.config.ts` 的 posts 集合改用条件 loader：`CMS_API_URL` 存在时用 cmsLoader，否则用 glob loader
 - 5 秒超时 + 优雅降级：CMS 不可达时返回空数据，不阻塞构建
-- `apps/web/src/pages/admin.astro` 改为 CMS 跳转 + 数据源状态看板
+- `apps/web/src/pages/[locale]/admin.astro` 改为 CMS 跳转 + 数据源状态看板
 
 ## 退出标准
 
