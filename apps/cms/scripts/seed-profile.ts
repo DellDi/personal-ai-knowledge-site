@@ -11,13 +11,39 @@ type SeedCollection =
   | 'glossary'
   | 'timeline';
 
-type SlateLeaf = {
+type LexicalTextNode = {
+  detail: 0;
+  format: 0;
+  mode: 'normal';
+  style: '';
   text: string;
+  type: 'text';
+  version: 1;
 };
 
-type SlateNode = {
-  children: Array<SlateLeaf | SlateNode>;
-  type?: string;
+type LexicalElementNode = {
+  children: Array<LexicalTextNode | LexicalElementNode>;
+  direction: 'ltr';
+  format: '';
+  indent: 0;
+  listType?: 'bullet';
+  start?: 1;
+  tag?: `h${1 | 2 | 3 | 4 | 5 | 6}` | 'ul';
+  textFormat?: 0;
+  type: 'paragraph' | 'heading' | 'list' | 'listitem';
+  value?: number;
+  version: 1;
+};
+
+type LexicalRoot = {
+  root: {
+    children: LexicalElementNode[];
+    direction: 'ltr';
+    format: '';
+    indent: 0;
+    type: 'root';
+    version: 1;
+  };
 };
 
 type BlockData = Record<string, unknown> & {
@@ -32,27 +58,61 @@ type SeedDoc = {
 const now = '2026-06-28T00:00:00.000Z';
 const commonTags = ['个人履历', '数据智能', 'AI 应用', '全栈工程'];
 
-function text(value: string): SlateLeaf {
-  return { text: value };
-}
-
-function p(value: string): SlateNode {
-  return { children: [text(value)] };
-}
-
-function h(level: 2 | 3, value: string): SlateNode {
-  return { type: `h${level}`, children: [text(value)] };
-}
-
-function ul(items: string[]): SlateNode {
+function text(value: string): LexicalTextNode {
   return {
-    type: 'ul',
-    children: items.map((item) => ({ type: 'li', children: [text(item)] })),
+    detail: 0,
+    format: 0,
+    mode: 'normal',
+    style: '',
+    text: value,
+    type: 'text',
+    version: 1,
   };
 }
 
-function rt(nodes: SlateNode[]): SlateNode[] {
-  return nodes;
+function element(
+  type: LexicalElementNode['type'],
+  children: LexicalElementNode['children'],
+  extra: Omit<Partial<LexicalElementNode>, 'children' | 'direction' | 'format' | 'indent' | 'type' | 'version'> = {},
+): LexicalElementNode {
+  return {
+    children,
+    direction: 'ltr',
+    format: '',
+    indent: 0,
+    type,
+    version: 1,
+    ...extra,
+  };
+}
+
+function p(value: string): LexicalElementNode {
+  return element('paragraph', [text(value)], { textFormat: 0 });
+}
+
+function h(level: 2 | 3, value: string): LexicalElementNode {
+  return element('heading', [text(value)], { tag: `h${level}` });
+}
+
+function ul(items: string[]): LexicalElementNode {
+  return element(
+    'list',
+    items.map((item, index) => element('listitem', [text(item)], { value: index + 1 })),
+    { listType: 'bullet', start: 1, tag: 'ul' },
+  );
+}
+
+function rt(nodes: LexicalElementNode[]): LexicalRoot {
+  return {
+    root: {
+      children: nodes,
+      direction: 'ltr',
+      format: '',
+      indent: 0,
+      type: 'root',
+      version: 1,
+    },
+  };
 }
 
 function statGrid(items: { value: string; label: string }[], columns: 2 | 3 | 4 = 3): BlockData {

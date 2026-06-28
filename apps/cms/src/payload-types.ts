@@ -178,11 +178,21 @@ export interface Post {
   updated?: string | null;
   tags?: string[] | null;
   cover?: (number | null) | Media;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contentBlocks?:
     | (
         | {
@@ -374,11 +384,21 @@ export interface Podcast {
         id?: string | null;
       }[]
     | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contentBlocks?:
     | (
         | {
@@ -509,11 +529,21 @@ export interface Knowledge {
     | 'tools';
   level?: ('basic' | 'intermediate' | 'advanced') | null;
   order?: number | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contentBlocks?:
     | (
         | {
@@ -635,11 +665,21 @@ export interface Topic {
   tags?: string[] | null;
   hero?: (number | null) | Media;
   items?: string[] | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contentBlocks?:
     | (
         | {
@@ -768,11 +808,21 @@ export interface Project {
         id?: string | null;
       }[]
     | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   contentBlocks?:
     | (
         | {
@@ -894,11 +944,21 @@ export interface Resource {
   tags?: string[] | null;
   type: 'tool' | 'book' | 'article' | 'video' | 'repo' | 'course';
   url?: string | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -919,11 +979,21 @@ export interface Glossary {
   updated?: string | null;
   tags?: string[] | null;
   aliases?: string[] | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -944,11 +1014,21 @@ export interface Timeline {
   updated?: string | null;
   tags?: string[] | null;
   kind?: ('milestone' | 'release' | 'learning') | null;
-  content?:
-    | {
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
         [k: string]: unknown;
-      }[]
-    | null;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   updatedAt: string;
   createdAt: string;
 }
