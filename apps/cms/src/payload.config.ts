@@ -48,8 +48,8 @@ export default buildConfig({
     ...(enableAutoLogin
       ? {
           autoLogin: {
-            email: 'owner@example.com',
-            password: 'local-dev-only-password',
+            email: '875372314@qq.com',
+            password: '123456',
           },
         }
       : {}),

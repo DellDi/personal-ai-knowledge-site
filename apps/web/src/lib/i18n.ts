@@ -34,7 +34,8 @@ type NavItem = {
 export const ui = {
   'zh-CN': {
     siteName: 'DellDi的信息内容栈',
-    siteDescription: '用于呈现个人品牌、项目实践、知识体系与技能储备的个人内容站。',
+    siteDescription:
+      '用于呈现个人品牌、项目实践、知识体系与技能储备的个人内容站。',
     skipToContent: '跳到正文',
     brandPrimary: 'DellDi',
     brandSecondary: '信息内容栈',
@@ -58,7 +59,8 @@ export const ui = {
     latestPodcast: '最新播客',
     latestPosts: '最新文章',
     knowledgeAreas: '知识库区域',
-    knowledgeAreasDescription: 'AI Agent / 工程架构 / 数据工程 / 前端工程 / 产品方法 / 运营管理',
+    knowledgeAreasDescription:
+      'AI Agent / 工程架构 / 数据工程 / 前端工程 / 产品方法 / 运营管理',
     knowledgeCta: '进入知识库',
     searchCta: '全站搜索',
     projectsTitle: '项目案例',
@@ -71,7 +73,8 @@ export const ui = {
     searchEmpty: '输入关键词后开始搜索。生产构建后会加载 Pagefind 索引。',
     noSearchResults: '没有找到匹配内容。',
     podcastDescription: '音频节目、文字稿、时间轴和本期提到的资源。',
-    postsDescription: '围绕 AI、工程架构、数据系统、产品建设和个人知识管理的长文记录。',
+    postsDescription:
+      '围绕 AI、工程架构、数据系统、产品建设和个人知识管理的长文记录。',
     knowledgeDescription: '长期维护的排查手册、方法论、架构记录和实践文档。',
     topicsDescription: '把分散的文章、播客、项目和知识库内容串成连续专题。',
     projectsDescription: '项目复盘、产品实践、架构方案和可复用的落地经验。',
@@ -84,7 +87,8 @@ export const ui = {
     openResource: '打开资源',
     podcastRss: '播客 RSS',
     adminTitle: '发布运营看板',
-    adminIntro: '这里用于检查 CMS、草稿预览、发布 Webhook、构建状态和内容集合概况，不承载真实写入操作。',
+    adminIntro:
+      '这里用于检查 CMS、草稿预览、发布 Webhook、构建状态和内容集合概况，不承载真实写入操作。',
     adminCmsLink: '进入 CMS 后台',
     adminCmsLinkHint: '在 cms 子域独立部署，负责内容编辑、草稿、审核和媒体库。',
     adminStatusTitle: '当前状态',
@@ -93,7 +97,8 @@ export const ui = {
     adminStatusModeLocal: '本地 MDX',
     adminStatusModeCms: 'CMS API',
     adminStatusModeUnreachable: 'CMS 不可达',
-    adminStatusGuide: '设置 CMS_API_URL 后，会在本地内容基础上叠加 CMS 已发布内容；CMS 不可达时保留本地内容。',
+    adminStatusGuide:
+      '设置 CMS_API_URL 后，会在本地内容基础上叠加 CMS 已发布内容；CMS 不可达时保留本地内容。',
     adminSourceStatus: 'CMS 数据源',
     adminWebhookStatus: 'Webhook 配置',
     adminPreviewStatus: '草稿预览',
@@ -126,10 +131,11 @@ export const ui = {
   },
   en: {
     siteName: "DellDi's Information Content Stack",
-    siteDescription: 'A personal content site for brand presence, project practice, knowledge assets, and skill inventory.',
+    siteDescription:
+      'A personal content site for brand presence, project practice, knowledge assets, and skill inventory.',
     skipToContent: 'Skip to content',
     brandPrimary: 'DellDi',
-    brandSecondary: "Information Content Stack",
+    brandSecondary: 'Information Content Stack',
     footerKicker: 'Personal content site',
     nav: [
       { label: 'Home', href: '/' },
@@ -142,15 +148,16 @@ export const ui = {
       { label: 'Glossary', href: '/glossary' },
       { label: 'Search', href: '/search' },
     ] satisfies NavItem[],
-    homeKicker: "DellDi's Information Content And Knowledge Stack",
-    homeTitle: "DellDi's Information Content And Knowledge Stack",
+    homeKicker: 'AI Agent & Knowledge Engineering',
+    homeTitle: "DellDi's Information Content Stack",
     homeIntro:
-      'This site exists to present the owner, archive personal work, and keep reusable knowledge visible over time.',
+      'After the Chinese section is complete, the English section will be available.',
     featured: 'Featured',
     latestPodcast: 'Latest podcast',
     latestPosts: 'Latest posts',
     knowledgeAreas: 'Knowledge areas',
-    knowledgeAreasDescription: 'AI agents / architecture / data engineering / frontend / product / operations',
+    knowledgeAreasDescription:
+      'AI agents / architecture / data engineering / frontend / product / operations',
     knowledgeCta: 'Knowledge base',
     searchCta: 'Search',
     projectsTitle: 'Project cases',
@@ -160,32 +167,44 @@ export const ui = {
     listen: 'Listen',
     backHome: 'Back home',
     searchPlaceholder: 'Search posts, podcasts, knowledge, and projects',
-    searchEmpty: 'Search is available after production build. Chinese content is the primary index.',
+    searchEmpty:
+      'Search is available after production build. Chinese content is the primary index.',
     noSearchResults: 'No results found.',
-    podcastDescription: 'Audio episodes, transcripts, timelines, and referenced resources.',
-    postsDescription: 'Long-form notes on AI, engineering, data systems, product building, and knowledge management.',
-    knowledgeDescription: 'Stable playbooks, troubleshooting notes, methods, and architecture records.',
-    topicsDescription: 'Topic trails are reserved here; Chinese topic content is maintained first.',
-    projectsDescription: 'Project reviews, product practices, architecture plans, and reusable lessons.',
+    podcastDescription:
+      'Audio episodes, transcripts, timelines, and referenced resources.',
+    postsDescription:
+      'Long-form notes on AI, engineering, data systems, product building, and knowledge management.',
+    knowledgeDescription:
+      'Stable playbooks, troubleshooting notes, methods, and architecture records.',
+    topicsDescription:
+      'Topic trails are reserved here; Chinese topic content is maintained first.',
+    projectsDescription:
+      'Project reviews, product practices, architecture plans, and reusable lessons.',
     resourcesDescription: 'Practical tools, docs, books, repos, and courses.',
-    glossaryDescription: 'Terms for AI, data, engineering, product, and agent workflows.',
-    timelineDescription: 'A dated trail reserved for platform evolution summaries.',
-    tagDescription: 'Published content connected by this tag. Chinese tags are maintained first.',
+    glossaryDescription:
+      'Terms for AI, data, engineering, product, and agent workflows.',
+    timelineDescription:
+      'A dated trail reserved for platform evolution summaries.',
+    tagDescription:
+      'Published content connected by this tag. Chinese tags are maintained first.',
     topicLinkedItems: 'linked items',
     projectFallbackRole: 'Project practice',
     openResource: 'Open resource',
     podcastRss: 'Podcast RSS',
     adminTitle: 'Publishing Dashboard',
-    adminIntro: 'A noindex dashboard for checking CMS, draft preview, publish webhooks, build status, and content collection health.',
+    adminIntro:
+      'A noindex dashboard for checking CMS, draft preview, publish webhooks, build status, and content collection health.',
     adminCmsLink: 'Open CMS admin',
-    adminCmsLinkHint: 'Deployed on the cms subdomain. Handles content editing, drafts, review, and media.',
+    adminCmsLinkHint:
+      'Deployed on the cms subdomain. Handles content editing, drafts, review, and media.',
     adminStatusTitle: 'Current status',
     adminStatusPosts: 'Posts',
     adminStatusMode: 'Data source',
     adminStatusModeLocal: 'Local MDX',
     adminStatusModeCms: 'CMS API',
     adminStatusModeUnreachable: 'CMS unreachable',
-    adminStatusGuide: 'Set CMS_API_URL to layer published CMS content on top of local content. Local content remains when CMS is unreachable.',
+    adminStatusGuide:
+      'Set CMS_API_URL to layer published CMS content on top of local content. Local content remains when CMS is unreachable.',
     adminSourceStatus: 'CMS source',
     adminWebhookStatus: 'Webhook config',
     adminPreviewStatus: 'Draft preview',
@@ -216,4 +235,4 @@ export const ui = {
     prevEntry: 'Previous',
     nextEntry: 'Next',
   },
-} as const;
+} as const

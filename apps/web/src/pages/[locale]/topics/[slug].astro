@@ -1,7 +1,7 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BlockRenderer from '../../../components/docs/BlockRenderer.astro';
 import EntryLayout from '../../../layouts/EntryLayout.astro';
-import type { PublicEntry } from '../../../lib/content';
 import type { Locale } from '../../../lib/i18n';
 
 export async function getStaticPaths() {
@@ -12,10 +12,12 @@ export async function getStaticPaths() {
   }));
 }
 
-const { entry, locale } = Astro.props as { entry: PublicEntry; locale: Locale };
+const { entry, locale } = Astro.props as { entry: CollectionEntry<'topics'>; locale: Locale };
 const { Content, headings } = await render(entry);
+const blocks = entry.data.contentBlocks;
 ---
 
 <EntryLayout collection="topics" entry={entry} locale={locale} headings={headings}>
   <Content />
+  {blocks && blocks.length > 0 && <BlockRenderer blocks={blocks} />}
 </EntryLayout>

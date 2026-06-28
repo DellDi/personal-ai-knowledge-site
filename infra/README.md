@@ -34,7 +34,7 @@ CMS_HOST_PORT=3001 docker compose -f infra/docker-compose.local.yml up --build
 - MinIO 控制台：http://localhost:9001（minio_admin / minio_admin_password）
 - PostgreSQL：localhost:5432（content / content_password / content_platform）
 
-本地 CMS 初始化账号：`owner@example.com` / `local-dev-only-password`。该账号只用于本地开发，生产环境必须关闭 `PAYLOAD_ENABLE_AUTOLOGIN` 并创建正式管理员。
+本地 CMS 初始化账号：`875372314@qq.com` / `123456`。该账号只用于本地开发，生产环境必须关闭 `PAYLOAD_ENABLE_AUTOLOGIN` 并创建正式管理员。
 
 如果只想重新同步本地数据库结构，可以单独执行：
 

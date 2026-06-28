@@ -51,12 +51,14 @@ export interface KnowledgeFields extends CommonFields {
 export interface TopicFields extends CommonFields {
   items: string[];
   hero?: string;
+  contentBlocks?: Block[];
 }
 
 export interface ProjectFields extends CommonFields {
   role?: string;
   stack: string[];
   links: { label: string; url: string }[];
+  contentBlocks?: Block[];
 }
 
 export interface ResourceFields extends CommonFields {

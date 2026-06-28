@@ -123,16 +123,17 @@ const knowledge = defineCollection({
 });
 
 const topics = defineCollection({
-  loader: collectionLoader('topics', ['items', 'hero']),
+  loader: collectionLoader('topics', ['items', 'hero', 'contentBlocks']),
   schema: z.object({
     ...common,
     items: z.array(z.string()).default([]),
     hero: z.string().optional(),
+    contentBlocks: contentBlocksField,
   }),
 });
 
 const projects = defineCollection({
-  loader: collectionLoader('projects', ['role', 'stack', 'links']),
+  loader: collectionLoader('projects', ['role', 'stack', 'links', 'contentBlocks']),
   schema: z.object({
     ...common,
     role: z.string().optional(),
@@ -145,6 +146,7 @@ const projects = defineCollection({
         }),
       )
       .default([]),
+    contentBlocks: contentBlocksField,
   }),
 });
 

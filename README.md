@@ -2,6 +2,10 @@
 
 这是一个以站点所有者本人为中心的 Astro 个人内容站，服务个人品牌展示、知识沉淀、技能储备、项目复盘和长期成长记录。第一阶段覆盖播客、文章、知识库、专题、项目案例、资源库、术语库、搜索、RSS、站点地图、黑夜模式、Docker 部署，以及后续后台管理、CMS、评论和 AI 检索扩展。
 
+## 项目截图
+
+![首页](./docs/images/home.png)
+
 ## 当前状态
 
 项目已经从第一版静态站骨架推进到“前台内容体验 + CMS 后台试点 + 发布工作流基础闭环”阶段：
@@ -60,7 +64,7 @@ pnpm infra:local
 - `http://localhost:9001`：MinIO 控制台
 - `http://localhost:4321/zh-CN/admin`：前台发布运营看板
 
-本地 CMS 初始化账号：`owner@example.com` / `local-dev-only-password`。
+本地 CMS 初始化账号：`875372314@qq.com` / `123456`。
 
 前台连接 CMS 试点：
 

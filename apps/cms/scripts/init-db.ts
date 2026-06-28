@@ -6,8 +6,8 @@ const payload = await getPayload({ config });
 
 payload.logger.info('Payload database schema initialized.');
 
-const localAdminEmail = 'owner@example.com';
-const localAdminPassword = 'local-dev-only-password';
+const localAdminEmail = '875372314@qq.com';
+const localAdminPassword = '123456';
 
 const existingAdmin = await payload.find({
   collection: 'users',
