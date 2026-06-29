@@ -55,8 +55,34 @@ type SeedDoc = {
   data: Record<string, unknown> & { slug: string; title: string };
 };
 
-const now = '2026-06-28T00:00:00.000Z';
 const commonTags = ['个人履历', '数据智能', 'AI 应用', '全栈工程'];
+
+const DATES = {
+  iotStart: '2019-06-01T00:00:00.000Z',
+  lowcodeForm: '2021-03-15T00:00:00.000Z',
+  biLowcode: '2022-06-10T00:00:00.000Z',
+  dataWarehouse: '2022-09-20T00:00:00.000Z',
+  backendCdc: '2023-06-15T00:00:00.000Z',
+  aiQuery: '2024-09-10T00:00:00.000Z',
+  aiWorkbench: '2025-09-01T00:00:00.000Z',
+  aiPracticePost: '2025-10-20T00:00:00.000Z',
+  careerSummaryPost: '2025-11-15T00:00:00.000Z',
+  topicProfile: '2026-01-10T00:00:00.000Z',
+  knowledgeStack: '2023-08-25T00:00:00.000Z',
+  knowledgeLowcode: '2022-08-15T00:00:00.000Z',
+  knowledgeAiAgent: '2025-10-15T00:00:00.000Z',
+  readingRoute: '2026-02-01T00:00:00.000Z',
+  glossaryMetric: '2023-03-10T00:00:00.000Z',
+  glossaryDataProduct: '2023-05-20T00:00:00.000Z',
+  glossarySemantic: '2024-06-15T00:00:00.000Z',
+  glossaryCdc: '2023-07-10T00:00:00.000Z',
+  glossaryDify: '2024-11-05T00:00:00.000Z',
+  timelineEducation: '2017-06-01T00:00:00.000Z',
+  timelineFirstJob: '2019-03-15T00:00:00.000Z',
+  timelineAwards: '2024-12-01T00:00:00.000Z',
+  timelineAiMigration: '2025-08-01T00:00:00.000Z',
+  timelinePersonalSite: '2026-03-01T00:00:00.000Z',
+};
 
 function text(value: string): LexicalTextNode {
   return {
@@ -177,27 +203,29 @@ const docs: SeedDoc[] = [
     data: {
       title: '个人能力图谱：把数据产品做成 AI 应用',
       description:
-        '一条从 BI、低代码、指标链路、后端服务到 AI 工作台的能力主线，展示我如何把复杂业务问题拆成可运行、可验证、可演进的系统。',
+        '一条从 BI 低代码、表单平台、数仓指标链路、Java 后端微服务到 AI 工作台的全栈能力主线，展示我如何把复杂业务问题拆成可运行、可验证、可演进的工程系统，并在 7 年经验中持续沉淀数据智能与 AI 应用落地能力。',
       lang: 'zh-CN',
       translationKey: 'topic-personal-engineering-profile',
       slug: 'personal-engineering-profile',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.topicProfile,
+      updated: DATES.topicProfile,
       tags: [...commonTags, '专题', '能力图谱'],
       items: [
         '/zh-CN/projects/ai-native-data-analysis-workbench',
         '/zh-CN/projects/ai-data-assistant-mobile-platform',
         '/zh-CN/projects/data-intelligence-bi-low-code-platform',
         '/zh-CN/projects/data-intelligence-backend-realtime-chain',
+        '/zh-CN/projects/iot-smart-hardware-mini-program',
         '/zh-CN/posts/from-bi-lowcode-to-ai-workbench',
         '/zh-CN/knowledge/enterprise-data-intelligence-stack',
+        '/zh-CN/knowledge/ai-agent-engineering-practice',
       ],
       content: rt([
         h(2, '我想展示的不是履历长度'),
         p(
-          '这个专题的核心不是把工作经历重新排版，而是把我解决问题的方式展开：先判断业务问题属于口径、流程、数据、交互还是系统边界，再选择合适的工程形态。',
+          '这个专题的核心不是把工作经历重新排版，而是把我解决问题的方式展开：先判断业务问题属于口径、流程、数据、交互还是系统边界，再选择合适的工程形态。7 年经验里，我从前端低代码设计器起步，逐步覆盖 Java 后端、数据仓库、CDC 实时链路和 AI Agent 工作流，带过 3-5 人研发小组，也在持续把 AI 能力纳入真实研发流程。',
         ),
         p(
           '我做过 BI 设计器、表单低代码、数仓指标、图表服务、CDC 链路、Dify 问数和 AI 工作台。这些经历看起来分散，但底层都在处理同一件事：把不稳定的业务表达，变成稳定的协议、状态和结果。',
@@ -223,7 +251,7 @@ const docs: SeedDoc[] = [
         ),
         quote(
           '好的 AI 应用不是把模型放到页面上，而是把原本散落在业务、数据、权限和交互里的判断路径显性化。',
-          'DellDi',
+          '曾迪',
           '个人能力图谱',
         ),
         compareTable(
@@ -285,14 +313,14 @@ const docs: SeedDoc[] = [
     data: {
       title: 'AI 原生数据分析工作台',
       description:
-        '一个面向数据分析场景的 AI 工作台实践：自然语言进入，经过意图识别、语义查询、执行计划、异步任务和结论组织，回到可追问的分析会话。',
+        '面向物业分析团队建设 AI 原生数据工作台，采用 Clean Architecture / Ports and Adapters 架构，支持自然语言数据分析、结构化意图解析、分析计划生成、流式执行进度、多轮追问和历史上下文保留。接入 LLM Provider、Cube 语义查询、Neo4j 图谱适配和 Redis 队列 + Worker 异步任务链路。',
       lang: 'zh-CN',
       translationKey: 'project-ai-native-data-analysis-workbench',
       slug: 'ai-native-data-analysis-workbench',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.aiWorkbench,
+      updated: DATES.aiWorkbench,
       tags: ['AI 工作台', 'Agent', '数据分析', '全栈工程'],
       role: '全栈开发 / AI 应用架构实践',
       stack: ['Next.js', 'React', 'TypeScript', 'PostgreSQL', 'Redis', 'Drizzle', 'Neo4j', 'Cube', 'LLM'],
@@ -302,8 +330,9 @@ const docs: SeedDoc[] = [
         p(
           '这个项目最重要的判断是：数据分析不是“用户问一句，模型答一句”。真实分析更像一段可追踪的任务过程，包含意图、约束、计划、执行、结果、追问和复盘。',
         ),
+        h(2, 'Clean Architecture 与工程治理'),
         p(
-          '所以我更关注系统能不能把 AI 的不确定性关进边界里：计划能不能展示，执行能不能中断，失败原因能不能读懂，结论能不能回到原始数据和语义模型。',
+          '采用 Clean Architecture / Ports and Adapters 架构，将领域模型、应用用例、基础设施适配器和 Next.js 表现层解耦。接入 LLM Provider、Cube 语义查询、Neo4j 图谱适配、Redis 队列 + Worker 异步任务链路，支撑长时间分析任务。处理超时、降级、AbortSignal 取消、限流、错误语义、权限边界、多轮会话事实错位和结果持久化等工程治理问题。',
         ),
         h(2, '工程上的关键拆分'),
         ul([
@@ -385,14 +414,14 @@ const docs: SeedDoc[] = [
     data: {
       title: 'AI 智能问数与移动端助手体系',
       description:
-        '围绕物业经营场景建设的 AI 问数编排和跨端对话体验，把 Dify 工作流、指标标准化、组织权限、图表协议和移动端渲染放到一条链路里。',
+        '面向物业经营管理与移动作业场景，建设 AI 问数编排、跨端 AI 对话与新版移动端底座。通过 Dify 工作流编排将意图识别、指标标准化、组织权限校验、数据服务调用和结果协议拼接串联成稳定链路，支撑经营指标问答、结构化图表结果、多轮追问和移动端业务入口。',
       lang: 'zh-CN',
       translationKey: 'project-ai-data-assistant-mobile-platform',
       slug: 'ai-data-assistant-mobile-platform',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.aiQuery,
+      updated: DATES.aiQuery,
       tags: ['Dify', '智能问数', '移动端', '经营分析'],
       role: 'AI 应用开发 / 工作流编排 / 移动端平台开发',
       stack: ['Dify Workflow', 'Qwen', 'OpenAI-compatible API', 'UniApp', 'Vue 2', 'SSE', 'ECharts', 'JSBridge'],
@@ -400,7 +429,11 @@ const docs: SeedDoc[] = [
       content: rt([
         h(2, '核心判断：问数不是问答'),
         p(
-          '企业问数如果只靠提示词，很容易出现“听起来合理，但口径不对”的结果。我参与的链路会先把自然语言问题变成标准指标、组织、时间、图表类型和数据服务入参，再输出结构化结果。',
+          '企业问数如果只靠提示词，很容易出现"听起来合理，但口径不对"的结果。我参与的链路会先把自然语言问题变成标准指标、组织、时间、图表类型和数据服务入参，再输出结构化结果。核心挑战不在模型，而在指标标准化、权限前置、结果协议化和异常分类处理。',
+        ),
+        h(2, '跨端 Chat 组件与工程沉淀'),
+        p(
+          '封装跨端 Chat 组件与 Dify API 调用层，兼容流式响应（SSE）、会话管理、历史记录、停止生成、反馈、建议问题、语音输入和文件上传。将 AI 问数从一次性 Demo 推进到可控工作流，支持指标卡、趋势图、对比表格、横/纵向柱图和 ECharts 图表展示。',
         ),
         h(2, '复杂点不在模型，而在业务约束'),
         ul([
@@ -469,14 +502,14 @@ const docs: SeedDoc[] = [
     data: {
       title: '数据智能 BI 低代码平台',
       description:
-        '围绕企业管理驾驶舱建设的 BI 设计器和图表渲染体系，覆盖模板设计、图表配置、多端适配、指标拖拽、联动交互和发布渲染。',
+        '面向企业数据服务与管理驾驶舱场景，建设可配置化 BI 设计、图表渲染、指标管理、数据标签、模型探查和大屏发布能力。参与两级 BI 设计器建设，维护 JSON 驱动的模板渲染链路，建设 40+ 图表组件注册与异步加载体系，支撑几十家私有云客户的数据智能场景。',
       lang: 'zh-CN',
       translationKey: 'project-data-intelligence-bi-low-code-platform',
       slug: 'data-intelligence-bi-low-code-platform',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.biLowcode,
+      updated: DATES.biLowcode,
       tags: ['BI', '低代码', '大屏', '数据产品'],
       role: '核心前端开发 / 数据产品工程化参与者',
       stack: ['Vue 2.7', 'Vuex', 'ECharts', 'G2Plot', 'Three.js', 'IndexedDB', 'Vite', 'Webpack'],
@@ -486,8 +519,9 @@ const docs: SeedDoc[] = [
         p(
           'BI 设计器真正难的地方，是让模板 JSON、设计态结构、渲染态协议、图表异步加载、历史记录、多端布局和数据权限长期共存。',
         ),
+        h(2, 'JSON 驱动的模板渲染链路'),
         p(
-          '我在这个项目里更关注“配置如何被生产、保存、回显、发布和消费”。这也是后来我做 AI 工作流时反复复用的思路。',
+          '参与两级 BI 设计器建设，维护 JSON 驱动的模板渲染链路，建设 40+ 图表组件注册与异步加载体系。通过 IndexedDB 承载撤销/重做历史，处理 Vue 2 动态配置响应式深合并、多端栅格适配、图表联动和复杂大屏交互。将重复图表与驾驶舱建设沉淀为配置化能力，支撑几十家私有云客户和标准/非标数据智能场景。',
         ),
         h(2, '我沉淀下来的设计原则'),
         ul([
@@ -546,7 +580,7 @@ const docs: SeedDoc[] = [
         ),
         quote(
           '配置化平台最怕“什么都能配”。真正可维护的低代码，是让变化进入清晰的模型，而不是把复杂度藏进 JSON。',
-          'DellDi',
+          '曾迪',
           'BI 设计器复盘',
         ),
       ],
@@ -557,14 +591,14 @@ const docs: SeedDoc[] = [
     data: {
       title: '企业低代码表单与门户设计平台',
       description:
-        '面向企业业务系统快速交付的表单、列表、门户和主题配置平台，把重复页面开发抽象成可迁移、可预览、可回显的配置体系。',
+        '面向企业业务系统快速交付场景，建设低代码表单设计、控件库、列表配置、树表结构、门户管理、主题设计和分步指引配置等能力。低代码能力成为公司 V10 页面条线的基础设施，支撑百家级客户场景下的持续开发与后续产品迭代。',
       lang: 'zh-CN',
       translationKey: 'project-enterprise-lowcode-form-portal-platform',
       slug: 'enterprise-lowcode-form-portal-platform',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.lowcodeForm,
+      updated: DATES.lowcodeForm,
       tags: ['低代码', '表单设计器', '门户', '前端工程'],
       role: '主要前端开发',
       stack: ['Vue 2', 'Vuex', 'Element UI', 'vuedraggable', 'grid-layout', 'html2canvas', 'driver.js'],
@@ -574,9 +608,9 @@ const docs: SeedDoc[] = [
         p(
           '表单、列表、筛选、按钮、树表、门户和移动端模板，看起来都是页面问题，本质是“业务形态相似但差异很多”的交付问题。',
         ),
-        h(2, '我更关注配置的生命周期'),
+        h(2, '配置的生命周期比保存更重要'),
         p(
-          '配置不是保存到数据库就结束。它还要能导入、预览、回显、迁移、校验、发布、回滚，并能被不同端的运行时消费。',
+          '建设表单控件包、配置面板、JSON 导入/预览/回显、列表字段拖拽、筛选条件、按钮权限和移动端低开控件适配。配置不是保存到数据库就结束，它还要能导入、预览、回显、迁移、校验、发布、回滚，并能被不同端的运行时消费。低代码能力成为公司 V10 页面条线的基础设施，支撑百家级客户场景下的持续交付。',
         ),
       ]),
       contentBlocks: [
@@ -608,14 +642,14 @@ const docs: SeedDoc[] = [
     data: {
       title: '数据仓库与指标生产链路',
       description:
-        '围绕企业数据中台建设的数据抽取、明细落仓、预统计、指标结果写入和调度辅助链路，连接源系统、数仓分层和下游看板。',
+        '围绕企业数据中台建设数据抽取、明细落仓、预统计、指标结果写入和调度执行链路，覆盖收费、品质、工单、HR、研发效能等业务域。维护 DataX JSON、DWD 建表 SQL、DWS 预统计 SQL 与 Python 调度辅助工具，支撑数百级指标与大量增量、全量、预统计和压缩表任务。',
       lang: 'zh-CN',
       translationKey: 'project-data-warehouse-metric-pipeline',
       slug: 'data-warehouse-metric-pipeline',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.dataWarehouse,
+      updated: DATES.dataWarehouse,
       tags: ['数仓', '指标口径', 'DataX', 'DolphinScheduler'],
       role: '数据工程参与者 / 指标链路开发',
       stack: ['MySQL', 'SQL', 'DataX', 'CDC', 'DWD', 'DWS', 'DolphinScheduler', 'Python'],
@@ -685,14 +719,14 @@ const docs: SeedDoc[] = [
     data: {
       title: '数据智能后端微服务与实时数据链路',
       description:
-        '围绕 BI 图表服务、数据中心查询、标签中台、CDC 同步和低代码运行时建设的 Java 后端与实时链路实践。',
+        '围绕企业数据智能平台建设图表服务、数据中心指标查询、标签中台、CDC 同步和低代码运行时。在 canal 侧实现跨库双写同步、夜间消费、表迁移修复初始化和压缩汇总表构建，逐步砍掉 Flink 常驻链路的重资源依赖，降低服务器资源与数据运维成本。',
       lang: 'zh-CN',
       translationKey: 'project-data-intelligence-backend-realtime-chain',
       slug: 'data-intelligence-backend-realtime-chain',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.backendCdc,
+      updated: DATES.backendCdc,
       tags: ['Java', '微服务', 'CDC', '标签中台', '实时链路'],
       role: '核心维护与开发',
       stack: ['Java', 'Spring Boot', 'OpenFeign', 'MyBatis', 'MySQL', 'Redis', 'EasyExcel', 'Binlog'],
@@ -703,7 +737,7 @@ const docs: SeedDoc[] = [
           '数据产品前端要稳定，服务层必须把权限、指标、维度、排序、分页、明细钻取、导出和数据来源差异统一起来。',
         ),
         p(
-          '这类后端不是简单 CRUD。它处在业务库、数据中心、BI 前端和标签任务之间，既要理解数据口径，也要处理动态 SQL、多数据源、幂等、锁和失败恢复。',
+          '这类后端不是简单 CRUD。它处在业务库、数据中心、BI 前端和标签任务之间，既要理解数据口径，也要处理动态 SQL、多数据源、幂等、锁和失败恢复。在 canal 侧实现跨库双写同步、夜间消费和压缩汇总表构建，逐步砍掉 Flink 常驻链路的重资源依赖。统一初始化与增量业务主键规则，解决字段拼接顺序不一致导致的拆行、金额偏差和动态 SQL 兼容问题。',
         ),
       ]),
       contentBlocks: [
@@ -741,18 +775,72 @@ const docs: SeedDoc[] = [
     },
   },
   {
+    collection: 'projects',
+    data: {
+      title: 'IoT 智能硬件与配套小程序',
+      description:
+        '面向 IoT 智能硬件设备场景，参与设备对接与配套小程序开发，覆盖设备绑定、状态展示、扫码交互、订单流转和用户端交互等业务场景，为后续企业级业务系统开发打下工程基础。',
+      lang: 'zh-CN',
+      translationKey: 'project-iot-smart-hardware-mini-program',
+      slug: 'iot-smart-hardware-mini-program',
+      status: 'published',
+      featured: false,
+      date: DATES.iotStart,
+      updated: DATES.iotStart,
+      tags: ['IoT', '小程序', '设备对接', '前端工程'],
+      role: '前端与小程序开发',
+      stack: ['微信小程序', 'Vue', 'UniApp', '接口联调', '设备数据展示'],
+      links: [],
+      content: rt([
+        h(2, '工程起点：从设备到用户端'),
+        p(
+          '这是我职业生涯早期参与的项目，但让我第一次完整体验了从设备端、接口层到用户端的链路闭环。设备状态展示看似简单，实际涉及设备上报协议、后端接口、前端轮询或推送以及小程序渲染限制。',
+        ),
+        h(2, '工程收获'),
+        ul([
+          '前端与硬件设备的间接对接，让我理解了数据链路的完整性。',
+          '小程序开发经验，为后续跨端适配和移动端平台打下基础。',
+          '接口联调与设备数据展示，为后续企业级业务系统和前后端协作积累经验。',
+        ]),
+      ]),
+      contentBlocks: [
+        statGrid(
+          [
+            { value: '设备管理', label: '设备绑定、状态展示、扫码交互' },
+            { value: '小程序', label: '用户端交互、订单流转、消息推送' },
+            { value: '接口联调', label: '设备数据上报、后端服务对接' },
+            { value: '跨端经验', label: '为后续 UniApp 和移动端平台积累基础' },
+          ],
+          4,
+        ),
+        steps('一次设备数据从上报到展示的路径', [
+          '设备端上报状态数据到 IoT 平台。',
+          '后端服务接收并处理设备数据。',
+          '前端通过接口轮询或推送获取设备状态。',
+          '小程序渲染设备信息和交互入口。',
+          '用户通过小程序完成设备绑定、扫码和订单操作。',
+        ]),
+        quote(
+          '这段经历虽然基础，但帮我建立了从设备端到用户端的完整链路意识。后续的 BI、低代码和 AI 应用，本质上都是这种链路思维的延伸。',
+          '曾迪',
+          'IoT 项目复盘',
+        ),
+      ],
+    },
+  },
+  {
     collection: 'posts',
     data: {
       title: '从 BI 低代码到 AI 工作台：我的工程主线',
       description:
-        '整理我从数据产品、低代码平台、数仓指标链路走向 AI 应用开发的能力迁移，不把 AI 当作孤立技能，而是放回业务系统里看。',
+        '整理我从数据产品、低代码平台、数仓指标链路、Java 后端微服务走向 AI 应用开发的能力迁移。7 年经验里，前端出身但不停留在前端，逐步覆盖后端、数据开发和 AI 应用，不把 AI 当作孤立技能，而是放回业务系统里看。',
       lang: 'zh-CN',
       translationKey: 'post-from-bi-lowcode-to-ai-workbench',
       slug: 'from-bi-lowcode-to-ai-workbench',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.careerSummaryPost,
+      updated: DATES.careerSummaryPost,
       tags: [...commonTags, '工程复盘'],
       category: '个人复盘',
       series: '个人能力图谱',
@@ -762,7 +850,7 @@ const docs: SeedDoc[] = [
           '我对 AI 应用的理解，更多来自过去做数据产品和低代码平台时遇到的问题：用户真正要的不是一个炫酷界面，而是把业务口径、数据结果、权限边界和下一步动作连接起来。',
         ),
         p(
-          'BI 低代码平台让我理解配置化和可视化，数仓指标链路让我理解数据可信，后端微服务让我理解服务边界，移动端 AI 问数让我理解交互闭环。这些东西叠在一起，才是我现在做 AI 工作台的底层经验。',
+          'BI 低代码平台让我理解配置化和可视化，数仓指标链路让我理解数据可信，后端微服务让我理解服务边界，移动端 AI 问数让我理解交互闭环。从前端出身到覆盖 Java 后端、数据开发与全栈工程，从需求、交互、接口联调到上线闭环推进。这些东西叠在一起，才是我现在做 AI 工作台的底层经验。',
         ),
         h(2, '能力迁移的几个关键点'),
         ul([
@@ -800,8 +888,8 @@ const docs: SeedDoc[] = [
       slug: 'enterprise-ai-query-is-not-chatbox',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.aiQuery,
+      updated: DATES.aiQuery,
       tags: ['AI 问数', '指标口径', '权限', '数据产品'],
       category: 'AI 实践',
       series: '个人能力图谱',
@@ -857,8 +945,8 @@ const docs: SeedDoc[] = [
       slug: 'enterprise-data-intelligence-stack',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.knowledgeStack,
+      updated: DATES.knowledgeStack,
       tags: ['数据智能', '数仓', 'BI', 'AI 分析'],
       area: 'data-engineering',
       level: 'advanced',
@@ -870,7 +958,7 @@ const docs: SeedDoc[] = [
         ),
         h(2, '为什么这张图谱对我重要'),
         p(
-          '它解释了为什么我不太愿意把 AI 应用只理解成模型调用。只要进入企业数据场景，AI 的每一句回答都依赖上游数据链路、口径治理、权限模型和结果展示协议。',
+          '它解释了为什么我不太愿意把 AI 应用只理解成模型调用。只要进入企业数据场景，AI 的每一句回答都依赖上游数据链路、口径治理、权限模型和结果展示协议。7 年经验里，我从前端低代码起步，逐步覆盖后端、数据开发和 AI 应用，这条完整链路就是我的能力底座。',
         ),
       ]),
       contentBlocks: [
@@ -895,8 +983,8 @@ const docs: SeedDoc[] = [
       slug: 'lowcode-designer-maintainability',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.knowledgeLowcode,
+      updated: DATES.knowledgeLowcode,
       tags: ['低代码', '设计器', '配置化', '前端架构'],
       area: 'frontend',
       level: 'advanced',
@@ -917,6 +1005,49 @@ const docs: SeedDoc[] = [
     },
   },
   {
+    collection: 'knowledge',
+    data: {
+      title: 'AI Agent 工程化实践：从 Dify 工作流到 AI Coding',
+      description:
+        '梳理我在 Dify 工作流编排、AI Agent 工具调用、多轮会话、流式响应和 AI Coding 工具链中的实践，把 AI 能力纳入真实研发和知识沉淀。',
+      lang: 'zh-CN',
+      translationKey: 'knowledge-ai-agent-engineering-practice',
+      slug: 'ai-agent-engineering-practice',
+      status: 'published',
+      featured: true,
+      date: DATES.knowledgeAiAgent,
+      updated: DATES.knowledgeAiAgent,
+      tags: ['AI Agent', 'Dify', 'RAG', 'AI Coding'],
+      area: 'ai-agent',
+      level: 'advanced',
+      order: 12,
+      content: rt([
+        h(2, 'AI Agent 的难点不在模型'),
+        p(
+          'Agent 的真正难点在于把不确定性关进边界里：意图识别要能落到标准业务对象，计划生成要可解释和可中断，工具调用要稳定可观测，执行状态要流式可追踪，失败兜底要区分超时、限流、权限和无数据。',
+        ),
+        h(2, '我在 AI 工具链上的实践'),
+        p(
+          '长期使用 Dify、OpenClaw、AI Coding、RAG、企业 IM 渠道等工具链，将需求拆解、接口联调、代码生成、问题排查和知识沉淀纳入研发流程。在真实企业场景里，Agent 还要处理权限边界、指标口径、组织层级和会话事实错位等问题，这些都不是靠提示词能解决的。',
+        ),
+      ]),
+      contentBlocks: [
+        steps('AI Agent 工作流的关键工程环节', [
+          '意图识别：把自然语言映射到标准指标、组织和时间。',
+          '计划生成：可展示、可中断、可恢复的分析计划。',
+          '工具调用：通过适配器层隔离外部依赖和权限边界。',
+          '执行状态：流式可观测，让用户看到进度和中间结果。',
+          '失败兜底：区分超时、限流、权限、无数据和模型异常。',
+        ]),
+        callout(
+          'tip',
+          'AI 工具链的核心价值',
+          '把 AI 能力纳入真实研发流程，而不是停留在 Demo 阶段。Dify 工作流、RAG 和 AI Coding 工具链的实践经验，让我能在企业场景里交付可控、可观测、可复盘的 AI 应用。',
+        ),
+      ],
+    },
+  },
+  {
     collection: 'resources',
     data: {
       title: '个人能力图谱阅读路线',
@@ -926,8 +1057,8 @@ const docs: SeedDoc[] = [
       slug: 'personal-profile-reading-route',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.readingRoute,
+      updated: DATES.readingRoute,
       tags: [...commonTags, '阅读路线'],
       type: 'article',
       url: '/zh-CN/topics/personal-engineering-profile',
@@ -949,8 +1080,8 @@ const docs: SeedDoc[] = [
       slug: 'metric-definition',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.glossaryMetric,
+      updated: DATES.glossaryMetric,
       tags: ['数据智能', '指标'],
       aliases: ['指标定义', '口径治理', 'targetId'],
       content: rt([
@@ -971,8 +1102,8 @@ const docs: SeedDoc[] = [
       slug: 'data-product-engineering',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.glossaryDataProduct,
+      updated: DATES.glossaryDataProduct,
       tags: ['数据产品', '工程化'],
       aliases: ['数据产品能力', '数据应用工程'],
       content: rt([
@@ -993,14 +1124,60 @@ const docs: SeedDoc[] = [
       slug: 'semantic-layer',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.glossarySemantic,
+      updated: DATES.glossarySemantic,
       tags: ['AI 问数', '数据建模'],
       aliases: ['Semantic Layer', 'Cube 语义层'],
       content: rt([
         h(2, '我的理解'),
         p(
           '语义层的价值是让“收缴率”“近 12 个月”“某区域项目”这类业务表达可以稳定落到指标、维度和查询上。它越清楚，AI 问数越不容易胡猜。',
+        ),
+      ]),
+    },
+  },
+  {
+    collection: 'glossary',
+    data: {
+      title: 'CDC 增量同步',
+      description:
+        '基于数据库变更日志（如 MySQL binlog）实现增量数据捕获与跨库同步的技术方案，是实时数据链路的核心环节。',
+      lang: 'zh-CN',
+      translationKey: 'glossary-cdc-incremental-sync',
+      slug: 'cdc-incremental-sync',
+      status: 'published',
+      featured: false,
+      date: DATES.glossaryCdc,
+      updated: DATES.glossaryCdc,
+      tags: ['数据开发', 'CDC', '实时链路'],
+      aliases: ['CDC', 'Change Data Capture', 'Canal', 'Flink CDC'],
+      content: rt([
+        h(2, '我的理解'),
+        p(
+          'CDC 的价值是让下游系统能实时消费上游变更，而不需要每次全量重跑。在物业数据智能场景里，canal、DataX 和 Flink CDC 都处理过。核心难点在于全量初始化与增量消费的业务主键对齐、字段拼接顺序一致性、失败重跑幂等性和压缩汇总正确性。',
+        ),
+      ]),
+    },
+  },
+  {
+    collection: 'glossary',
+    data: {
+      title: 'Dify 工作流编排',
+      description:
+        '基于 Dify 平台构建的 AI 工作流，将意图识别、参数提取、工具调用和结果拼接串联成可控的 AI 应用链路。',
+      lang: 'zh-CN',
+      translationKey: 'glossary-dify-workflow',
+      slug: 'dify-workflow',
+      status: 'published',
+      featured: false,
+      date: DATES.glossaryDify,
+      updated: DATES.glossaryDify,
+      tags: ['AI 应用', 'Dify', '工作流'],
+      aliases: ['Dify', 'Dify Workflow', 'AI 工作流编排'],
+      content: rt([
+        h(2, '我的理解'),
+        p(
+          'Dify 工作流的价值是让 AI 问数从一次性 Demo 变成可控的业务链路。通过意图识别、参数提取、指标标准化、权限校验、数据服务调用和结果协议拼接，把模型能力放进企业级工程框架里。核心是把业务判断从提示词里抽出来，放进工程系统。',
         ),
       ]),
     },
@@ -1016,8 +1193,8 @@ const docs: SeedDoc[] = [
       slug: 'data-product-to-ai-application',
       status: 'published',
       featured: true,
-      date: now,
-      updated: now,
+      date: DATES.timelineAiMigration,
+      updated: DATES.timelineAiMigration,
       tags: [...commonTags, '成长线'],
       kind: 'milestone',
       content: rt([
@@ -1039,14 +1216,82 @@ const docs: SeedDoc[] = [
       slug: 'personal-site-as-profile-system',
       status: 'published',
       featured: false,
-      date: now,
-      updated: now,
+      date: DATES.timelinePersonalSite,
+      updated: DATES.timelinePersonalSite,
       tags: ['个人站点', '内容平台', '履历系统'],
       kind: 'release',
       content: rt([
         h(2, '为什么要这样做'),
         p(
           '传统简历只能压缩经历，而个人内容站可以展开经历：项目可以有背景、取舍、边界、技术栈和后续演进；知识库可以展示长期学习；专题可以把看似分散的能力串成一条线。',
+        ),
+      ]),
+    },
+  },
+  {
+    collection: 'timeline',
+    data: {
+      title: '本科：信阳师范 - 信息管理与信息系统',
+      description: '2013-2017 年就读于信阳师范信息管理与信息系统专业，获本科学历。交叉背景为后续理解业务口径、产品边界和工程交付打下基础。',
+      lang: 'zh-CN',
+      translationKey: 'timeline-education-xinyang',
+      slug: 'education-xinyang',
+      status: 'published',
+      featured: false,
+      date: DATES.timelineEducation,
+      updated: DATES.timelineEducation,
+      tags: ['教育', '信息管理'],
+      kind: 'learning',
+      content: rt([
+        h(2, '专业背景'),
+        p(
+          '信息管理与信息系统专业兼具管理学与信息技术交叉视角，让我在后来的企业数据智能和 AI 应用落地中，更容易理解业务口径、产品边界和工程交付之间的关系。英语四级，具备基本的英文技术文档阅读能力。',
+        ),
+      ]),
+    },
+  },
+  {
+    collection: 'timeline',
+    data: {
+      title: '第一份工作：IoT 智能硬件与小程序开发',
+      description:
+        '2019.03-2020.04 在浙江聚物智享科技有限公司，参与 IoT 智能硬件设备对接与配套小程序开发，覆盖设备绑定、状态展示、扫码、订单与用户端交互。',
+      lang: 'zh-CN',
+      translationKey: 'timeline-first-job-iot',
+      slug: 'first-job-iot',
+      status: 'published',
+      featured: false,
+      date: DATES.timelineFirstJob,
+      updated: DATES.timelineFirstJob,
+      tags: ['IoT', '小程序', '前端'],
+      kind: 'milestone',
+      content: rt([
+        h(2, '工程起点'),
+        p(
+          '完成前端页面、微信小程序、接口联调与设备数据展示相关工作。这段经历为后续企业级业务系统开发打下工程基础，也让我第一次完整体验了从设备端到用户端的链路闭环。',
+        ),
+      ]),
+    },
+  },
+  {
+    collection: 'timeline',
+    data: {
+      title: '三次年度优秀员工',
+      description:
+        '2021 年度优秀员工 - 生机勃勃星；2022 年度优秀员工 - 飞跃进步星；2024 年度优秀员工 - 研发经理星。记录了从前端开发到数据产品、再到带团队和 AI 应用工程的成长轨迹。',
+      lang: 'zh-CN',
+      translationKey: 'timeline-awards-outstanding',
+      slug: 'awards-outstanding',
+      status: 'published',
+      featured: true,
+      date: DATES.timelineAwards,
+      updated: DATES.timelineAwards,
+      tags: ['荣誉', '成长线'],
+      kind: 'milestone',
+      content: rt([
+        h(2, '成长轨迹'),
+        p(
+          '2021 年生机勃勃星代表刚进入数据产品领域的冲劲，2022 年飞跃进步星代表在低代码和后端方向的突破，2024 年研发经理星代表在团队带领和 AI 应用工程方向上的认可。三次获奖串联起来，就是一条从前端开发走向全栈与 AI 应用的成长线。',
         ),
       ]),
     },

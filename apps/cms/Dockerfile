@@ -12,7 +12,7 @@ COPY apps/cms apps/cms
 
 FROM source AS init
 WORKDIR /app/apps/cms
-CMD ["sh", "-c", "pnpm db:init"]
+CMD ["sh", "-c", "pnpm db:init && pnpm seed:profile"]
 
 FROM source AS build
 RUN pnpm --filter @personal-ai-knowledge-site/cms build
