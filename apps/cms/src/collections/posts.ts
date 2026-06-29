@@ -1,12 +1,13 @@
 import type { CollectionConfig } from 'payload';
-import {
-  CONTENT_STATUSES,
-  LANGS,
-} from '@personal-ai-knowledge-site/content-contract';
+import { commonContentFields, contentBlocksField, mediaUploadField, richTextContentField } from './field-labels';
 import { sharedBlocks } from './shared-blocks';
 
 export const posts: CollectionConfig = {
   slug: 'posts',
+  labels: {
+    singular: '文章',
+    plural: '文章',
+  },
   access: {
     read: ({ req: { user } }: { req: { user?: unknown } }) => {
       if (user) return true;
@@ -14,47 +15,16 @@ export const posts: CollectionConfig = {
     },
   },
   fields: [
-    { name: 'title', type: 'text', required: true },
-    { name: 'description', type: 'textarea', required: true },
-    {
-      name: 'lang',
-      type: 'select',
-      required: true,
-      defaultValue: 'zh-CN',
-      options: [...LANGS],
-    },
-    { name: 'translationKey', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true },
-    { name: 'category', type: 'text', required: true },
-    { name: 'series', type: 'text' },
-    {
-      name: 'status',
-      type: 'select',
-      required: true,
-      defaultValue: 'draft',
-      options: [...CONTENT_STATUSES],
-    },
-    { name: 'featured', type: 'checkbox', defaultValue: false },
-    { name: 'date', type: 'date', required: true },
-    { name: 'updated', type: 'date' },
-    { name: 'tags', type: 'text', hasMany: true, defaultValue: [] },
-    {
-      name: 'cover',
-      type: 'upload',
-      relationTo: 'media',
-    },
-    {
-      name: 'content',
-      type: 'richText',
-    },
-    {
-      name: 'contentBlocks',
-      type: 'blocks',
-      blocks: sharedBlocks,
-    },
+    ...commonContentFields({ dateRequired: true }),
+    { name: 'category', type: 'text', label: '分类', required: true },
+    { name: 'series', type: 'text', label: '系列' },
+    mediaUploadField({ name: 'cover', label: '封面', mimeType: 'image' }),
+    richTextContentField(),
+    contentBlocksField(sharedBlocks),
     {
       name: 'author',
       type: 'relationship',
+      label: '作者',
       relationTo: 'users',
       defaultValue: ({ user }: { user?: { id: string } }) => user?.id,
     },

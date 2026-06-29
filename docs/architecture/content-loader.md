@@ -19,7 +19,7 @@
 1. 从 `{CMS_API_URL}/{collection}` 分页拉取 `status: published` 内容。
 2. 把 Payload richText content 转成 Markdown。
 3. 把 Payload block 的 `blockType` 规范化成前台契约里的 `type`。
-4. 把上传关系字段（如 `cover` / `hero`）规范化为 URL 字符串。
+4. 把上传关系字段（如 `cover` / `hero` / `audioFile` / block 内媒体 / `asset`）规范化为 URL 字符串。
 5. 用 `context.parseData` 走 zod schema 校验。
 6. 用 `context.renderMarkdown` 渲染正文。
 7. 写入 `context.store`。
@@ -52,6 +52,22 @@ Payload 返回的 block 形态类似：
 | statGridBlock | statGrid |
 | compareTableBlock | compareTable |
 
+## 媒体字段规范化
+
+Payload 后台负责上传，Astro 前台只消费 URL 字符串：
+
+| CMS 字段 | 用途 | 前台输出 |
+|---|---|---|
+| `podcast.audioFile` | 播客音频上传 | `audio` |
+| `posts.cover` / `podcast.cover` / `topics.hero` | 封面图上传 | `cover` / `hero` |
+| `audioBlock.file` | 音频块主文件 | `src` |
+| `audioBlock.downloadFile` | 音频块下载附件 | `download` |
+| `imageBlock.image` | 图片块文件 | `src` |
+| `resources.asset` | 资源库站内附件 | `url` |
+| `podcast.resources[].file` | 单集资源附件 | `resources[].url` |
+
+CMS 新内容录入统一使用 Payload 上传控件。已有本地测试库如果还保留早期手填 URL 字段，直接重建本地开发库，不为旧测试数据保留隐藏兼容字段。
+
 ## 详情页渲染
 
 posts 和 knowledge 详情页使用组合渲染：
@@ -79,3 +95,4 @@ posts 和 knowledge 详情页使用组合渲染：
 - `status: published` 在 CMS 查询和公开页面两侧都过滤。
 - 本地内容和 CMS 内容不要使用同一语言、同一集合、同一 slug，否则会产生重复路由。
 - `translationKey` 关联逻辑在 `lib/content.ts` 统一处理，对数据源透明。
+- 站内图片、音频、PDF、文档等附件必须通过 `media` collection 上传；外部文章、仓库、视频平台和 iframe 嵌入仍使用文本 URL。

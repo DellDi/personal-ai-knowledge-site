@@ -32,7 +32,11 @@ interface PayloadDoc {
   tags?: string[];
   category?: string;
   series?: string;
-  cover?: { url?: string };
+  audio?: unknown;
+  audioFile?: unknown;
+  cover?: unknown;
+  hero?: unknown;
+  asset?: unknown;
   content?: unknown;
   contentBlocks?: unknown[];
   [key: string]: unknown;
@@ -104,6 +108,24 @@ function mediaURL(value: unknown): string | undefined {
   return url;
 }
 
+function normalizeResourceLinks(value: unknown): { label: string; url: string; note?: string }[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const resources = value
+    .map((item) => {
+      if (!isRecord(item)) return undefined;
+      const label = stringValue(item.label);
+      const url = stringValue(item.url) ?? mediaURL(item.file);
+      if (!label || !url) return undefined;
+      return {
+        label,
+        url,
+        ...(stringValue(item.note) ? { note: stringValue(item.note) } : {}),
+      };
+    })
+    .filter((item): item is { label: string; url: string; note?: string } => Boolean(item));
+  return resources.length > 0 ? resources : undefined;
+}
+
 function blockColumns(value: unknown): 2 | 3 | 4 | undefined {
   return value === 2 || value === 3 || value === 4 ? value : undefined;
 }
@@ -143,20 +165,20 @@ function normalizeBlock(block: unknown): Block | undefined {
     }
     case 'audio':
     case 'audioBlock': {
-      const src = mediaURL(block.src);
+      const src = mediaURL(block.file);
       return src
         ? {
             type: 'audio',
             src,
             title: stringValue(block.title),
             duration: stringValue(block.duration),
-            download: mediaURL(block.download),
+            download: mediaURL(block.downloadFile),
           }
         : undefined;
     }
     case 'image':
     case 'imageBlock': {
-      const src = mediaURL(block.src);
+      const src = mediaURL(block.image);
       const alt = stringValue(block.alt);
       return src && alt
         ? {
@@ -279,7 +301,11 @@ function normalizeBlocks(blocks: unknown): Block[] | undefined {
 
 function normalizePassthroughField(field: string, value: unknown): unknown {
   if (field === 'contentBlocks') return normalizeBlocks(value);
-  if (field === 'cover' || field === 'hero') return mediaURL(value);
+  if (field === 'resources') return normalizeResourceLinks(value);
+  if (field === 'url') return stringValue(value) ?? mediaURL(value);
+  if (field === 'audio' || field === 'audioFile' || field === 'cover' || field === 'hero' || field === 'asset') {
+    return mediaURL(value);
+  }
   return value;
 }
 
@@ -365,8 +391,15 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
             series: doc.series,
           };
           for (const field of passthroughFields) {
-            if (doc[field] !== undefined) {
-              rawData[field] = normalizePassthroughField(field, doc[field]);
+            const value =
+              field === 'audio'
+                ? doc.audioFile
+                : field === 'url' && collection === 'resources'
+                  ? (doc.url ?? doc.asset)
+                  : doc[field];
+
+            if (value !== undefined) {
+              rawData[field] = normalizePassthroughField(field, value);
             }
           }
           if (passthroughFields.includes('contentBlocks') && normalizedBlocks) {

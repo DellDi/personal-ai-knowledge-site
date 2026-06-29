@@ -166,18 +166,48 @@ export interface User {
 export interface Post {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
+  status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
+  featured?: boolean | null;
+  /**
+   * 公开发布时间，必填。
+   */
+  date: string;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
+  updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
+  tags?: string[] | null;
   category: string;
   series?: string | null;
-  status: 'draft' | 'published' | 'archived';
-  featured?: boolean | null;
-  date: string;
-  updated?: string | null;
-  tags?: string[] | null;
   cover?: (number | null) | Media;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -193,6 +223,9 @@ export interface Post {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * 用于构建提示、代码、图片、步骤、统计、对比表等更精致的展示区块。
+   */
   contentBlocks?:
     | (
         | {
@@ -212,16 +245,25 @@ export interface Post {
             blockType: 'codeBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            file: number | Media;
             title?: string | null;
             duration?: string | null;
-            download?: string | null;
+            /**
+             * 可选；不填时播放器会直接使用音频文件地址。
+             */
+            downloadFile?: (number | null) | Media;
             id?: string | null;
             blockName?: string | null;
             blockType: 'audioBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            image: number | Media;
             alt: string;
             caption?: string | null;
             source?: string | null;
@@ -304,6 +346,9 @@ export interface Post {
  */
 export interface Media {
   id: number;
+  /**
+   * 用于无障碍阅读、SEO 和图片加载失败时的说明。
+   */
   alt?: string | null;
   caption?: string | null;
   source?: string | null;
@@ -352,18 +397,48 @@ export interface Media {
 export interface Podcast {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 公开发布时间，必填。
+   */
   date: string;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   episode: number;
   season?: number | null;
-  audio: string;
+  /**
+   * 上传到 media 集合；本地写入 MinIO，生产通过同一套配置写入阿里 OSS。
+   */
+  audioFile: number | Media;
   duration?: string | null;
   cover?: (number | null) | Media;
   transcript?: boolean | null;
@@ -379,11 +454,18 @@ export interface Podcast {
   resources?:
     | {
         label: string;
-        url: string;
+        url?: string | null;
+        /**
+         * 外部链接和上传附件二选一。附件会进入 media 集合，由 MinIO/OSS 托管。
+         */
+        file?: (number | null) | Media;
         note?: string | null;
         id?: string | null;
       }[]
     | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -399,6 +481,9 @@ export interface Podcast {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * 用于构建提示、代码、图片、步骤、统计、对比表等更精致的展示区块。
+   */
   contentBlocks?:
     | (
         | {
@@ -418,16 +503,25 @@ export interface Podcast {
             blockType: 'codeBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            file: number | Media;
             title?: string | null;
             duration?: string | null;
-            download?: string | null;
+            /**
+             * 可选；不填时播放器会直接使用音频文件地址。
+             */
+            downloadFile?: (number | null) | Media;
             id?: string | null;
             blockName?: string | null;
             blockType: 'audioBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            image: number | Media;
             alt: string;
             caption?: string | null;
             source?: string | null;
@@ -509,14 +603,41 @@ export interface Podcast {
 export interface Knowledge {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 可选；不填写时不会作为强时间线内容处理。
+   */
   date?: string | null;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   area:
     | 'ai-agent'
@@ -528,7 +649,13 @@ export interface Knowledge {
     | 'management'
     | 'tools';
   level?: ('basic' | 'intermediate' | 'advanced') | null;
+  /**
+   * 同一知识领域下的手动排序，数字越小越靠前。
+   */
   order?: number | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -544,6 +671,9 @@ export interface Knowledge {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * 用于构建提示、代码、图片、步骤、统计、对比表等更精致的展示区块。
+   */
   contentBlocks?:
     | (
         | {
@@ -563,16 +693,25 @@ export interface Knowledge {
             blockType: 'codeBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            file: number | Media;
             title?: string | null;
             duration?: string | null;
-            download?: string | null;
+            /**
+             * 可选；不填时播放器会直接使用音频文件地址。
+             */
+            downloadFile?: (number | null) | Media;
             id?: string | null;
             blockName?: string | null;
             blockType: 'audioBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            image: number | Media;
             alt: string;
             caption?: string | null;
             source?: string | null;
@@ -654,17 +793,50 @@ export interface Knowledge {
 export interface Topic {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 可选；不填写时不会作为强时间线内容处理。
+   */
   date?: string | null;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   hero?: (number | null) | Media;
+  /**
+   * 填写关联内容的 slug 或 translationKey，用于专题聚合和后续推荐。
+   */
   items?: string[] | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -680,6 +852,9 @@ export interface Topic {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * 用于构建提示、代码、图片、步骤、统计、对比表等更精致的展示区块。
+   */
   contentBlocks?:
     | (
         | {
@@ -699,16 +874,25 @@ export interface Topic {
             blockType: 'codeBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            file: number | Media;
             title?: string | null;
             duration?: string | null;
-            download?: string | null;
+            /**
+             * 可选；不填时播放器会直接使用音频文件地址。
+             */
+            downloadFile?: (number | null) | Media;
             id?: string | null;
             blockName?: string | null;
             blockType: 'audioBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            image: number | Media;
             alt: string;
             caption?: string | null;
             source?: string | null;
@@ -790,14 +974,41 @@ export interface Topic {
 export interface Project {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 可选；不填写时不会作为强时间线内容处理。
+   */
   date?: string | null;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   role?: string | null;
   stack?: string[] | null;
@@ -808,6 +1019,9 @@ export interface Project {
         id?: string | null;
       }[]
     | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -823,6 +1037,9 @@ export interface Project {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * 用于构建提示、代码、图片、步骤、统计、对比表等更精致的展示区块。
+   */
   contentBlocks?:
     | (
         | {
@@ -842,16 +1059,25 @@ export interface Project {
             blockType: 'codeBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            file: number | Media;
             title?: string | null;
             duration?: string | null;
-            download?: string | null;
+            /**
+             * 可选；不填时播放器会直接使用音频文件地址。
+             */
+            downloadFile?: (number | null) | Media;
             id?: string | null;
             blockName?: string | null;
             blockType: 'audioBlock';
           }
         | {
-            src: string;
+            /**
+             * 上传后自动由 media 集合生成访问地址。
+             */
+            image: number | Media;
             alt: string;
             caption?: string | null;
             source?: string | null;
@@ -933,17 +1159,54 @@ export interface Project {
 export interface Resource {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 可选；不填写时不会作为强时间线内容处理。
+   */
   date?: string | null;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   type: 'tool' | 'book' | 'article' | 'video' | 'repo' | 'course';
+  /**
+   * 外部资料、站外文章、代码仓库、视频课程等继续填写链接。
+   */
   url?: string | null;
+  /**
+   * 站内 PDF、图片、音频、文档等资源走上传附件，最终由 MinIO/OSS 托管。
+   */
+  asset?: (number | null) | Media;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -969,16 +1232,46 @@ export interface Resource {
 export interface Glossary {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 可选；不填写时不会作为强时间线内容处理。
+   */
   date?: string | null;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   aliases?: string[] | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -1004,16 +1297,46 @@ export interface Glossary {
 export interface Timeline {
   id: number;
   title: string;
+  /**
+   * 用于列表卡片、SEO 摘要和搜索结果，建议控制在 80 到 160 字。
+   */
   description: string;
+  /**
+   * 用于前台路由和内容过滤。当前主站优先维护中文内容。
+   */
   lang: 'zh-CN' | 'en';
+  /**
+   * 同一内容的不同语言版本使用相同 key；只写中文时也需要填写，方便未来扩展。
+   */
   translationKey: string;
+  /**
+   * 用于生成页面 URL，建议使用小写英文、数字和短横线。
+   */
   slug: string;
+  /**
+   * 只有“已发布”的内容会进入公开页面、RSS 和搜索入口。
+   */
   status: 'draft' | 'published' | 'archived';
+  /**
+   * 勾选后可用于首页、专题或重点内容区域的优先展示。
+   */
   featured?: boolean | null;
+  /**
+   * 公开发布时间，必填。
+   */
   date: string;
+  /**
+   * 内容有明显修订时再填写，用于前台展示更新时间。
+   */
   updated?: string | null;
+  /**
+   * 用于筛选、搜索和相关内容推荐。技术名词可以保留英文原名。
+   */
   tags?: string[] | null;
   kind?: ('milestone' | 'release' | 'learning') | null;
+  /**
+   * 适合录入连续正文；复杂展示结构建议使用下方“内容模块”。
+   */
   content?: {
     root: {
       type: string;
@@ -1171,13 +1494,13 @@ export interface PostsSelect<T extends boolean = true> {
   lang?: T;
   translationKey?: T;
   slug?: T;
-  category?: T;
-  series?: T;
   status?: T;
   featured?: T;
   date?: T;
   updated?: T;
   tags?: T;
+  category?: T;
+  series?: T;
   cover?: T;
   content?: T;
   contentBlocks?:
@@ -1204,17 +1527,17 @@ export interface PostsSelect<T extends boolean = true> {
         audioBlock?:
           | T
           | {
-              src?: T;
+              file?: T;
               title?: T;
               duration?: T;
-              download?: T;
+              downloadFile?: T;
               id?: T;
               blockName?: T;
             };
         imageBlock?:
           | T
           | {
-              src?: T;
+              image?: T;
               alt?: T;
               caption?: T;
               source?: T;
@@ -1311,7 +1634,7 @@ export interface PodcastSelect<T extends boolean = true> {
   tags?: T;
   episode?: T;
   season?: T;
-  audio?: T;
+  audioFile?: T;
   duration?: T;
   cover?: T;
   transcript?: T;
@@ -1329,6 +1652,7 @@ export interface PodcastSelect<T extends boolean = true> {
     | {
         label?: T;
         url?: T;
+        file?: T;
         note?: T;
         id?: T;
       };
@@ -1357,17 +1681,17 @@ export interface PodcastSelect<T extends boolean = true> {
         audioBlock?:
           | T
           | {
-              src?: T;
+              file?: T;
               title?: T;
               duration?: T;
-              download?: T;
+              downloadFile?: T;
               id?: T;
               blockName?: T;
             };
         imageBlock?:
           | T
           | {
-              src?: T;
+              image?: T;
               alt?: T;
               caption?: T;
               source?: T;
@@ -1488,17 +1812,17 @@ export interface KnowledgeSelect<T extends boolean = true> {
         audioBlock?:
           | T
           | {
-              src?: T;
+              file?: T;
               title?: T;
               duration?: T;
-              download?: T;
+              downloadFile?: T;
               id?: T;
               blockName?: T;
             };
         imageBlock?:
           | T
           | {
-              src?: T;
+              image?: T;
               alt?: T;
               caption?: T;
               source?: T;
@@ -1618,17 +1942,17 @@ export interface TopicsSelect<T extends boolean = true> {
         audioBlock?:
           | T
           | {
-              src?: T;
+              file?: T;
               title?: T;
               duration?: T;
-              download?: T;
+              downloadFile?: T;
               id?: T;
               blockName?: T;
             };
         imageBlock?:
           | T
           | {
-              src?: T;
+              image?: T;
               alt?: T;
               caption?: T;
               source?: T;
@@ -1755,17 +2079,17 @@ export interface ProjectsSelect<T extends boolean = true> {
         audioBlock?:
           | T
           | {
-              src?: T;
+              file?: T;
               title?: T;
               duration?: T;
-              download?: T;
+              downloadFile?: T;
               id?: T;
               blockName?: T;
             };
         imageBlock?:
           | T
           | {
-              src?: T;
+              image?: T;
               alt?: T;
               caption?: T;
               source?: T;
@@ -1860,6 +2184,7 @@ export interface ResourcesSelect<T extends boolean = true> {
   tags?: T;
   type?: T;
   url?: T;
+  asset?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;

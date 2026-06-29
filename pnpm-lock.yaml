@@ -22,6 +22,9 @@ importers:
       '@payloadcms/storage-s3':
         specifier: ^3.0.0
         version: 3.85.1(@types/react@19.2.17)(monaco-editor@0.25.0)(next@16.2.9(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.77.4))(payload@3.85.1(graphql@16.14.2)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3)
+      '@payloadcms/translations':
+        specifier: ^3.85.1
+        version: 3.85.1
       '@personal-ai-knowledge-site/content-contract':
         specifier: workspace:*
         version: link:../../packages/content-contract

@@ -53,12 +53,33 @@ posts、podcast、knowledge、topics、projects 等内容 collection 可使用 `
 
 - calloutBlock
 - codeBlock
+- audioBlock（音频文件走 media 上传）
+- imageBlock（图片文件走 media 上传）
 - quoteBlock
+- embedBlock（外部嵌入地址仍为 URL 文本）
 - stepsBlock
 - statGridBlock
 - compareTableBlock
 
 Astro 端的 BlockRenderer 已按 type 映射到 `apps/web/src/components/docs/` 下的文档组件。当前 posts / knowledge 详情页启用 BlockRenderer，其余集合先渲染 richText / Markdown 正文。
+
+## 媒体与附件
+
+所有站内可托管资源统一进入 `media` collection，由 Payload 的 S3 storage adapter 写入对象存储：
+
+- 开发期：MinIO
+- 生产：阿里云 OSS
+
+后台字段分工：
+
+- `posts.cover`、`podcast.cover`、`topics.hero`：图片上传控件
+- `podcast.audioFile`：播客音频上传控件
+- `audioBlock.file` / `audioBlock.downloadFile`：音频块主文件和下载附件
+- `imageBlock.image`：图片块上传控件
+- `resources.asset`：资源库站内附件
+- `podcast.resources[].file`：播客单集资源附件
+
+外部链接仍保留文本字段，例如资源库外部链接、项目链接、引用来源链接和嵌入地址。前台 loader 会把 media 关系对象转成 URL 字符串，前台组件不直接关心 MinIO 或 OSS 细节。
 
 ## 发布 Hooks
 

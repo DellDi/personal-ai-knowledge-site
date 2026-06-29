@@ -35,7 +35,10 @@
 - [ ] `docker compose -f infra/docker-compose.local.yml up --build`
 - [ ] Payload CMS 可登录
 - [ ] posts collection 可新建、编辑、发布、下架
-- [ ] media collection 可上传图片到 MinIO
+- [ ] media collection 可上传图片、音频和附件到 MinIO
+- [ ] podcast 音频文件使用上传控件并能在前台播放
+- [ ] audioBlock / imageBlock 使用上传控件并能在 BlockRenderer 中渲染
+- [ ] resources 上传附件可作为资源链接打开
 - [ ] 8 个 collection 可在 CMS 后台访问
 - [ ] 设置 `CMS_API_URL` 后本地 MDX 与 CMS published 内容混合加载
 - [ ] CMS 不可达时 5s 超时优雅降级，保留本地内容，不阻塞构建
@@ -61,6 +64,7 @@
 - [ ] `docker compose -f infra/docker-compose.prod.yml config` 通过
 - [ ] 生产栈不启动 MinIO
 - [ ] Payload CMS 使用阿里云 OSS 上传媒体成功
+- [ ] 生产 OSS 图片、音频、附件 URL 可被前台页面直接访问
 - [ ] `web-build` 可从 CMS 拉取内容并生成 `dist/client`、`dist/server` 和 Pagefind 索引
 - [ ] `web` 使用 Astro Node server 启动，`/preview` SSR 可用
 - [ ] 1Panel / Nginx 将 `www` 反代到 `127.0.0.1:8080`

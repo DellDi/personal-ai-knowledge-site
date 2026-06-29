@@ -21,6 +21,7 @@
     "@payloadcms/next": "^3.0.0",
     "@payloadcms/richtext-lexical": "^3.85.1",
     "@payloadcms/storage-s3": "^3.0.0",
+    "@payloadcms/translations": "^3.85.1",
     "@personal-ai-knowledge-site/content-contract": "workspace:*",
     "graphql": "^16.9.0",
     "next": "^16.0.0",

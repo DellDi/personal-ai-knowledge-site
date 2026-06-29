@@ -40,6 +40,7 @@
 - `infra/docker-compose.local.yml` 已建立 PostgreSQL + MinIO + CMS 本地开发栈。
 - `infra/docker-compose.prod.yml` 已建立 PostgreSQL + CMS + Nginx 前台生产运行栈，生产媒体走阿里云 OSS。
 - posts collection 已支持草稿版本、S3 媒体配置和结构化 Block 字段。
+- 站内媒体已统一走 Payload `media` collection：文章封面、专题封面、播客封面、播客音频、Audio/Image Block、资源附件和播客单集附件都可通过上传控件写入 MinIO / OSS。
 
 ## 进行中
 
@@ -65,7 +66,7 @@
 
 - 本地 Docker 后端栈仍需完整验证：`docker compose -f infra/docker-compose.local.yml up --build`。
 - 生产 Docker 栈仍需服务器验证：`docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms`。
-- CMS 登录、posts CRUD、图片上传、Payload API 读取仍需真实环境联调。
+- CMS 登录、posts CRUD、图片/音频/附件上传、Payload API 读取仍需真实环境联调。
 - 使用真实 CMS 数据构建 Astro 页面仍需端到端验收，尤其是 BlockRenderer 和 OSS 媒体 URL。
 - Pagefind 目前是基础搜索；集合筛选、标签筛选和内容地图页仍未完成。
 - 其余集合虽然已可从 CMS 加载 richText 正文，但 BlockRenderer 暂时只在 posts / knowledge 详情页启用。
@@ -76,7 +77,7 @@
 ### P0
 
 - 让 `infra/docker-compose.local.yml` 在本机完整跑通。
-- 打通 Payload CMS 登录、posts 新建、图片上传。
+- 打通 Payload CMS 登录、posts 新建、图片/音频/附件上传。
 - 用真实 CMS posts 数据验证 Astro 构建、列表页、详情页、RSS、Sitemap、Pagefind。
 - 用阿里云 OSS 测一轮生产 S3_* 配置，确认上传 URL 与前台渲染。
 

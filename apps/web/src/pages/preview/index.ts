@@ -75,6 +75,24 @@ function escapeHtml(value: unknown): string {
     .replace(/'/g, '&#39;');
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function stringValue(value: unknown): string | undefined {
+  return typeof value === 'string' && value.length > 0 ? value : undefined;
+}
+
+function mediaURL(value: unknown): string | undefined {
+  if (typeof value === 'string') return value;
+  if (!isRecord(value)) return undefined;
+  return stringValue(value.url) ?? stringValue(value.filename);
+}
+
+function blockColumns(value: unknown): 2 | 3 | 4 | undefined {
+  return value === 2 || value === 3 || value === 4 ? value : undefined;
+}
+
 const BLOCK_TYPE_MAP: Record<string, Block['type']> = {
   richTextBlock: 'richText',
   calloutBlock: 'callout',
@@ -89,12 +107,118 @@ const BLOCK_TYPE_MAP: Record<string, Block['type']> = {
 };
 
 function normalizeBlock(block: unknown): Block | undefined {
-  if (!block || typeof block !== 'object') return undefined;
-  const record = block as Record<string, unknown>;
-  const rawType = typeof record.type === 'string' ? record.type : typeof record.blockType === 'string' ? record.blockType : '';
+  if (!isRecord(block)) return undefined;
+  const rawType = stringValue(block.type) ?? stringValue(block.blockType) ?? '';
   const type = BLOCK_TYPE_MAP[rawType] ?? rawType;
-  if (!type) return undefined;
-  return { ...record, type } as Block;
+
+  if (type === 'richText') {
+    const content = stringValue(block.content);
+    return content ? { type: 'richText', content } : undefined;
+  }
+  if (type === 'callout') {
+    const content = stringValue(block.content);
+    if (!content) return undefined;
+    const variant = block.variant === 'tip' || block.variant === 'warning' || block.variant === 'danger' ? block.variant : 'info';
+    return { type: 'callout', variant, title: stringValue(block.title), content };
+  }
+  if (type === 'code') {
+    const code = stringValue(block.code);
+    return code ? { type: 'code', language: stringValue(block.language), filename: stringValue(block.filename), code } : undefined;
+  }
+  if (type === 'audio') {
+    const src = mediaURL(block.file);
+    return src
+      ? {
+          type: 'audio',
+          src,
+          title: stringValue(block.title),
+          duration: stringValue(block.duration),
+          download: mediaURL(block.downloadFile),
+        }
+      : undefined;
+  }
+  if (type === 'image') {
+    const src = mediaURL(block.image);
+    const alt = stringValue(block.alt);
+    return src && alt
+      ? {
+          type: 'image',
+          src,
+          alt,
+          caption: stringValue(block.caption),
+          source: stringValue(block.source),
+        }
+      : undefined;
+  }
+  if (type === 'quote') {
+    const content = stringValue(block.content);
+    return content
+      ? {
+          type: 'quote',
+          content,
+          author: stringValue(block.author),
+          source: stringValue(block.source),
+          url: stringValue(block.url),
+        }
+      : undefined;
+  }
+  if (type === 'embed') {
+    const src = stringValue(block.src);
+    const ratio = block.ratio === '4-3' || block.ratio === '1-1' ? block.ratio : '16-9';
+    return src ? { type: 'embed', src, title: stringValue(block.title), ratio } : undefined;
+  }
+  if (type === 'steps') {
+    const items = Array.isArray(block.items)
+      ? block.items
+          .map((item) => {
+            if (typeof item === 'string') return item;
+            return isRecord(item) ? stringValue(item.text) : undefined;
+          })
+          .filter((item): item is string => Boolean(item))
+      : [];
+    return items.length > 0 ? { type: 'steps', title: stringValue(block.title), items } : undefined;
+  }
+  if (type === 'statGrid') {
+    const items = Array.isArray(block.items)
+      ? block.items
+          .map((item) => {
+            if (!isRecord(item)) return undefined;
+            const value = stringValue(item.value);
+            const label = stringValue(item.label);
+            return value && label ? { value, label } : undefined;
+          })
+          .filter((item): item is { value: string; label: string } => Boolean(item))
+      : [];
+    return items.length > 0 ? { type: 'statGrid', columns: blockColumns(block.columns), items } : undefined;
+  }
+  if (type === 'compareTable') {
+    const columns = Array.isArray(block.columns)
+      ? block.columns
+          .map((column) => {
+            if (!isRecord(column)) return undefined;
+            const key = stringValue(column.key);
+            const label = stringValue(column.label);
+            return key && label ? { key, label, highlight: column.highlight === true } : undefined;
+          })
+          .filter((column): column is { key: string; label: string; highlight: boolean } => Boolean(column))
+      : [];
+    const rows = Array.isArray(block.rows)
+      ? block.rows
+          .map((row) => {
+            const data = isRecord(row) && isRecord(row.data) ? row.data : row;
+            if (!isRecord(data)) return undefined;
+            return Object.fromEntries(
+              Object.entries(data)
+                .filter(([, value]) => value !== undefined && value !== null)
+                .map(([key, value]) => [key, String(value)]),
+            );
+          })
+          .filter((row): row is Record<string, string> => Boolean(row))
+      : [];
+    return columns.length > 0 ? { type: 'compareTable', caption: stringValue(block.caption), columns, rows } : undefined;
+  }
+
+  return undefined;
 }
 
 function renderBlocks(blocks: unknown): string {
