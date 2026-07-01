@@ -133,9 +133,10 @@ const topics = defineCollection({
 });
 
 const projects = defineCollection({
-  loader: collectionLoader('projects', ['role', 'stack', 'links', 'contentBlocks']),
+  loader: collectionLoader('projects', ['role', 'stack', 'links', 'cover', 'contentBlocks']),
   schema: z.object({
     ...common,
+    cover: z.string().optional(),
     role: z.string().optional(),
     stack: z.array(z.string()).default([]),
     links: z
@@ -151,9 +152,10 @@ const projects = defineCollection({
 });
 
 const resources = defineCollection({
-  loader: collectionLoader('resources', ['type', 'url']),
+  loader: collectionLoader('resources', ['type', 'url', 'cover']),
   schema: z.object({
     ...common,
+    cover: z.string().optional(),
     type: z.enum(RESOURCE_TYPES),
     url: z.string().optional(),
   }),

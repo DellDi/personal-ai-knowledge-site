@@ -9,6 +9,7 @@ updated: 2026-06-27
 tags: ["Astro", "知识库", "AI Agent"]
 status: "published"
 featured: true
+cover: "/images/projects/personal-ai-knowledge-site.svg"
 role: "产品与工程实践"
 stack: ["Astro", "React", "Tailwind CSS", "Pagefind", "Docker"]
 links:

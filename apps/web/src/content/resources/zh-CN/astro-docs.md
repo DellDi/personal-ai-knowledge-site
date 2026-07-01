@@ -9,6 +9,7 @@ updated: 2026-06-27
 tags: ["Astro", "官方文档", "前端工程"]
 status: "published"
 featured: true
+cover: "/images/resources/astro-docs.svg"
 type: "tool"
 url: "https://docs.astro.build/"
 ---

@@ -11,6 +11,7 @@ tags:
   - 书籍
 status: published
 featured: false
+cover: /images/resources/systems-thinking.svg
 type: book
 url: https://book.douban.com
 ---

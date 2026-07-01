@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Card from './Card.astro';
+import CardCover from './CardCover.astro';
 import Tag from './Tag.astro';
 import { getEntryPath } from '../lib/content';
 import { ui, type Locale } from '../lib/i18n';
@@ -16,14 +17,17 @@ const t = ui[locale];
 
 <Card href={getEntryPath('projects', entry)}>
   <article class="project-card">
-    <p>{entry.data.role ?? t.projectFallbackRole}</p>
-    <h3>{entry.data.title}</h3>
-    <span>{entry.data.description}</span>
-    <div class="stack">
-      {entry.data.stack.map((item) => <strong>{item}</strong>)}
-    </div>
-    <div class="tags">
-      {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+    <CardCover src={entry.data.cover} alt={entry.data.title} fallback={entry.data.title} />
+    <div class="content">
+      <p>{entry.data.role ?? t.projectFallbackRole}</p>
+      <h3>{entry.data.title}</h3>
+      <span>{entry.data.description}</span>
+      <div class="stack">
+        {entry.data.stack.map((item) => <strong>{item}</strong>)}
+      </div>
+      <div class="tags">
+        {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+      </div>
     </div>
   </article>
 </Card>
@@ -31,7 +35,14 @@ const t = ui[locale];
 <style>
   .project-card {
     display: grid;
+    grid-template-columns: minmax(120px, 34%) 1fr;
+    gap: clamp(16px, 3vw, 28px);
+  }
+
+  .content {
+    display: grid;
     gap: 14px;
+    align-content: start;
   }
 
   p {
@@ -68,5 +79,11 @@ const t = ui[locale];
     color: #111111;
     font-family: var(--font-mono);
     font-size: 0.74rem;
+  }
+
+  @media (max-width: 520px) {
+    .project-card {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

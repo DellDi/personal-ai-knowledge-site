@@ -147,6 +147,7 @@ export const projects: CollectionConfig = {
   },
   fields: [
     ...commonContentFields(),
+    mediaUploadField({ name: 'cover', label: '项目封面', mimeType: 'image' }),
     { name: 'role', type: 'text', label: '我的角色', admin: { placeholder: '例如 全栈工程师 / 架构设计 / 产品共创' } },
     { name: 'stack', type: 'text', label: '技术栈', hasMany: true, defaultValue: [] },
     {
@@ -183,6 +184,7 @@ export const resources: CollectionConfig = {
   },
   fields: [
     ...commonContentFields(),
+    mediaUploadField({ name: 'cover', label: '资源封面', mimeType: 'image' }),
     { name: 'type', type: 'select', label: '资源类型', required: true, options: resourceTypeOptions },
     {
       name: 'url',

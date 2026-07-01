@@ -13,7 +13,7 @@ items:
   - "post-astro-content-platform-foundation"
   - "knowledge-agent-workflow"
   - "podcast-agent-content-platform"
-hero: "/images/topic-astro-content-platform.png"
+hero: "/images/topics/astro-content-platform.svg"
 ---
 
 ## 专题说明

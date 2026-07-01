@@ -11,6 +11,7 @@ tags:
   - 项目复盘
 status: published
 featured: true
+cover: /images/projects/knowledge-site.svg
 role: 独立设计与开发
 stack:
   - Astro

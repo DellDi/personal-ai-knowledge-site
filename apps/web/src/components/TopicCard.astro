@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Card from './Card.astro';
+import CardCover from './CardCover.astro';
 import Tag from './Tag.astro';
 import { getEntryPath } from '../lib/content';
 import { ui, type Locale } from '../lib/i18n';
@@ -16,11 +17,14 @@ const t = ui[locale];
 
 <Card href={getEntryPath('topics', entry)}>
   <article class="topic-card">
-    <p>{locale === 'zh-CN' ? `${entry.data.items.length} 个${t.topicLinkedItems}` : `${entry.data.items.length} ${t.topicLinkedItems}`}</p>
-    <h3>{entry.data.title}</h3>
-    <span>{entry.data.description}</span>
-    <div>
-      {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+    <CardCover src={entry.data.hero} alt={entry.data.title} fallback={entry.data.title} />
+    <div class="content">
+      <p>{locale === 'zh-CN' ? `${entry.data.items.length} 个${t.topicLinkedItems}` : `${entry.data.items.length} ${t.topicLinkedItems}`}</p>
+      <h3>{entry.data.title}</h3>
+      <span>{entry.data.description}</span>
+      <div>
+        {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+      </div>
     </div>
   </article>
 </Card>
@@ -28,7 +32,14 @@ const t = ui[locale];
 <style>
   .topic-card {
     display: grid;
+    grid-template-columns: minmax(120px, 34%) 1fr;
+    gap: clamp(16px, 3vw, 28px);
+  }
+
+  .content {
+    display: grid;
     gap: 14px;
+    align-content: start;
   }
 
   p {
@@ -55,5 +66,11 @@ const t = ui[locale];
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+  }
+
+  @media (max-width: 520px) {
+    .topic-card {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

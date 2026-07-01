@@ -11,6 +11,7 @@ tags:
   - 工具
 status: published
 featured: false
+cover: /images/resources/astro.svg
 type: tool
 url: https://astro.build
 ---
