@@ -101,6 +101,8 @@ web
   -> 服务 /preview 和 /healthz
 ```
 
+生产 `web` 使用 `Dockerfile.web-runtime`，不在启动镜像时执行 Astro build；`dist` 只由 `web-build` 写入 `web_dist` volume。
+
 生产 webhook 推荐指向服务器上的受保护重建入口，由它执行：
 
 ```bash

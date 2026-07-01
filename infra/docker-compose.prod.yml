@@ -15,6 +15,14 @@ services:
     image: postgres:16-alpine
     container_name: cks-prod-postgres
     env_file: *prod-env-file
+    # 2GB 服务器优化：限制 PostgreSQL 内存占用到 100-150MB
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c effective_cache_size=256MB
+      -c work_mem=4MB
+      -c maintenance_work_mem=32MB
+      -c max_connections=50
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -48,37 +56,50 @@ services:
       retries: 3
     logging: *default-logging
 
+  cms-init:
+    build:
+      context: ..
+      dockerfile: apps/cms/Dockerfile
+      target: init
+    container_name: cks-prod-cms-init
+    profiles:
+      - init
+    env_file: *prod-env-file
+    environment:
+      # Payload only applies db.push during initialization outside production.
+      NODE_ENV: development
+      NODE_OPTIONS: --max-old-space-size=512
+      PAYLOAD_FORCE_DRIZZLE_PUSH: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    logging: *default-logging
+
   web-build:
-    image: node:24-alpine
+    build:
+      context: ..
+      dockerfile: Dockerfile.web-build
     container_name: cks-prod-web-build
     profiles:
       - build
-    working_dir: /app
+    working_dir: /app/apps/web
     env_file: *prod-env-file
     environment:
       NODE_ENV: production
-      NODE_OPTIONS: --max-old-space-size=768
+      NODE_OPTIONS: --max-old-space-size=512
       CMS_API_URL: http://cms:3000/api
     depends_on:
       cms:
         condition: service_healthy
     volumes:
-      - ..:/app
       - web_dist:/app/apps/web/dist
-      - pnpm_store:/pnpm/store
-    command: >
-      sh -c "
-      corepack enable &&
-      pnpm config set store-dir /pnpm/store &&
-      pnpm install --frozen-lockfile &&
-      pnpm -C apps/web build
-      "
+    command: ["pnpm", "build"]
     logging: *default-logging
 
   web:
     build:
       context: ..
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.web-runtime
     image: personal-ai-knowledge-site-web:latest
     container_name: cks-prod-web
     env_file: *prod-env-file
@@ -86,7 +107,7 @@ services:
       NODE_ENV: production
       HOST: 0.0.0.0
       PORT: 4321
-      NODE_OPTIONS: --max-old-space-size=512
+      NODE_OPTIONS: --max-old-space-size=256
       CMS_API_URL: http://cms:3000/api
     volumes:
       - web_dist:/app/apps/web/dist:ro
@@ -104,4 +125,3 @@ services:
 volumes:
   postgres_data:
   web_dist:
-  pnpm_store:

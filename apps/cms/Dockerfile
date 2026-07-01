@@ -15,6 +15,7 @@ WORKDIR /app/apps/cms
 CMD ["sh", "-c", "pnpm db:init && pnpm seed:profile"]
 
 FROM source AS build
+ENV NODE_OPTIONS=--max-old-space-size=512
 RUN pnpm --filter @personal-ai-knowledge-site/cms build
 
 FROM node:22-alpine AS runtime

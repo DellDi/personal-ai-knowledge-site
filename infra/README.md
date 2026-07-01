@@ -62,17 +62,20 @@ cp infra/env/production.example.env infra/env/production.env
 
 `docker-compose.prod.yml` 的 `production.env` 在 `config` 校验时可缺省，便于本地检查；真实部署前仍必须创建并填写该文件。
 
-2. 启动数据库和 CMS：
+2. 启动数据库并初始化 CMS 数据结构：
 
 ```bash
-docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms
+docker compose -f infra/docker-compose.prod.yml up -d --build postgres
+docker compose -f infra/docker-compose.prod.yml --profile init run --rm cms-init
+docker compose -f infra/docker-compose.prod.yml up -d --build cms
 ```
 
-生产环境需要在首次启动或内容模型变更后执行数据库迁移/初始化；不要用本地 `db.push` 代替生产迁移。
+`cms-init` 会运行 `pnpm db:init && pnpm seed:profile`。首次部署或内容模型变更后需要执行；它只在初始化阶段用 `NODE_ENV=development` 显式执行 schema push，常驻 `cms` 仍使用 `NODE_ENV=production`。
 
 3. 构建前台产物：
 
 ```bash
+docker compose -f infra/docker-compose.prod.yml --profile build build web-build
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
 ```
 
@@ -81,6 +84,7 @@ docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-bui
 4. 启动前台 Astro Node server：
 
 ```bash
+docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml up -d web
 ```
 
@@ -145,3 +149,12 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 ```
 
 Astro 前台进程只负责服务公开页面、`/preview` 和 `/healthz`，不直接执行系统重建命令。
+
+代码、依赖、Astro 配置或本地 content 变更后，先串行重建镜像，再运行一次 `web-build`：
+
+```bash
+docker compose -f infra/docker-compose.prod.yml --profile build build web-build
+docker compose -f infra/docker-compose.prod.yml build web
+docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
+docker compose -f infra/docker-compose.prod.yml up -d web
+```

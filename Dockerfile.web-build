@@ -1,0 +1,20 @@
+FROM node:24-alpine
+ENV NODE_OPTIONS=--max-old-space-size=512
+
+WORKDIR /app
+RUN corepack enable
+
+# 预装依赖到镜像层，构建时跳过 pnpm install
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/package.json
+COPY packages/content-contract/package.json packages/content-contract/package.json
+RUN pnpm install --frozen-lockfile --filter @personal-ai-knowledge-site/web...
+
+# 复制源码（构建时通过 volume 覆盖 dist）
+COPY packages/content-contract packages/content-contract
+COPY apps/web apps/web
+
+WORKDIR /app/apps/web
+
+# 构建时只执行 astro build，不再装依赖
+CMD ["pnpm", "build"]
