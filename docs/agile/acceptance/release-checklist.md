@@ -49,7 +49,7 @@
 ## 发布工作流
 
 - [ ] `REBUILD_WEBHOOK_URL` 未配置时，CMS 保存内容不报错
-- [ ] 配置 `REBUILD_WEBHOOK_URL` 后，published 发送 `publish` payload
+- [ ] 配置 `REBUILD_WEBHOOK_URL` 和 `REBUILD_WEBHOOK_TOKEN` 后，published 发送 `publish` payload
 - [ ] draft / archived 发送 `unpublish` payload
 - [ ] 删除内容发送 `delete` payload
 - [ ] `/preview/[collection]/[id]` 可读取 CMS 草稿

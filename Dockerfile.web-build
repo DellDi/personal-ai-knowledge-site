@@ -1,8 +1,12 @@
-FROM node:24-alpine
+ARG NODE_IMAGE=node:22-alpine
+ARG PNPM_VERSION=11.7.0
+
+FROM ${NODE_IMAGE}
+ARG PNPM_VERSION
 ENV NODE_OPTIONS=--max-old-space-size=512
 
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g pnpm@${PNPM_VERSION}
 
 # 预装依赖到镜像层，构建时跳过 pnpm install
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./

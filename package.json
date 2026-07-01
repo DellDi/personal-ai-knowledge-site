@@ -16,7 +16,8 @@
     "infra:local": "docker compose -f infra/docker-compose.local.yml up --build",
     "infra:prod:up": "docker compose -f infra/docker-compose.prod.yml up -d --build postgres cms",
     "infra:prod:build-web": "docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build",
-    "infra:prod:web": "docker compose -f infra/docker-compose.prod.yml up -d web"
+    "infra:prod:web": "docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web",
+    "infra:prod:webhook": "node infra/rebuild-webhook.mjs"
   },
   "packageManager": "pnpm@11.7.0"
 }

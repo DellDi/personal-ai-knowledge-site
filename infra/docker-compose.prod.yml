@@ -10,6 +10,10 @@ x-prod-env-file: &prod-env-file
   - path: ./env/production.env
     required: false
 
+x-node-build-args: &node-build-args
+  NODE_IMAGE: node:22-alpine
+  PNPM_VERSION: 11.7.0
+
 services:
   postgres:
     image: postgres:16-alpine
@@ -37,6 +41,7 @@ services:
     build:
       context: ..
       dockerfile: apps/cms/Dockerfile
+      args: *node-build-args
     container_name: cks-prod-cms
     env_file: *prod-env-file
     environment:
@@ -46,7 +51,9 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "127.0.0.1:3000:3000"
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/access"]
@@ -61,6 +68,7 @@ services:
       context: ..
       dockerfile: apps/cms/Dockerfile
       target: init
+      args: *node-build-args
     container_name: cks-prod-cms-init
     profiles:
       - init
@@ -79,6 +87,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile.web-build
+      args: *node-build-args
     container_name: cks-prod-web-build
     profiles:
       - build
@@ -100,6 +109,7 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile.web-runtime
+      args: *node-build-args
     image: personal-ai-knowledge-site-web:latest
     container_name: cks-prod-web
     env_file: *prod-env-file
@@ -112,7 +122,7 @@ services:
     volumes:
       - web_dist:/app/apps/web/dist:ro
     ports:
-      - "127.0.0.1:8080:4321"
+      - "8080:4321"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4321/healthz"]

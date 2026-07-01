@@ -13,17 +13,25 @@ function getWebhookURL(): string | undefined {
   return process.env.REBUILD_WEBHOOK_URL ?? undefined;
 }
 
+function getWebhookToken(): string | undefined {
+  return process.env.REBUILD_WEBHOOK_TOKEN ?? undefined;
+}
+
 async function notifyWebhook(payload: WebhookPayload): Promise<void> {
   const url = getWebhookURL();
   if (!url) return;
 
+  const token = getWebhookToken();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
 
   try {
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: JSON.stringify(payload),
       signal: controller.signal,
     });

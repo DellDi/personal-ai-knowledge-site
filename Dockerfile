@@ -1,6 +1,10 @@
-FROM node:24-alpine AS deps
+ARG NODE_IMAGE=node:22-alpine
+ARG PNPM_VERSION=11.7.0
+
+FROM ${NODE_IMAGE} AS deps
+ARG PNPM_VERSION
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g pnpm@${PNPM_VERSION}
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
 COPY packages/content-contract/package.json packages/content-contract/package.json
@@ -12,7 +16,7 @@ COPY apps/web apps/web
 COPY packages/content-contract packages/content-contract
 RUN pnpm -C apps/web build
 
-FROM node:24-alpine AS runtime
+FROM ${NODE_IMAGE} AS runtime
 WORKDIR /app/apps/web
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0

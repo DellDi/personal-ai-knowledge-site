@@ -61,6 +61,7 @@ docker compose -f infra/docker-compose.prod.yml --profile build build web-build
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
 docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml up -d web
+pnpm infra:prod:webhook
 ```
 
 说明：
@@ -69,7 +70,9 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 - `cms-init` 是一次性初始化任务，用于创建 Payload 数据库结构和种子内容；首次部署或内容模型变更后运行。它只在初始化阶段使用 `NODE_ENV=development` 并显式执行 schema push，常驻 `cms` 仍使用 `NODE_ENV=production`。
 - `web-build` 是一次性构建任务，不常驻；它把 Astro 产物写入 `web_dist` volume。
 - `web` 使用 `Dockerfile.web-runtime`，不执行 Astro build，只读取 `web_dist` volume 并启动 `node dist/server/entry.mjs`。
+- `rebuild-webhook` 是宿主机上的轻量 Node 原生 HTTP 服务，只接收受保护的 CMS 发布通知，并串行执行前台重建。
 - `cms` 和 `web` 只绑定 `127.0.0.1`，公网入口交给 1Panel / Nginx。
+- CMS 容器通过 `host.docker.internal` 调用宿主机 webhook；`docker-compose.prod.yml` 已给 `cms` 配置 `host-gateway`。
 - 每次 CMS 内容发布后，推荐由 webhook 触发 `web-build`，再重启或滚动更新 `web`。
 
 ## 环境变量
@@ -82,14 +85,17 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 DATABASE_URI=postgres://content:YOUR_PASSWORD@postgres:5432/content_platform
 PAYLOAD_SECRET=YOUR_RANDOM_SECRET
 PAYLOAD_ENABLE_AUTOLOGIN=false
-PAYLOAD_PUBLIC_SERVER_URL=https://cms.example.com
-PAYLOAD_CORS_ORIGINS=https://www.example.com,https://cms.example.com
-PAYLOAD_CSRF_ORIGINS=https://www.example.com,https://cms.example.com
+PAYLOAD_PUBLIC_SERVER_URL=http://delldiagi.top
+PAYLOAD_CORS_ORIGINS=http://delldiagi.top,http://delldiagi.top
+PAYLOAD_CSRF_ORIGINS=http://delldiagi.top,http://delldiagi.top
 
 CMS_API_URL=http://cms:3000/api
-CMS_ADMIN_URL=https://cms.example.com/admin
+CMS_ADMIN_URL=http://delldiagi.top/admin
 CMS_API_TOKEN=your-preview-token
-REBUILD_WEBHOOK_URL=https://deploy.example.com/hooks/rebuild-personal-site
+REBUILD_WEBHOOK_URL=http://host.docker.internal:4000/hooks/rebuild-personal-site
+REBUILD_WEBHOOK_TOKEN=your-random-rebuild-webhook-token
+WEBHOOK_HOST=0.0.0.0
+WEBHOOK_PORT=4000
 
 S3_ENDPOINT=https://oss-cn-hangzhou.aliyuncs.com
 S3_REGION=oss-cn-hangzhou
@@ -124,7 +130,7 @@ psql "postgres://content:YOUR_PASSWORD@YOUR_PROD_HOST:5432/content_platform" < c
 
 ## 发布重建
 
-Payload CMS 的发布 hooks 会在内容发布、下架或删除时向 `REBUILD_WEBHOOK_URL` 发送 JSON payload。这个 URL 应该指向受保护的部署编排入口，例如服务器脚本或 CI/CD deploy hook。
+Payload CMS 的发布 hooks 会在内容发布、下架或删除时向 `REBUILD_WEBHOOK_URL` 发送 JSON payload。生产默认指向宿主机上的 `infra/rebuild-webhook.mjs`，由它验证 token 后执行固定的前台重建命令。
 
 推荐把“代码/依赖部署”和“内容发布重建”分开。
 
@@ -134,14 +140,14 @@ Payload CMS 的发布 hooks 会在内容发布、下架或删除时向 `REBUILD_
 docker compose -f infra/docker-compose.prod.yml --profile build build web-build
 docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
-docker compose -f infra/docker-compose.prod.yml up -d web
+docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```
 
 仅 CMS 内容发布、下架或删除后：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
-docker compose -f infra/docker-compose.prod.yml up -d web
+docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```
 
 第一版不让 Astro 进程直接执行重建命令，避免把前台运行时变成远程命令执行入口。
@@ -157,6 +163,7 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 当前生产栈针对 2GB 内存服务器做了以下优化：
 
 - PostgreSQL 限制 `shared_buffers=64MB`、`max_connections=50`，内存占用压到 100–150MB
+- CMS 和 Web Dockerfile 统一使用 `node:22-alpine`，并固定 `pnpm@11.7.0`，避免 2GB 服务器重复拉取 Node 22 与 Node 24 两套基础镜像层，也减少 Corepack 临时下载的不确定性
 - `web-build` 使用预装依赖镜像（`Dockerfile.web-build`），内容发布重建时只跑 `astro build` + `pagefind`，不再执行 `pnpm install`
 - `web` 使用运行时镜像（`Dockerfile.web-runtime`），启动时只执行 `node dist/server/entry.mjs`
 - CMS、普通前台镜像和 `web-build` 的 Node build 阶段使用 `NODE_OPTIONS=--max-old-space-size=512` 控制 V8 heap 峰值
@@ -170,7 +177,7 @@ docker compose -f infra/docker-compose.prod.yml up -d web
 | PostgreSQL | 常驻 | 100–150 MB |
 | Payload CMS | 常驻 | 300–400 MB |
 | Astro Web | 常驻 | 100–200 MB |
-| Webhook 接收端 | 常驻 | 50–80 MB |
+| Node webhook | 常驻 | 30–60 MB |
 | Nginx / 1Panel | 常驻 | 50–100 MB |
 | OS + Docker | 常驻 | 300–400 MB |
 | **常驻合计** | | **900–1330 MB** |
@@ -203,13 +210,46 @@ swap 比物理内存慢，但能防止构建时 OOM 杀死进程。构建完成�
 
 ### Webhook 接收端
 
-webhook 接收端是宿主机上的轻量服务（50–80MB），负责：
+`rebuild-webhook` 是 [infra/rebuild-webhook.mjs](../../infra/rebuild-webhook.mjs) 单文件 Node 原生 HTTP 服务（约 30–60MB），部署在宿主机上，负责：
 
 1. 接收 CMS 发布通知
-2. 验证 Bearer token
-3. 异步触发 `web-build` + 重启 `web`
+2. 验证 `Authorization: Bearer $REBUILD_WEBHOOK_TOKEN`
+3. 异步、串行触发 `web-build`
+4. 用 `docker compose up -d --force-recreate --no-deps web` 重启前台，使新的 `dist` 生效
 
-推荐用 Fastify 实现，监听 `127.0.0.1:4000`，由 Nginx 反代到 `deploy.example.com/hooks/rebuild`。
+在宿主机仓库根目录启动：
+
+```bash
+pnpm infra:prod:webhook
+```
+
+该服务默认读取 `infra/env/production.env`，也可以通过 `WEBHOOK_ENV_FILE` 指定环境变量文件。线上建议用 systemd 常驻：
+
+```ini
+[Unit]
+Description=Personal AI Knowledge Site rebuild webhook
+After=docker.service network.target
+
+[Service]
+WorkingDirectory=/path/to/personal-ai-knowledge-site
+Environment=WEBHOOK_ENV_FILE=/path/to/personal-ai-knowledge-site/infra/env/production.env
+ExecStart=/usr/bin/node infra/rebuild-webhook.mjs
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+CMS 容器直连宿主机时推荐：
+
+```env
+REBUILD_WEBHOOK_URL=http://host.docker.internal:4000/hooks/rebuild-personal-site
+REBUILD_WEBHOOK_TOKEN=your-random-rebuild-webhook-token
+WEBHOOK_HOST=0.0.0.0
+```
+
+如果改用 Nginx 反代 `deploy.example.com` 到 `127.0.0.1:4000`，则 `WEBHOOK_HOST` 可以设回 `127.0.0.1`，并把 `REBUILD_WEBHOOK_URL` 改成对应 HTTPS 地址。不要去掉 Bearer token，不要把 4000 端口裸露到公网。
 
 不建议同时常驻：
 

@@ -56,7 +56,7 @@
 ### 发布工作流
 
 - Payload 8 个内容集合已接入发布 hooks。
-- `REBUILD_WEBHOOK_URL` 未配置时不影响 CMS 保存；配置后发布、下架、删除会发送 webhook payload。
+- `REBUILD_WEBHOOK_URL` 未配置时不影响 CMS 保存；配置后发布、下架、删除会发送 webhook payload，并可通过 `REBUILD_WEBHOOK_TOKEN` 调用受保护的宿主机 `rebuild-webhook` 服务。
 - Astro 已新增 `/preview/[collection]/[id]` 和 `/preview?collection=&id=` SSR 草稿预览端点。
 - 预览端点使用 `CMS_API_URL` / `CMS_API_TOKEN` 读取 CMS 草稿，并保持 noindex。
 - `/zh-CN/admin` 已从纯预留壳调整为 noindex 发布运营看板，展示 CMS 跳转、数据源、Webhook、预览端点、搜索索引、构建状态、集合计数和最近发布；`/en/admin` 保留英文看板。
@@ -70,7 +70,7 @@
 - 使用真实 CMS 数据构建 Astro 页面仍需端到端验收，尤其是 BlockRenderer 和 OSS 媒体 URL。
 - Pagefind 目前是基础搜索；集合筛选、标签筛选和内容地图页仍未完成。
 - 其余集合虽然已可从 CMS 加载 richText 正文，但 BlockRenderer 暂时只在 posts / knowledge 详情页启用。
-- 真实服务器 webhook 重建、评论、Meilisearch、AI RAG 仍是后续目标。
+- 真实服务器 webhook 重建仍需上线联调；评论、Meilisearch、AI RAG 仍是后续目标。
 
 ## 当前优先级
 
@@ -84,7 +84,7 @@
 ### P1
 
 - 补充 CMS 试点使用说明和环境变量说明。
-- 在服务器上联调 `REBUILD_WEBHOOK_URL` 到部署脚本或 CI hook。
+- 在服务器上联调 `REBUILD_WEBHOOK_URL` 到宿主机 `rebuild-webhook`，验证发布后自动 `web-build` 并刷新前台。
 - 使用真实 `CMS_API_TOKEN` 验证草稿预览读取非公开内容。
 
 ### P2

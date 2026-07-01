@@ -11,7 +11,7 @@
 | 第三轮 | CMS 后台基座 | 已完成基础实现 | Payload CMS、PostgreSQL、MinIO、内容契约层已落地；本地 Docker 联调仍需持续验证 |
 | 第四轮 | Astro ↔ CMS 试点 | 已完成基础实现 | cmsLoader、5s 超时降级、admin 状态看板已实现 |
 | 第五轮 | Block 渲染层与全集合迁移 | 已完成基础实现 | BlockRenderer、全集合条件 loader、本地 + CMS 混合加载已落地，待真实 CMS 数据验收 |
-| 第六轮 | 发布工作流 | 已完成基础实现 | Payload webhook、Astro SSR 草稿预览、发布状态机、admin 发布看板、Node SSR 部署口子已落地，待服务器真实 webhook 联调 |
+| 第六轮 | 发布工作流 | 已完成基础实现 | Payload webhook、Astro SSR 草稿预览、发布状态机、admin 发布看板、Node SSR 部署口子和宿主机 Node 重建入口已落地，待服务器真实 webhook 联调 |
 | 第七轮以后 | 评论、搜索升级、AI 索引 | 未开始 | 作为平台化增强目标保留 |
 
 ## 第一轮：平台骨架（已完成）
@@ -101,7 +101,7 @@
 
 待服务器验证：
 
-- `REBUILD_WEBHOOK_URL` 指向真实部署脚本或 CI hook
+- `REBUILD_WEBHOOK_URL` 指向宿主机 `rebuild-webhook`，并配置 `REBUILD_WEBHOOK_TOKEN`
 - `CMS_API_TOKEN` 读取非公开草稿
 - 发布 / 下架 / 删除后触发 `web-build` 并刷新前台
 

@@ -89,7 +89,7 @@ Astro 端的 BlockRenderer 已按 type 映射到 `apps/web/src/components/docs/`
 - `status: draft` / `status: archived`：发送 `unpublish`
 - 删除文档：发送 `delete`
 
-Webhook 由 `REBUILD_WEBHOOK_URL` 控制，未配置时跳过，不影响 CMS 保存。
+Webhook 由 `REBUILD_WEBHOOK_URL` 控制，未配置时跳过，不影响 CMS 保存。配置 `REBUILD_WEBHOOK_TOKEN` 后，CMS 会用 `Authorization: Bearer $REBUILD_WEBHOOK_TOKEN` 调用受保护的重建入口。
 
 ## 访问控制
 

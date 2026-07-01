@@ -1,6 +1,10 @@
-FROM node:22-alpine AS deps
+ARG NODE_IMAGE=node:22-alpine
+ARG PNPM_VERSION=11.7.0
+
+FROM ${NODE_IMAGE} AS deps
+ARG PNPM_VERSION
 WORKDIR /app
-RUN corepack enable
+RUN npm install -g pnpm@${PNPM_VERSION}
 COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml ./
 COPY apps/cms/package.json apps/cms/package.json
 COPY packages/content-contract/package.json packages/content-contract/package.json
@@ -18,9 +22,8 @@ FROM source AS build
 ENV NODE_OPTIONS=--max-old-space-size=512
 RUN pnpm --filter @personal-ai-knowledge-site/cms build
 
-FROM node:22-alpine AS runtime
+FROM ${NODE_IMAGE} AS runtime
 WORKDIR /app
-RUN corepack enable
 ENV NODE_ENV=production
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/apps/cms/node_modules ./apps/cms/node_modules

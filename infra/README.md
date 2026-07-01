@@ -88,15 +88,23 @@ docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml up -d web
 ```
 
+5. 在宿主机启动发布重建 webhook：
+
+```bash
+pnpm infra:prod:webhook
+```
+
 生产容器只绑定本机端口：
 
 - 前台：`127.0.0.1:8080`
 - CMS：`127.0.0.1:3000`
+- 发布重建 webhook：宿主机 Node 进程，默认 `127.0.0.1:4000`；容器直连宿主机时设为 `0.0.0.0:4000`
 
 用 1Panel / Nginx 再反代：
 
 - `www.example.com` → `127.0.0.1:8080`
 - `cms.example.com` → `127.0.0.1:3000`
+- 可选：`deploy.example.com` → `127.0.0.1:4000`，必须保留 Bearer token 鉴权
 - `assets.example.com` → 阿里云 OSS / CDN CNAME
 
 ## OSS 切换与迁移
@@ -141,14 +149,24 @@ psql "postgres://content:YOUR_PASSWORD@YOUR_PROD_HOST:5432/content_platform" < c
 
 ## 发布重建
 
-CMS 发布 hooks 使用 `REBUILD_WEBHOOK_URL` 通知外部部署入口。这个入口应由服务器脚本、CI/CD 或受保护的内部服务承接，然后执行：
+CMS 发布 hooks 使用 `REBUILD_WEBHOOK_URL` 通知受保护的宿主机 `rebuild-webhook` 服务。容器直连宿主机时推荐在 `infra/env/production.env` 中使用：
+
+```env
+REBUILD_WEBHOOK_URL=http://host.docker.internal:4000/hooks/rebuild-personal-site
+REBUILD_WEBHOOK_TOKEN=CHANGE_ME_RANDOM_REBUILD_WEBHOOK_TOKEN
+WEBHOOK_HOST=0.0.0.0
+```
+
+CMS hook 会用 `Authorization: Bearer $REBUILD_WEBHOOK_TOKEN` 发送通知。`rebuild-webhook` 接收后异步执行：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
-docker compose -f infra/docker-compose.prod.yml up -d web
+docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```
 
 Astro 前台进程只负责服务公开页面、`/preview` 和 `/healthz`，不直接执行系统重建命令。
+
+`rebuild-webhook` 在宿主机直接执行固定 compose 命令，不需要挂载 Docker socket。如果需要外部触发，使用 Nginx 反代到 `127.0.0.1:4000`，并保持 token 鉴权。
 
 代码、依赖、Astro 配置或本地 content 变更后，先串行重建镜像，再运行一次 `web-build`：
 
@@ -156,5 +174,5 @@ Astro 前台进程只负责服务公开页面、`/preview` 和 `/healthz`，不�
 docker compose -f infra/docker-compose.prod.yml --profile build build web-build
 docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
-docker compose -f infra/docker-compose.prod.yml up -d web
+docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```

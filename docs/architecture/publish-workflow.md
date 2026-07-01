@@ -103,11 +103,19 @@ web
 
 生产 `web` 使用 `Dockerfile.web-runtime`，不在启动镜像时执行 Astro build；`dist` 只由 `web-build` 写入 `web_dist` volume。
 
-生产 webhook 推荐指向服务器上的受保护重建入口，由它执行：
+生产 webhook 推荐指向宿主机的 Node `rebuild-webhook` 服务：
+
+```env
+REBUILD_WEBHOOK_URL=http://host.docker.internal:4000/hooks/rebuild-personal-site
+REBUILD_WEBHOOK_TOKEN=your-random-rebuild-webhook-token
+WEBHOOK_HOST=0.0.0.0
+```
+
+CMS hook 会带 `Authorization: Bearer $REBUILD_WEBHOOK_TOKEN`。`rebuild-webhook` 验证后异步、串行执行：
 
 ```bash
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
-docker compose -f infra/docker-compose.prod.yml up -d web
+docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```
 
-第一版不在 Astro 运行时内部执行重建命令。
+`rebuild-webhook` 部署在宿主机上，使用 Node 原生 HTTP 服务执行固定 compose 命令。容器直连宿主机时监听 `0.0.0.0:4000`；如需外部触发，使用 Nginx 反代到 `127.0.0.1:4000` 并保留 Bearer token。Astro 运行时内部仍不执行重建命令。
