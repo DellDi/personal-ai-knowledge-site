@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>GIF 预览</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0a0a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .image-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1a1a1a;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .image-wrapper img {
+      max-width: 100%;
+      max-height: 85vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #666;
+      font-size: 14px;
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #333;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .info {
+      color: #888;
+      font-size: 12px;
+      text-align: center;
+      word-break: break-all;
+      max-width: 100%;
+      padding: 0 10px;
+    }
+
+    .info a {
+      color: #666;
+      text-decoration: none;
+    }
+
+    .info a:hover {
+      color: #aaa;
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #ff4444;
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    /* 移动端优化 */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .image-wrapper img {
+        max-height: 80vh;
+      }
+
+      .info {
+        font-size: 11px;
+      }
+    }
+
+    /* 超大屏幕优化 */
+    @media (min-width: 1440px) {
+      .container {
+        max-width: 1200px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="image-wrapper">
+      <div class="loading" id="loading">加载中</div>
+      <img id="preview-image" src="" alt="GIF 预览" style="display: none;" />
+      <div class="error" id="error" style="display: none;">图片加载失败</div>
+    </div>
+    <div class="info" id="info"></div>
+  </div>
+
+  <script>
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function decodeUrl(url) {
+      try {
+        return decodeURIComponent(url);
+      } catch (e) {
+        return url;
+      }
+    }
+
+    const imageUrl = getQueryParam('url');
+    const img = document.getElementById('preview-image');
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const info = document.getElementById('info');
+
+    if (!imageUrl) {
+      loading.style.display = 'none';
+      error.style.display = 'block';
+      error.textContent = '请提供图片 URL 参数';
+    } else {
+      const decodedUrl = decodeUrl(imageUrl);
+      img.src = decodedUrl;
+
+      img.onload = function() {
+        loading.style.display = 'none';
+        img.style.display = 'block';
+        info.innerHTML = '原图链接：<a href="' + decodedUrl + '" target="_blank" rel="noopener">' + decodedUrl + '</a>';
+      };
+
+      img.onerror = function() {
+        loading.style.display = 'none';
+        error.style.display = 'block';
+        error.textContent = '图片加载失败，请检查链接是否正确';
+      };
+    }
+  </script>
+</body>
+</html>
