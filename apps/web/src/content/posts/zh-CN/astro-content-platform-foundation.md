@@ -9,6 +9,7 @@ updated: 2026-06-27
 tags: ["Astro", "内容平台", "工程架构"]
 status: "published"
 featured: true
+cover: "/images/posts/astro-content-platform-foundation.svg"
 category: "工程架构"
 series: "个人 AI 知识站"
 ---

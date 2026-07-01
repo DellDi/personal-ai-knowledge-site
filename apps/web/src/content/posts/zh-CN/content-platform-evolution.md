@@ -11,6 +11,7 @@ tags:
   - CMS
 status: published
 featured: false
+cover: /images/posts/content-platform-evolution.svg
 category: 工程架构
 ---
 

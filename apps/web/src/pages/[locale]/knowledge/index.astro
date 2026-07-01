@@ -73,11 +73,16 @@ const t = ui[locale];
 
   .knowledge-nav {
     position: sticky;
-    top: 96px;
+    top: var(--sticky-offset);
+    z-index: 20;
     align-self: start;
+    max-height: calc(100vh - var(--sticky-offset) - 16px);
+    max-height: calc(100svh - var(--sticky-offset) - 16px);
     padding: 0;
     border: var(--border-width) solid var(--color-border);
     background: var(--color-surface);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
   }
 
   .knowledge-nav-toggle {
@@ -141,6 +146,7 @@ const t = ui[locale];
 
   .area-section {
     margin-top: 32px;
+    scroll-margin-top: calc(var(--sticky-offset) + 16px);
   }
 
   .area-section:first-of-type {
@@ -197,7 +203,8 @@ const t = ui[locale];
     }
 
     .knowledge-nav {
-      position: static;
+      max-height: min(56vh, calc(100vh - var(--sticky-offset) - 16px));
+      max-height: min(56svh, calc(100svh - var(--sticky-offset) - 16px));
     }
   }
 </style>

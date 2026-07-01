@@ -12,6 +12,7 @@ featured: true
 episode: 1
 season: 1
 audio: "/audio/placeholder.mp3"
+cover: "/images/podcast/agent-content-platform.svg"
 duration: "18:00"
 transcript: true
 hosts: ["周夏"]

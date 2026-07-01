@@ -101,9 +101,10 @@ const podcast = defineCollection({
 });
 
 const posts = defineCollection({
-  loader: collectionLoader('posts', ['contentBlocks']),
+  loader: collectionLoader('posts', ['cover', 'contentBlocks']),
   schema: z.object({
     ...common,
+    cover: z.string().optional(),
     date: z.coerce.date(),
     category: z.string(),
     series: z.string().optional(),

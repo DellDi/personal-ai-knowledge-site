@@ -28,8 +28,13 @@ const items = headings.filter((heading) => heading.depth > 1 && heading.depth < 
 <style>
   .toc {
     position: sticky;
-    top: 96px;
+    top: var(--sticky-offset);
+    z-index: 20;
     align-self: start;
+    max-height: calc(100vh - var(--sticky-offset) - 16px);
+    max-height: calc(100svh - var(--sticky-offset) - 16px);
+    overflow-y: auto;
+    scrollbar-gutter: stable;
     padding: 16px;
     border: var(--border-width) solid var(--color-border);
     background: var(--color-surface);
@@ -66,7 +71,8 @@ const items = headings.filter((heading) => heading.depth > 1 && heading.depth < 
 
   @media (max-width: 1080px) {
     .toc {
-      position: static;
+      max-height: min(52vh, calc(100vh - var(--sticky-offset) - 16px));
+      max-height: min(52svh, calc(100svh - var(--sticky-offset) - 16px));
     }
   }
 </style>

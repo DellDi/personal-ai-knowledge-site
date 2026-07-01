@@ -19,6 +19,7 @@
   --radius-sm: 4px;
   --container: 1180px;
   --content: 760px;
+  --sticky-offset: 88px;
   --font-display: "Newsreader", Georgia, serif;
   --font-body: "Public Sans", Arial, sans-serif;
   --font-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
@@ -48,6 +49,7 @@ html {
   color: var(--color-ink);
   font-family: var(--font-body);
   overflow-x: hidden;
+  scroll-padding-top: calc(var(--sticky-offset) + 16px);
   text-size-adjust: 100%;
 }
 
@@ -61,6 +63,13 @@ body {
     var(--color-bg);
   background-size: 32px 32px;
   color: var(--color-ink);
+}
+
+@supports (overflow: clip) {
+  html,
+  body {
+    overflow-x: clip;
+  }
 }
 
 a {
@@ -190,6 +199,18 @@ svg {
 @media (max-width: 720px) {
   .container {
     width: min(100% - 32px, var(--container));
+  }
+}
+
+@media (max-width: 940px) {
+  :root {
+    --sticky-offset: 136px;
+  }
+}
+
+@media (max-width: 520px) {
+  :root {
+    --sticky-offset: 214px;
   }
 }
 

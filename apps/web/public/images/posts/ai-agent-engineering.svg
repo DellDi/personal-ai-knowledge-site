@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="AI Agent 工程化实践封面">
+  <rect width="800" height="600" fill="#f4f0e8"/>
+  <rect x="0" y="0" width="800" height="600" fill="none" stroke="#111111" stroke-width="4"/>
+  <rect x="32" y="32" width="736" height="536" fill="none" stroke="#111111" stroke-width="2"/>
+  <rect x="60" y="60" width="140" height="36" fill="#ff4d00" stroke="#111111" stroke-width="2"/>
+  <text x="130" y="85" font-family="Space Mono, monospace" font-size="16" font-weight="700" fill="#111111" text-anchor="middle">AI Agent</text>
+  <rect x="220" y="60" width="140" height="36" fill="#dfff00" stroke="#111111" stroke-width="2"/>
+  <text x="290" y="85" font-family="Space Mono, monospace" font-size="16" font-weight="700" fill="#111111" text-anchor="middle">Engineering</text>
+  <text x="60" y="220" font-family="Newsreader, Georgia, serif" font-size="64" font-weight="800" fill="#111111">从套壳到</text>
+  <text x="60" y="310" font-family="Newsreader, Georgia, serif" font-size="64" font-weight="800" fill="#111111">可维护系统</text>
+  <rect x="60" y="340" width="420" height="4" fill="#111111"/>
+  <text x="60" y="390" font-family="Public Sans, Arial, sans-serif" font-size="24" fill="#655d54">提示词 · 工具编排 · 上下文 · 评估</text>
+  <rect x="680" y="480" width="80" height="40" fill="#dfff00" stroke="#111111" stroke-width="2"/>
+  <text x="720" y="506" font-family="Space Mono, monospace" font-size="18" font-weight="700" fill="#111111" text-anchor="middle">A</text>
+</svg>

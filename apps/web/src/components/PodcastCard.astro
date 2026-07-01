@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import Badge from './Badge.astro';
 import Card from './Card.astro';
+import CardCover from './CardCover.astro';
 import Tag from './Tag.astro';
 import { formatDate, getEntryPath } from '../lib/content';
 import { ui, type Locale } from '../lib/i18n';
@@ -12,27 +13,45 @@ interface Props {
 }
 
 const { entry, locale } = Astro.props;
+const href = getEntryPath('podcast', entry);
 ---
 
-<Card href={getEntryPath('podcast', entry)}>
+<Card>
   <article class="podcast-card">
-    <div class="topline">
-      <Badge tone="accent">S{entry.data.season} EP{entry.data.episode}</Badge>
-      <span>{formatDate(entry.data.date, locale)}</span>
+    <a class="cover-link focus-ring" href={href} aria-label={entry.data.title}>
+      <CardCover src={entry.data.cover} alt={entry.data.title} fallback={entry.data.title} />
+    </a>
+    <div class="content">
+      <div class="topline">
+        <Badge tone="accent">S{entry.data.season} EP{entry.data.episode}</Badge>
+        <span>{formatDate(entry.data.date, locale)}</span>
+      </div>
+      <h3><a class="title-link focus-ring" href={href}>{entry.data.title}</a></h3>
+      <p>{entry.data.description}</p>
+      <div class="tags">
+        {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
+      </div>
+      <a class="listen focus-ring" href={href}>{ui[locale].listen}</a>
     </div>
-    <h3>{entry.data.title}</h3>
-    <p>{entry.data.description}</p>
-    <div class="tags">
-      {entry.data.tags.map((tag) => <Tag tag={tag} locale={locale} />)}
-    </div>
-    <strong>{ui[locale].listen}</strong>
   </article>
 </Card>
 
 <style>
   .podcast-card {
     display: grid;
+    grid-template-columns: minmax(120px, 34%) 1fr;
+    gap: clamp(16px, 3vw, 28px);
+  }
+
+  .cover-link {
+    display: block;
+  }
+
+  .content {
+    display: grid;
     gap: 14px;
+    align-content: start;
+    min-width: 0;
   }
 
   .topline {
@@ -53,6 +72,15 @@ const { entry, locale } = Astro.props;
     line-height: 0.98;
   }
 
+  .title-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .title-link:hover {
+    color: var(--color-accent);
+  }
+
   p {
     margin: 0;
     color: var(--color-muted);
@@ -65,9 +93,21 @@ const { entry, locale } = Astro.props;
     gap: 8px;
   }
 
-  strong {
+  .listen {
     color: var(--color-accent);
     font-family: var(--font-mono);
     font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .listen:hover {
+    color: var(--color-accent-2);
+  }
+
+  @media (max-width: 520px) {
+    .podcast-card {
+      grid-template-columns: 1fr;
+    }
   }
 </style>

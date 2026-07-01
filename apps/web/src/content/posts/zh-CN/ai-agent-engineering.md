@@ -11,6 +11,7 @@ tags:
   - LLM
 status: published
 featured: true
+cover: /images/posts/ai-agent-engineering.svg
 category: AI 实践
 series: AI Agent 工程化
 ---

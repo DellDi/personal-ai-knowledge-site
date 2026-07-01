@@ -1,0 +1,4 @@
+interface:
+  display_name: "CMS 内容迁移"
+  short_description: "把 Markdown/JSON 批量导入 Payload CMS，支持媒体上传。"
+  default_prompt: "把这批文档整理为标准导入 JSON，并用 dry-run 校验后导入 CMS。"
