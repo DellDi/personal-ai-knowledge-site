@@ -176,3 +176,107 @@ docker compose -f infra/docker-compose.prod.yml build web
 docker compose -f infra/docker-compose.prod.yml --profile build run --rm web-build
 docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps web
 ```
+
+## 本地手动部署（`pnpm deploy:web`）
+
+适用于阿里云 ECS 等无法稳定拉取 GitHub 代码的服务器。脚本通过 **rsync 或 tar+ssh 管道上传本地源码**到服务器，再 SSH 执行 docker 重建前台。**私钥只保留在本地 `~/.ssh`，不进入仓库、不进入 CI**，且只在手动执行时才部署。
+
+### 1. 配置
+
+复制模板并填写：
+
+```bash
+cp infra/env/deploy.example.env infra/env/deploy.env
+cp infra/env/ssh_config.example infra/env/ssh_config
+```
+
+`deploy.env` 关键项：
+
+| 变量 | 说明 |
+|---|---|
+| `DEPLOY_SSH_HOST` | `ssh_config` 中的 Host 别名，脚本执行 `ssh -F ssh_config $HOST ...` |
+| `DEPLOY_PROJECT_DIR` | 服务器上项目根目录绝对路径，同步目标、SSH 命令工作目录 |
+| `DEPLOY_SSH_CONFIG` | 项目内 SSH 配置路径，默认 `infra/env/ssh_config`；不存在则回退到 `~/.ssh/config` |
+| `DEPLOY_COMPOSE_FILE` | compose 文件相对路径，默认 `infra/docker-compose.prod.yml` |
+| `DEPLOY_STEP_TIMEOUT` | 单步超时秒数，默认 `1800`（30 分钟，构建较慢时用） |
+
+`ssh_config` 示例（从 `ssh_config.example` 复制后修改）：
+
+```
+Host mysite
+  HostName 1.2.3.4
+  User deploy
+  Port 22
+  IdentityFile ~/.ssh/id_ed25519
+  IdentitiesOnly yes
+  StrictHostKeyChecking accept-new
+  ServerAliveInterval 30
+```
+
+`deploy.env` 和 `ssh_config` 均被 `.gitignore` 忽略，不会进入版本库。私钥本身保留在 `~/.ssh/`，配置文件只引用路径。
+
+### 2. 同步方式：rsync 与 tar+ssh 管道
+
+脚本**自动检测**本地是否安装 `rsync`：
+
+- **有 rsync**：使用 `rsync -avz --progress -e ssh` 增量同步，只传变更文件，速度快。
+- **无 rsync**（如 Windows 未安装）：自动回退到 `tar -czf - ... | ssh ... tar -xzf -` 管道方案，全量压缩传输，无需额外安装。
+
+两种方式共享相同的排除规则，服务器 `infra/env/production.env` 永不被覆盖。
+
+### 3. 前置条件
+
+- **本地**：`ssh` 必须可用（Windows 自带 OpenSSH）；`rsync` 可选（有则增量、无则 tar 回退）；`tar` 在 Windows 10+ 自带。
+- **服务器**：`ssh` + `tar` 必须可用（Linux 默认都有）；`rsync` 仅在本地也用 rsync 时需要。
+- 服务器上 `DEPLOY_PROJECT_DIR` 的**父目录**需已存在。
+- 服务器上需自行维护 `infra/env/production.env`（同步已排除 `infra/env/*.env`，不会被覆盖）。
+
+### 4. 排除规则
+
+与 `.dockerignore` 对齐，并额外保护服务器本地配置：
+
+- 排除：`.git`、`node_modules`、`apps/*/dist`、`apps/*/.astro`、`.cache`、`.pagefind`、`coverage`、`.env*`、`infra/env/*.env` 等
+- **保留**：服务器 `infra/env/production.env` 永不被覆盖
+
+### 5. 使用
+
+```bash
+# 全流程：上传源码 → build web-build → run web-build → recreate web
+pnpm deploy:web
+
+# 跳过源码上传，用服务器现有代码重建
+pnpm deploy:web -- --skip-sync
+
+# 跳过 docker build（适合无 Dockerfile 变更，直接 run）
+pnpm deploy:web -- --skip-build
+
+# 只 force-recreate web 容器，最快重启（不传代码不构建）
+pnpm deploy:web -- --only-recreate
+
+# docker build 加 --no-cache
+pnpm deploy:web -- --no-build-cache
+
+# rsync 删除服务器上本地已不存在的文件（仅 rsync 模式生效，首次不建议用）
+pnpm deploy:web -- --delete
+
+# 只打印将执行的命令，不连接服务器（验证计划用）
+pnpm deploy:web -- --dry-run
+
+# 查看帮助
+pnpm deploy:web -- --help
+```
+
+### 6. 失败续跑
+
+任一步骤失败脚本会立即中止并返回非零退出码。修复后可用 `--skip-*` 跳过已完成的步骤续跑，例如 `web-build` 已成功但 `web` 容器没起来：
+
+```bash
+pnpm deploy:web -- --skip-sync --skip-build
+```
+
+### 7. 与 webhook 的关系
+
+- `pnpm deploy:web`：**代码 + 前台**变更时用，从本地主动触发，会先上传最新源码。
+- `rebuild-webhook`（`infra/rebuild-webhook.mjs`）：**仅内容发布**时用，由 CMS hook 触发，不上传代码，只重建前台产物。
+
+两者互补：改代码用 `deploy:web`，纯 CMS 发内容用 webhook。

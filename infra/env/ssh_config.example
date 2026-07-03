@@ -1,0 +1,28 @@
+# 项目内 SSH 客户端配置模板
+# 复制为 ssh_config 后填写：cp infra/env/ssh_config.example infra/env/ssh_config
+# ssh_config 已被 .gitignore 忽略，不会进入版本库。
+#
+# 用法：deploy.mjs 通过 `ssh -F infra/env/ssh_config` 与
+#       `rsync -e "ssh -F infra/env/ssh_config"` 引用本文件，
+#       不依赖全局 ~/.ssh/config。
+#
+# 私钥本身仍保留在本地 ~/.ssh/，这里只引用路径，不复制密钥内容。
+
+Host mysite
+  # 服务器公网 IP 或域名
+  HostName 1.2.3.4
+  # SSH 登录用户
+  User deploy
+  # SSH 端口，默认 22，改过就填实际端口
+  Port 22
+  # 本地私钥路径（保留在 ~/.ssh，不进仓库）
+  IdentityFile ~/.ssh/id_ed25519
+  # 只用指定密钥，避免 agent 里其他 key 导致 Too many authentication failures
+  IdentitiesOnly yes
+  # 跳过首次连接 host key 确认（自动化部署用；追求安全可去掉并预先 ssh-keyscan）
+  StrictHostKeyChecking accept-new
+  # 保持连接，避免长构建中途断线
+  ServerAliveInterval 30
+  ServerAliveCountMax 4
+  # 压缩传输，rsync 小文件多时略快
+  Compression yes

@@ -17,3 +17,5 @@ coverage/
 !.env.example
 infra/env/*.env
 !infra/env/*.example.env
+infra/env/ssh_config
+!infra/env/ssh_config.example
