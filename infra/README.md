@@ -238,19 +238,42 @@ Host mysite
 - 排除：`.git`、`node_modules`、`apps/*/dist`、`apps/*/.astro`、`.cache`、`.pagefind`、`coverage`、`.env*`、`infra/env/*.env` 等
 - **保留**：服务器 `infra/env/production.env` 永不被覆盖
 
-### 5. 使用
+### 5. 部署目标（`--target`）
+
+脚本支持多实例服务重建，通过 `--target` 选择目标：
+
+| 目标 | 重建内容 | 适用场景 |
+|---|---|---|
+| `all`（默认） | CMS + 前台 web | 代码变更涉及前后端 |
+| `web` | 仅前台 web | 只改了 `apps/web` 或前台配置 |
+| `cms` | 仅 CMS | 只改了 `apps/cms` 或 Payload 配置 |
+
+CMS 重建先于 web，因为 `web-build` 依赖 `cms` healthy。`postgres` 不在部署范围内（数据持久化，不重建）。
+
+**`--with-init`**：重建 CMS 时同时跑 `cms-init` 同步数据库 schema（`db push + seed`）。仅在内容模型变更后需要，日常重建不用加。
+
+### 6. 使用
 
 ```bash
-# 全流程：上传源码 → build web-build → run web-build → recreate web
+# 全流程：上传源码 → 重建 cms → 重建 web（默认 --target all）
 pnpm deploy:web
+
+# 只重建前台 web
+pnpm deploy:web -- --target web
+
+# 只重建 CMS
+pnpm deploy:web -- --target cms
+
+# 重建 CMS 并跑 cms-init 同步 schema（内容模型变更后用）
+pnpm deploy:web -- --target cms --with-init
 
 # 跳过源码上传，用服务器现有代码重建
 pnpm deploy:web -- --skip-sync
 
-# 跳过 docker build（适合无 Dockerfile 变更，直接 run）
+# 跳过 docker build（适合无 Dockerfile 变更，直接 run/recreate）
 pnpm deploy:web -- --skip-build
 
-# 只 force-recreate web 容器，最快重启（不传代码不构建）
+# 只 force-recreate 目标容器，最快重启（不传代码不构建）
 pnpm deploy:web -- --only-recreate
 
 # docker build 加 --no-cache
@@ -266,17 +289,17 @@ pnpm deploy:web -- --dry-run
 pnpm deploy:web -- --help
 ```
 
-### 6. 失败续跑
+### 7. 失败续跑
 
-任一步骤失败脚本会立即中止并返回非零退出码。修复后可用 `--skip-*` 跳过已完成的步骤续跑，例如 `web-build` 已成功但 `web` 容器没起来：
+任一步骤失败脚本会立即中止并返回非零退出码。修复后可用 `--skip-*` 跳过已完成的步骤续跑，例如 CMS 已重建成功但 web 没起来：
 
 ```bash
-pnpm deploy:web -- --skip-sync --skip-build
+pnpm deploy:web -- --target web --skip-sync
 ```
 
-### 7. 与 webhook 的关系
+### 8. 与 webhook 的关系
 
-- `pnpm deploy:web`：**代码 + 前台**变更时用，从本地主动触发，会先上传最新源码。
+- `pnpm deploy:web`：**代码 + 服务**变更时用，从本地主动触发，会先上传最新源码，可重建 CMS 和/或 web。
 - `rebuild-webhook`（`infra/rebuild-webhook.mjs`）：**仅内容发布**时用，由 CMS hook 触发，不上传代码，只重建前台产物。
 
 两者互补：改代码用 `deploy:web`，纯 CMS 发内容用 webhook。
