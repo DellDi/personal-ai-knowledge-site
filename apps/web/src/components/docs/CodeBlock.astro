@@ -5,17 +5,49 @@ interface Props {
   language?: string;
   filename?: string;
   code: string;
+  /** 折叠阈值：超过该行数自动折叠，设为 0 则不自动折叠 */
+  collapseThreshold?: number;
 }
 
-const { language, filename, code } = Astro.props;
+const { language, filename, code, collapseThreshold = 12 } = Astro.props;
+const lineCount = code.split('\n').length;
+const autoCollapse = collapseThreshold > 0 && lineCount > collapseThreshold;
 ---
 
-<figure class="code-block" data-pagefind-ignore>
+<figure
+  class:list={['code-block', { 'is-collapsed': autoCollapse }]}
+  data-code-block
+  data-collapsed={autoCollapse ? 'true' : 'false'}
+  data-pagefind-ignore
+>
   <figcaption>
-    {filename && <span>{filename}</span>}
-    {language && <Badge>{language}</Badge>}
+    <div class="caption-meta">
+      {filename && <span class="caption-filename">{filename}</span>}
+      {language && <Badge>{language}</Badge>}
+      {lineCount > 1 && <span class="caption-lines">{lineCount} 行</span>}
+    </div>
+    <div class="caption-actions">
+      <button type="button" class="code-action code-copy focus-ring" data-action="copy" aria-label="复制代码">
+        <svg class="icon icon-copy" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+        <svg class="icon icon-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span class="action-label">复制</span>
+      </button>
+      <button type="button" class="code-action code-collapse focus-ring" data-action="collapse" aria-label={autoCollapse ? '展开代码' : '折叠代码'} aria-expanded={!autoCollapse}>
+        <svg class="icon icon-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+        <span class="action-label">{autoCollapse ? '展开' : '折叠'}</span>
+      </button>
+    </div>
   </figcaption>
-  <pre><code>{code}</code></pre>
+  <div class="code-body" data-code-body>
+    <pre><code>{code}</code></pre>
+  </div>
 </figure>
 
 <style>
@@ -23,6 +55,7 @@ const { language, filename, code } = Astro.props;
     margin: 1.6rem 0;
     border: var(--border-width) solid var(--color-border);
     box-shadow: var(--shadow-hard-sm);
+    background: var(--color-code-bg);
   }
 
   figcaption {
@@ -38,8 +71,97 @@ const { language, filename, code } = Astro.props;
     font-size: 0.78rem;
   }
 
-  figcaption span {
+  .caption-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .caption-filename {
     color: var(--color-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .caption-lines {
+    color: var(--color-muted);
+    font-size: 0.72rem;
+    opacity: 0.7;
+  }
+
+  .caption-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .code-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface-strong);
+    color: var(--color-muted);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+  }
+
+  .code-action:hover {
+    background: var(--color-accent-3);
+    color: #111111;
+    border-color: var(--color-border);
+  }
+
+  .code-action:active {
+    transform: translateY(1px);
+  }
+
+  .code-action.is-copied {
+    background: var(--color-accent-3);
+    color: #111111;
+  }
+
+  .icon {
+    flex-shrink: 0;
+  }
+
+  .icon-check {
+    display: none;
+  }
+
+  .code-action.is-copied .icon-copy {
+    display: none;
+  }
+
+  .code-action.is-copied .icon-check {
+    display: block;
+  }
+
+  .action-label {
+    line-height: 1;
+  }
+
+  .code-body {
+    overflow: hidden;
+    transition: max-height 0.24s ease;
+  }
+
+  .code-block:not(.is-collapsed) .code-body {
+    max-height: none;
+  }
+
+  .code-block.is-collapsed .code-body {
+    max-height: 0;
   }
 
   pre {
@@ -57,4 +179,81 @@ const { language, filename, code } = Astro.props;
     font-size: 0.88rem;
     line-height: 1.6;
   }
+
+  /* 折叠状态时图标旋转 */
+  .code-block.is-collapsed .icon-chevron {
+    transform: rotate(-90deg);
+  }
+
+  .icon-chevron {
+    transition: transform 0.2s ease;
+  }
+
+  @media (max-width: 520px) {
+    .action-label {
+      display: none;
+    }
+    .code-action {
+      padding: 6px 8px;
+    }
+    .caption-lines {
+      display: none;
+    }
+  }
 </style>
+
+<script>
+  function initCodeBlocks() {
+    const blocks = document.querySelectorAll<HTMLElement>('[data-code-block]');
+    blocks.forEach((block) => {
+      if (block.dataset.initialized) return;
+      block.dataset.initialized = 'true';
+
+      const copyBtn = block.querySelector<HTMLButtonElement>('[data-action="copy"]');
+      const collapseBtn = block.querySelector<HTMLButtonElement>('[data-action="collapse"]');
+      const codeEl = block.querySelector('code');
+
+      if (copyBtn && codeEl) {
+        copyBtn.addEventListener('click', async () => {
+          const text = codeEl.textContent ?? '';
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+              // execCommand 已废弃但作为 clipboard API 的兜底仍需保留
+              void document.execCommand('copy');
+            } catch {}
+            document.body.removeChild(ta);
+          }
+          copyBtn.classList.add('is-copied');
+          const label = copyBtn.querySelector('.action-label');
+          if (label) label.textContent = '已复制';
+          window.setTimeout(() => {
+            copyBtn.classList.remove('is-copied');
+            if (label) label.textContent = '复制';
+          }, 1800);
+        });
+      }
+
+      if (collapseBtn) {
+        collapseBtn.addEventListener('click', () => {
+          const collapsed = block.classList.toggle('is-collapsed');
+          block.dataset.collapsed = String(collapsed);
+          collapseBtn.setAttribute('aria-expanded', String(!collapsed));
+          collapseBtn.setAttribute('aria-label', collapsed ? '展开代码' : '折叠代码');
+          const label = collapseBtn.querySelector('.action-label');
+          if (label) label.textContent = collapsed ? '展开' : '折叠';
+        });
+      }
+    });
+  }
+
+  initCodeBlocks();
+  document.addEventListener('astro:page-load', initCodeBlocks);
+</script>

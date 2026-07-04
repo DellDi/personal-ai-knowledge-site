@@ -73,6 +73,23 @@ contentBlocks:
     variant: warning
     title: 常见误区
     content: 不要以为接了 RAG 就不会有幻觉。RAG 降低的是"凭记忆编造"的幻觉，但如果检索到的 chunk 本身有错或与问题不相关，模型仍可能基于错误上下文生成错误答案。所以 RAG 的质量很大程度取决于检索质量，不是接了就万事大吉。
+  - type: code
+    language: ts
+    filename: rag-pipeline.ts
+    code: |
+      type RagPipeline = {
+        chunk(text: string): string[];           // 切块
+        embed(chunk: string): number[];          // 向量化
+        store(id: string, vec: number[]): void;  // 写入向量库
+        retrieve(query: string, topK: number): Chunk[];  // 检索
+        generate(query: string, context: Chunk[]): Answer; // 生成
+      };
+
+      // 一次 RAG 查询的完整流程
+      const answer = pipeline.generate(
+        userQuestion,
+        pipeline.retrieve(userQuestion, 5),
+      );
   - type: quote
     content: RAG 不是让模型变聪明，而是让模型有据可查。它把"凭记忆答"变成"查着答"，这一步就能把企业知识库问答的可用性从 demo 提升到生产。
     author: 本站核心观点
