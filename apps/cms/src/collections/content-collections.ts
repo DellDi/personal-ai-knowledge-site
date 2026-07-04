@@ -220,6 +220,7 @@ export const glossary: CollectionConfig = {
     ...commonContentFields(),
     { name: 'aliases', type: 'text', label: '别名', hasMany: true, defaultValue: [] },
     richTextContentField(),
+    contentBlocksField(sharedBlocks),
   ],
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'status', 'updatedAt'] },
 };

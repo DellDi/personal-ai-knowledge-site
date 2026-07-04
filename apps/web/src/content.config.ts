@@ -163,10 +163,11 @@ const resources = defineCollection({
 });
 
 const glossary = defineCollection({
-  loader: collectionLoader('glossary', ['aliases']),
+  loader: collectionLoader('glossary', ['aliases', 'contentBlocks']),
   schema: z.object({
     ...common,
     aliases: z.array(z.string()).default([]),
+    contentBlocks: contentBlocksField,
   }),
 });
 

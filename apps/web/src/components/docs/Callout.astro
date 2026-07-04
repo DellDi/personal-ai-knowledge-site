@@ -11,29 +11,67 @@ const labels: Record<string, string> = {
   warning: '注意',
   danger: '风险',
 };
+const marks: Record<string, string> = {
+  info: 'i',
+  tip: '+',
+  warning: '!',
+  danger: '×',
+};
 ---
 
 <aside class:list={['callout', `callout-${variant}`]} data-pagefind-ignore>
-  <p class="callout-label">{title ?? labels[variant]}</p>
-  <div class="callout-body"><slot /></div>
+  <div class="callout-mark" aria-hidden="true">{marks[variant]}</div>
+  <div class="callout-content">
+    <p class="callout-label">{title ?? labels[variant]}</p>
+    <div class="callout-body"><slot /></div>
+  </div>
 </aside>
 
 <style>
   .callout {
-    margin: 1.6rem 0;
-    padding: 18px 20px;
+    position: relative;
+    margin: 1.8rem 0;
+    display: grid;
+    grid-template-columns: 44px 1fr;
     border: var(--border-width) solid var(--color-border);
     background: var(--color-surface);
     box-shadow: var(--shadow-hard-sm);
+    overflow: hidden;
+  }
+
+  .callout::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--callout-accent, var(--color-accent-2));
+  }
+
+  .callout-mark {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--color-bg);
+    background: var(--callout-accent, var(--color-accent-2));
+    border-right: var(--border-width) solid var(--color-border);
+  }
+
+  .callout-content {
+    padding: 16px 20px 18px;
+    min-width: 0;
   }
 
   .callout-label {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
     font-family: var(--font-mono);
     font-size: 0.78rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    color: var(--callout-accent, var(--color-accent-2));
   }
 
   .callout-body {
@@ -45,39 +83,37 @@ const labels: Record<string, string> = {
   }
 
   .callout-info {
-    border-left-width: 6px;
-  }
-  .callout-info .callout-label {
-    color: var(--color-accent-2);
+    --callout-accent: var(--color-accent-2);
   }
 
   .callout-tip {
-    border-left-width: 6px;
-    border-left-color: var(--color-accent-3);
+    --callout-accent: var(--color-accent-3);
+  }
+  .callout-tip .callout-mark {
+    color: #111111;
   }
   .callout-tip .callout-label {
     color: var(--color-ink);
   }
-  .callout-tip .callout-body {
-    background: color-mix(in srgb, var(--color-accent-3) 12%, transparent);
-    margin: 0 -20px -18px;
-    padding: 12px 20px 18px;
-  }
 
   .callout-warning {
-    border-left-width: 6px;
-    border-left-color: var(--color-accent);
-  }
-  .callout-warning .callout-label {
-    color: var(--color-accent);
+    --callout-accent: var(--color-accent);
   }
 
   .callout-danger {
-    border-left-width: 6px;
-    border-left-color: var(--color-accent);
+    --callout-accent: var(--color-accent);
     background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
   }
-  .callout-danger .callout-label {
-    color: var(--color-accent);
+
+  @media (max-width: 480px) {
+    .callout {
+      grid-template-columns: 36px 1fr;
+    }
+    .callout-mark {
+      font-size: 1.25rem;
+    }
+    .callout-content {
+      padding: 14px 16px 16px;
+    }
   }
 </style>

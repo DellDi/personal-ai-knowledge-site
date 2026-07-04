@@ -100,6 +100,10 @@ function stringValue(value: unknown): string | undefined {
   return typeof value === 'string' && value.length > 0 ? value : undefined;
 }
 
+function numberValue(value: unknown): number | undefined {
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
 function mediaURL(value: unknown): string | undefined {
   if (typeof value === 'string') return value;
   if (!isRecord(value)) return undefined;
@@ -300,13 +304,19 @@ function normalizeBlocks(blocks: unknown): Block[] | undefined {
 }
 
 function normalizePassthroughField(field: string, value: unknown): unknown {
+  if (value === null || value === undefined) return undefined;
   if (field === 'contentBlocks') return normalizeBlocks(value);
   if (field === 'resources') return normalizeResourceLinks(value);
   if (field === 'url') return stringValue(value) ?? mediaURL(value);
+  if (field === 'order') return numberValue(value);
   if (field === 'audio' || field === 'audioFile' || field === 'cover' || field === 'hero' || field === 'asset') {
     return mediaURL(value);
   }
   return value;
+}
+
+function pruneNullishFields(data: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(data).filter(([, value]) => value !== null && value !== undefined));
 }
 
 export function cmsLoader(options: CmsLoaderOptions): Loader {
@@ -388,7 +398,7 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
             date: doc.date,
             updated: doc.updated,
             category: doc.category,
-            series: doc.series,
+            series: stringValue(doc.series),
           };
           for (const field of passthroughFields) {
             const value =
@@ -398,8 +408,9 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
                   ? (doc.url ?? doc.asset)
                   : doc[field];
 
-            if (value !== undefined) {
-              rawData[field] = normalizePassthroughField(field, value);
+            const normalizedValue = normalizePassthroughField(field, value);
+            if (normalizedValue !== undefined) {
+              rawData[field] = normalizedValue;
             }
           }
           if (passthroughFields.includes('contentBlocks') && normalizedBlocks) {
@@ -408,7 +419,7 @@ export function cmsLoader(options: CmsLoaderOptions): Loader {
 
           const data = await ctx.parseData({
             id,
-            data: rawData,
+            data: pruneNullishFields(rawData),
           });
 
           let rendered: { html: string; metadata?: Record<string, unknown> } | undefined;
