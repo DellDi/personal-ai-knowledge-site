@@ -9,7 +9,7 @@ interface Props {
   collapseThreshold?: number;
 }
 
-const { language, filename, code, collapseThreshold = 12 } = Astro.props;
+const { language, filename, code, collapseThreshold = 0 } = Astro.props;
 const lineCount = code.split('\n').length;
 const autoCollapse = collapseThreshold > 0 && lineCount > collapseThreshold;
 ---
