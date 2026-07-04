@@ -650,11 +650,13 @@ async function replaceAsync(input, regex, replacer) {
 function extractCodeBlocks(markdown, blocks) {
   return markdown.replace(/```([^\n`]*)\n([\s\S]*?)```/g, (_match, info, code) => {
     const [language, ...rest] = info.trim().split(/\s+/).filter(Boolean);
+    const normalizedCode = code.replace(/\n$/, '');
+    if (!normalizedCode.trim()) return '\n\n';
     blocks.push({
       blockType: 'codeBlock',
       ...(language ? { language } : {}),
       ...(rest.length > 0 ? { filename: rest.join(' ') } : {}),
-      code: code.replace(/\n$/, ''),
+      code: normalizedCode,
     });
     return '\n\n';
   });
