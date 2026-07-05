@@ -20,4 +20,4 @@ infra/env/*.env
 infra/env/ssh_config
 !infra/env/ssh_config.example
 
-migrations/
+/migrations
