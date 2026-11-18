@@ -32,7 +32,10 @@ const timeline = withPublishHooks(timelineRaw);
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-const enableAutoLogin = process.env.PAYLOAD_ENABLE_AUTOLOGIN === 'true';
+const autoLoginEmail = process.env.PAYLOAD_AUTOLOGIN_EMAIL;
+const autoLoginPassword = process.env.PAYLOAD_AUTOLOGIN_PASSWORD;
+const enableAutoLogin =
+  process.env.PAYLOAD_ENABLE_AUTOLOGIN === 'true' && Boolean(autoLoginEmail && autoLoginPassword);
 const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL ?? 'http://localhost:3000';
 const corsOrigins = process.env.PAYLOAD_CORS_ORIGINS?.split(',').map((origin) => origin.trim()).filter(Boolean) ?? ['*'];
 const csrfOrigins =
@@ -50,8 +53,8 @@ export default buildConfig({
     ...(enableAutoLogin
       ? {
           autoLogin: {
-            email: '875372314@qq.com',
-            password: '123456',
+            email: autoLoginEmail as string,
+            password: autoLoginPassword as string,
           },
         }
       : {}),

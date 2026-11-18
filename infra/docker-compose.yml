@@ -61,6 +61,8 @@ services:
       DATABASE_URI: postgres://content:content_password@postgres:5432/content_platform
       PAYLOAD_SECRET: payload_secret_change_me
       PAYLOAD_ENABLE_AUTOLOGIN: "true"
+      PAYLOAD_AUTOLOGIN_EMAIL: "875372314@qq.com"
+      PAYLOAD_AUTOLOGIN_PASSWORD: "123456"
       PAYLOAD_PUBLIC_SELF_PATH: http://localhost:3000
       PAYLOAD_PUBLIC_SERVER_URL: http://localhost:3000
       PAYLOAD_CORS_ORIGINS: "http://localhost:4321,http://localhost:3000"

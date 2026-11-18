@@ -83,33 +83,37 @@ if (adapter?.requireDrizzleKit && adapter.schema && adapter.drizzle) {
 
 payload.logger.info('Payload database schema initialized.');
 
-const localAdminEmail = '875372314@qq.com';
-const localAdminPassword = '123456';
+const localAdminEmail = process.env.PAYLOAD_AUTOLOGIN_EMAIL;
+const localAdminPassword = process.env.PAYLOAD_AUTOLOGIN_PASSWORD;
 
-const existingAdmin = await payload.find({
-  collection: 'users',
-  depth: 0,
-  limit: 1,
-  overrideAccess: true,
-  where: {
-    email: {
-      equals: localAdminEmail,
-    },
-  },
-});
-
-if (existingAdmin.totalDocs === 0) {
-  await payload.create({
+if (localAdminEmail && localAdminPassword) {
+  const existingAdmin = await payload.find({
     collection: 'users',
-    data: {
-      email: localAdminEmail,
-      name: '本地管理员',
-      password: localAdminPassword,
-    },
+    depth: 0,
+    limit: 1,
     overrideAccess: true,
+    where: {
+      email: {
+        equals: localAdminEmail,
+      },
+    },
   });
 
-  payload.logger.info(`Local CMS admin user created: ${localAdminEmail}`);
+  if (existingAdmin.totalDocs === 0) {
+    await payload.create({
+      collection: 'users',
+      data: {
+        email: localAdminEmail,
+        name: '本地管理员',
+        password: localAdminPassword,
+      },
+      overrideAccess: true,
+    });
+
+    payload.logger.info(`Local CMS admin user created: ${localAdminEmail}`);
+  }
+} else {
+  payload.logger.info('PAYLOAD_AUTOLOGIN_EMAIL / PAYLOAD_AUTOLOGIN_PASSWORD 未设置，跳过创建本地 CMS 管理员。');
 }
 
 await payload.destroy();

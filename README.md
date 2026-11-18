@@ -75,7 +75,7 @@ pnpm infra:local
 - `http://localhost:9001`：MinIO 控制台
 - `http://localhost:4321/zh-CN/admin`：前台发布运营看板
 
-本地 CMS 初始化账号：`875372314@qq.com` / `123456`。
+本地 CMS 初始化账号由环境变量 `PAYLOAD_AUTOLOGIN_EMAIL` / `PAYLOAD_AUTOLOGIN_PASSWORD` 提供（见 `infra/docker-compose.local.yml`）；未设置时 `cms-init` 不会创建账号，生产环境也不应设置。
 
 前台连接 CMS 试点：
 
