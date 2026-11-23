@@ -132,6 +132,29 @@ services:
       retries: 3
     logging: *default-logging
 
+  mcp:
+    build:
+      context: ..
+      dockerfile: apps/mcp/Dockerfile
+      args: *node-build-args
+    container_name: cks-prod-mcp
+    env_file: *prod-env-file
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3300
+      NODE_OPTIONS: --max-old-space-size=256
+    ports:
+      - "127.0.0.1:13300:3300"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3300/healthz"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+    logging: *default-logging
+
 volumes:
   postgres_data:
   web_dist:

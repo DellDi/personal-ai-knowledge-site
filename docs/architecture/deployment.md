@@ -152,6 +152,28 @@ docker compose -f infra/docker-compose.prod.yml up -d --force-recreate --no-deps
 
 第一版不让 Astro 进程直接执行重建命令，避免把前台运行时变成远程命令执行入口。
 
+## MCP 附件服务
+
+`apps/mcp` 提供 Streamable HTTP 的 MCP 端点 `/mcp`。工具 `create_upload` 为附件签发预签名 PUT 地址，文件由客户端直接上传到 OSS，服务器不中转文件内容。
+
+- 鉴权：`Authorization: Bearer $MCP_BEARER_TOKEN`，`/healthz` 无需 token。
+- 存储：与 CMS 共用 `S3_*` 中的 endpoint、region、bucket，但凭据使用专用的 `MCP_S3_ACCESS_KEY_ID` / `MCP_S3_SECRET_ACCESS_KEY`，与 CMS 隔离。对象写入 `mcp/YYYY/MM/` 前缀，bucket 为公开读时 `publicUrl` 可直接访问。
+- 上传流程：调用 `create_upload` 拿到 `uploadUrl` 与 `requiredHeaders`，然后执行 `curl -X PUT -H "Content-Type: <mimeType>" -H "Content-Length: <size>" --data-binary @<文件> "<uploadUrl>"`。签名已绑定 Content-Type 和 Content-Length，与声明不一致会被 OSS 拒绝。
+- 端口：容器内 `3300`，宿主机只绑定 `127.0.0.1:13300`。
+- 反代：`mcp.<域名>` → `127.0.0.1:13300`，必须是 HTTPS。Host 头会按 `MCP_ALLOWED_HOSTS` 校验，所以反代要保留 `Host $host`。
+
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:13300;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_buffering off;
+    proxy_read_timeout 300s;
+}
+```
+
+环境变量见 `infra/env/production.example.env` 中的 `MCP_*`。`MCP_BEARER_TOKEN` 需要长随机串，不要使用短口令。
+
 ## 健康检查
 
 - 前台 Astro Node server：`/healthz`

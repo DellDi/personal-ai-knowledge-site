@@ -98,6 +98,7 @@ pnpm infra:prod:webhook
 
 - 前台：`127.0.0.1:8080`
 - CMS：`127.0.0.1:3000`
+- MCP 附件服务：`127.0.0.1:13300`
 - 发布重建 webhook：宿主机 Node 进程，默认 `127.0.0.1:4000`；容器直连宿主机时绑定 Docker 网关 IP（`docker network inspect bridge` 的 Gateway，如 `10.255.0.1`），不要使用 `0.0.0.0`；若用 systemd 托管，unit 里的 `Environment=WEBHOOK_HOST` 会覆盖 env 文件
 
 CMS 管理后台不要对公网开放：生产环境必须保持 `PAYLOAD_ENABLE_AUTOLOGIN=false`，且不要为 3000 端口在安全组或 Nginx 里开放公网入口；运维时通过 SSH 隧道访问：`ssh -L 3000:127.0.0.1:3000 <服务器>`，再打开 `http://localhost:3000/admin`。此方式下 `PAYLOAD_PUBLIC_SERVER_URL`、`CMS_ADMIN_URL`、`PAYLOAD_CORS_ORIGINS`、`PAYLOAD_CSRF_ORIGINS` 均使用 `http://localhost:3000` 系列地址。
@@ -106,6 +107,7 @@ CMS 管理后台不要对公网开放：生产环境必须保持 `PAYLOAD_ENABLE
 
 - `www.example.com` → `127.0.0.1:8080`
 - `cms.example.com` → `127.0.0.1:3000`
+- `mcp.example.com` → `127.0.0.1:13300`（HTTPS，详见 `docs/architecture/deployment.md` 的 MCP 附件服务）
 - 可选：`deploy.example.com` → `127.0.0.1:4000`，必须保留 Bearer token 鉴权
 - `assets.example.com` → 阿里云 OSS / CDN CNAME
 
