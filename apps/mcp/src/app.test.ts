@@ -98,6 +98,20 @@ describe('create_upload tool', () => {
     assert.ok(body.error || body.result?.isError);
   });
 
+  it('接受新增的文档、压缩包、图片音视频、字体与静态资源类型', async () => {
+    for (const mimeType of ['application/msword', 'application/rtf', 'application/x-7z-compressed', 'image/heic', 'video/quicktime', 'audio/flac', 'font/woff2', 'text/css', 'text/javascript']) {
+      const body = await readRpc(await callCreateUpload({ filename: 'x', mimeType, size: 10 }));
+      assert.ok(body.result && !body.result.isError, mimeType);
+    }
+  });
+
+  it('拒绝可在浏览器中直接执行脚本的类型', async () => {
+    for (const mimeType of ['application/xhtml+xml', 'image/svg+xml']) {
+      const body = await readRpc(await callCreateUpload({ filename: 'x', mimeType, size: 10 }));
+      assert.ok(body.error || body.result?.isError, mimeType);
+    }
+  });
+
   it('拒绝超过上限的文件', async () => {
     const body = await readRpc(
       await callCreateUpload({ filename: 'x.pdf', mimeType: 'application/pdf', size: 2 * 1024 * 1024 }),
